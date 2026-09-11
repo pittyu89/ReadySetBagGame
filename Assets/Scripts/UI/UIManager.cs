@@ -1,0 +1,381 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+using TMPro;
+
+public class UIManager : MonoBehaviour
+{
+    [Header("Left Menu Panels")]
+    [SerializeField] private GameObject optionsPanel;
+    [SerializeField] private GameObject howToPlayPanel;
+    [SerializeField] private GameObject aboutPanel;
+    [SerializeField] private GameObject switchPanel;
+
+    [Header("User Display")]
+    [SerializeField] private TextMeshProUGUI userDisplayName;
+    [SerializeField] private TextMeshProUGUI studentIdText;
+    [SerializeField] private Image statusIcon;
+    [SerializeField] private GameObject playerCard;
+    [SerializeField] private Image avatarImage;
+    [SerializeField] private Sprite femaleAvatarSprite;
+    [SerializeField] private Sprite maleAvatarSprite;
+
+    [Header("Main Menu Buttons")]
+    [SerializeField] private Button optionsButton;
+    [SerializeField] private Button howToPlayMenuButton;
+    [SerializeField] private Button aboutButton;
+    [SerializeField] private Button switchButton;       // Customize button
+    [SerializeField] private Button exitButton;
+    [SerializeField] private Button logoutButton;          // Inside Options panel
+    [SerializeField] private Button optionsPanelCloseButton;
+    [SerializeField] private Button howToPlayPanelCloseButton;
+    [SerializeField] private Button aboutPanelCloseButton;
+
+    [Header("Play Menu Panels")]
+    [SerializeField] private GameObject teacherSessionPanel;
+    [SerializeField] private GameObject offlineModePanel;
+    [SerializeField] private GameObject teacherSessionHelpPanel;
+    [SerializeField] private GameObject offlineModeHelpPanel;
+    [SerializeField] private GameObject joinRoomPanel;
+    [SerializeField] private GameObject difficultyPanel;
+
+    [Header("Play Menu Buttons")]
+    [SerializeField] private Button playButton;         // Main PLAY button
+    [SerializeField] private Button teacherSessionQuestionButton;
+    [SerializeField] private Button offlineModeQuestionButton;
+    [SerializeField] private Button teacherSessionPlayButton;
+    [SerializeField] private Button offlineModePlayButton;  // Offline Mode PLAY button
+    [SerializeField] private Button startGameButton;    // START button on difficulty panel
+    [SerializeField] private Button backArrowButton;
+    [SerializeField] private Button teacherSessionHelpCloseButton;
+    [SerializeField] private Button offlineModeHelpCloseButton;
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip mainMenuBGM;
+    [SerializeField] private AudioClip buttonClickAudio;
+
+    private const string SELECTED_CHARACTER_SUFFIX = "_SelectedCharacter";
+
+    private GameObject currentLeftMenuPanel;
+    private Stack<string> navigationStack = new Stack<string>();
+
+    void Start()
+    {
+        // Hide all panels initially
+        HideAllPanels();
+
+        // Initialize the user display name
+        UpdateUserDisplayName();
+        RefreshAvatar();
+        if (optionsButton != null)
+            optionsButton.onClick.AddListener(() => { PlayButtonAudio(); ToggleLeftMenuPanel(optionsPanel, "options"); });
+        
+        if (howToPlayMenuButton != null)
+            howToPlayMenuButton.onClick.AddListener(() => { PlayButtonAudio(); ToggleLeftMenuPanel(howToPlayPanel, "howToPlay"); });
+        
+        if (aboutButton != null)
+            aboutButton.onClick.AddListener(() => { PlayButtonAudio(); ToggleLeftMenuPanel(aboutPanel, "about"); });
+
+        if (switchButton != null)
+            switchButton.onClick.AddListener(() => { PlayButtonAudio(); ToggleLeftMenuPanel(switchPanel, "switch"); });
+
+        if (exitButton != null)
+            exitButton.onClick.AddListener(OnExitClicked);
+
+        if (optionsPanelCloseButton != null)
+            optionsPanelCloseButton.onClick.AddListener(CloseLeftMenuPanel);
+
+        if (howToPlayPanelCloseButton != null)
+            howToPlayPanelCloseButton.onClick.AddListener(CloseLeftMenuPanel);
+
+        if (aboutPanelCloseButton != null)
+            aboutPanelCloseButton.onClick.AddListener(CloseLeftMenuPanel);
+
+        if (logoutButton != null)
+            logoutButton.onClick.AddListener(OnLogoutClicked);
+
+        // Setup play menu button listeners
+        if (playButton != null)
+            playButton.onClick.AddListener(() => { PlayButtonAudio(); ShowPlayMenu(); });
+
+        if (teacherSessionQuestionButton != null)
+            teacherSessionQuestionButton.onClick.AddListener(ShowTeacherSessionHelp);
+
+        if (offlineModeQuestionButton != null)
+            offlineModeQuestionButton.onClick.AddListener(ShowOfflineModeHelp);
+
+        if (teacherSessionPlayButton != null)
+            teacherSessionPlayButton.onClick.AddListener(ShowJoinRoomPanel);
+
+        if (offlineModePlayButton != null)
+            offlineModePlayButton.onClick.AddListener(ShowDifficultyPanel);
+
+        if (startGameButton != null)
+            startGameButton.onClick.AddListener(StartGame);
+
+        if (backArrowButton != null)
+            backArrowButton.onClick.AddListener(GoBack);
+
+        if (teacherSessionHelpCloseButton != null)
+            teacherSessionHelpCloseButton.onClick.AddListener(GoBack);
+
+        if (offlineModeHelpCloseButton != null)
+            offlineModeHelpCloseButton.onClick.AddListener(GoBack);
+
+        // BGM is started by VideoBackgroundIntro after the loading screen finishes.
+    }
+
+    /// <summary>
+    /// Starts the main menu background music. Called by VideoBackgroundIntro once the
+    /// loading screen is done so music doesn't play over the loading video.
+    /// </summary>
+    public void PlayMainMenuBGM()
+    {
+        if (mainMenuBGM != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlayMusic(mainMenuBGM);
+    }
+
+    void OnDestroy()
+    {
+        // Stop music when leaving main menu
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.StopMusic();
+    }
+
+    void HideAllPanels()
+    {
+        optionsPanel.SetActive(false);
+        howToPlayPanel.SetActive(false);
+        aboutPanel.SetActive(false);
+        switchPanel.SetActive(false);
+        teacherSessionPanel.SetActive(false);
+        offlineModePanel.SetActive(false);
+        teacherSessionHelpPanel.SetActive(false);
+        offlineModeHelpPanel.SetActive(false);
+        joinRoomPanel.SetActive(false);
+        difficultyPanel.SetActive(false);
+    }
+
+    private void ToggleLeftMenuPanel(GameObject panel, string panelName)
+    {
+        // If the panel is already open, close it
+        if (currentLeftMenuPanel == panel)
+        {
+            panel.SetActive(false);
+            currentLeftMenuPanel = null;
+        }
+        // If another panel is open, close it and open the new one
+        else
+        {
+            if (currentLeftMenuPanel != null)
+            {
+                currentLeftMenuPanel.SetActive(false);
+            }
+            
+            panel.SetActive(true);
+            currentLeftMenuPanel = panel;
+        }
+    }
+
+    private void CloseLeftMenuPanel()
+    {
+        if (currentLeftMenuPanel != null)
+        {
+            currentLeftMenuPanel.SetActive(false);
+            currentLeftMenuPanel = null;
+        }
+    }
+
+    private void ShowPlayMenu()
+    {
+        navigationStack.Clear();
+        navigationStack.Push("mainMenu");
+        
+        HideAllPanels();
+        
+        if (playerCard != null)
+            playerCard.SetActive(false);
+        SetMainMenuButtonsVisible(false);
+
+        teacherSessionPanel.SetActive(true);
+        offlineModePanel.SetActive(true);
+        backArrowButton.gameObject.SetActive(true);
+        navigationStack.Push("playMenu");
+    }
+
+    private void ShowTeacherSessionHelp()
+    {
+        navigationStack.Push("teacherSessionHelp");
+        teacherSessionHelpPanel.SetActive(true);
+    }
+
+    private void ShowOfflineModeHelp()
+    {
+        navigationStack.Push("offlineModeHelp");
+        offlineModeHelpPanel.SetActive(true);
+    }
+
+    private void ShowJoinRoomPanel()
+    {
+        navigationStack.Push("joinRoom");
+        teacherSessionPanel.SetActive(false);
+        offlineModePanel.SetActive(false);
+        joinRoomPanel.SetActive(true);
+    }
+
+    private void GoBack()
+    {
+        if (navigationStack.Count == 0)
+            return;
+
+        string currentScreen = navigationStack.Pop();
+
+        if (currentScreen == "playMenu")
+        {
+            // Return to main menu
+            HideAllPanels();
+            if (playerCard != null)
+                playerCard.SetActive(true);
+            SetMainMenuButtonsVisible(true);
+            backArrowButton.gameObject.SetActive(false);
+        }
+        else if (currentScreen == "joinRoom")
+        {
+            // Return to play menu (Teacher Session and Offline Mode)
+            HideAllPanels();
+            teacherSessionPanel.SetActive(true);
+            offlineModePanel.SetActive(true);
+        }
+        else if (currentScreen == "difficulty")
+        {
+            // Return to play menu (Teacher Session and Offline Mode)
+            HideAllPanels();
+            teacherSessionPanel.SetActive(true);
+            offlineModePanel.SetActive(true);
+        }
+        else if (currentScreen == "teacherSessionHelp")
+        {
+            // Return to play menu (Teacher Session and Offline Mode)
+            teacherSessionHelpPanel.SetActive(false);
+            teacherSessionPanel.SetActive(true);
+            offlineModePanel.SetActive(true);
+        }
+        else if (currentScreen == "offlineModeHelp")
+        {
+            // Return to play menu (Teacher Session and Offline Mode)
+            offlineModeHelpPanel.SetActive(false);
+            teacherSessionPanel.SetActive(true);
+            offlineModePanel.SetActive(true);
+        }
+    }
+
+    // This can be called by the close buttons on help panels
+    public void CloseHelpPanel()
+    {
+        GoBack();
+    }
+
+    private void ShowDifficultyPanel()
+    {
+        navigationStack.Push("difficulty");
+        HideAllPanels();
+        difficultyPanel.SetActive(true);
+    }
+
+    private void StartGame()
+    {
+        // Clear SessionCode for offline mode (don't treat it as a teacher session)
+        PlayerPrefs.DeleteKey("SessionCode");
+        PlayerPrefs.Save();
+        
+        SceneManager.LoadScene("LoadingScene");
+    }
+
+    // Reset the current left menu panel tracking (called when panels close)
+    public void ResetLeftMenuPanel()
+    {
+        currentLeftMenuPanel = null;
+    }
+
+    private void OnExitClicked()
+    {
+        PlayButtonAudio();
+        Application.Quit();
+
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #endif
+    }
+
+    private void OnLogoutClicked()
+    {
+        PlayButtonAudio();
+        StudentLoginManager.Logout();
+        SceneManager.LoadScene("LoginScene");
+    }
+
+    private void SetMainMenuButtonsVisible(bool visible)
+    {
+        if (playButton != null) playButton.gameObject.SetActive(visible);
+        if (optionsButton != null) optionsButton.gameObject.SetActive(visible);
+        if (switchButton != null) switchButton.gameObject.SetActive(visible);
+        if (exitButton != null) exitButton.gameObject.SetActive(visible);
+        if (howToPlayMenuButton != null) howToPlayMenuButton.gameObject.SetActive(visible);
+        if (aboutButton != null) aboutButton.gameObject.SetActive(visible);
+    }
+
+    private void PlayButtonAudio()
+    {
+        if (buttonClickAudio != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFX(buttonClickAudio);
+    }
+
+    /// <summary>
+    /// Shows the avatar of the character the current user picked in the Customize panel.
+    /// Public so SwitchPanelManager can refresh the card as soon as a new pick is confirmed.
+    /// </summary>
+    public void RefreshAvatar()
+    {
+        if (avatarImage == null)
+            return;
+
+        bool isGuest = PlayerPrefs.GetString("IsGuest", "false") == "true";
+        string userName = isGuest ? "Guest" : PlayerPrefs.GetString("StudentName", "User");
+        string selectedCharacter = PlayerPrefs.GetString(userName + SELECTED_CHARACTER_SUFFIX, "Female");
+
+        Sprite avatar = selectedCharacter == "Male" ? maleAvatarSprite : femaleAvatarSprite;
+        if (avatar != null)
+            avatarImage.sprite = avatar;
+
+        // Keep the empty photo frame showing if a sprite hasn't been assigned.
+        avatarImage.enabled = avatar != null;
+    }
+
+    private void UpdateUserDisplayName()
+    {
+        if (userDisplayName == null)
+            return;
+
+        bool isGuest = PlayerPrefs.GetString("IsGuest", "false") == "true";
+
+        if (isGuest)
+        {
+            userDisplayName.text = "Guest";
+            if (studentIdText != null)
+                studentIdText.text = "ID#: N/A";
+            if (statusIcon != null)
+                statusIcon.color = new Color(0.502f, 0.502f, 0.502f, 1f); // #808080
+        }
+        else
+        {
+            string studentName = PlayerPrefs.GetString("StudentName", "User");
+            string studentId = PlayerPrefs.GetString("StudentUsername", "");
+            userDisplayName.text = studentName;
+            if (studentIdText != null)
+                studentIdText.text = "ID#: " + (string.IsNullOrEmpty(studentId) ? "N/A" : studentId.ToUpper());
+            if (statusIcon != null)
+                statusIcon.color = new Color(0.357f, 0.682f, 0.235f, 1f); // #5BAE3C
+        }
+    }
+}

@@ -1,0 +1,912 @@
+fileFormatVersion: 2
+guid: 23bea4618ef62404c979bbc20ef92432
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_0
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 225
+        width: 199
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 31eea0c705772a04f9b80fc3dcace21c
+      internalID: -1695274407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_1
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 225
+        width: 203
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a99ab166d1c1a274dbf67fee25d74bfc
+      internalID: -1522870028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_2
+      rect:
+        serializedVersion: 2
+        x: 859
+        y: 225
+        width: 202
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c71535b729dff76409ac208a84536bb5
+      internalID: -1353949034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_3
+      rect:
+        serializedVersion: 2
+        x: 1245
+        y: 225
+        width: 203
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1db6edd3f2ec24440b66167fce3048af
+      internalID: 1873287710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_4
+      rect:
+        serializedVersion: 2
+        x: 1628
+        y: 225
+        width: 202
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2be9edec4a3184b46a37aaf23a71724d
+      internalID: -426509037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_5
+      rect:
+        serializedVersion: 2
+        x: 2014
+        y: 225
+        width: 199
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 890a2e9558134cb429226bb7bdcf28ff
+      internalID: 1730488276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_6
+      rect:
+        serializedVersion: 2
+        x: 2396
+        y: 225
+        width: 203
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 20fc03b11e7c3524cb3ffb712e1da72a
+      internalID: -1266538043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_7
+      rect:
+        serializedVersion: 2
+        x: 2779
+        y: 225
+        width: 202
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1469cfce5f6d309438f3ed567b48a872
+      internalID: 1169451688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_8
+      rect:
+        serializedVersion: 2
+        x: 3165
+        y: 225
+        width: 203
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e742773a11ec5c544a14c36e21cbb139
+      internalID: -822040335
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_9
+      rect:
+        serializedVersion: 2
+        x: 3548
+        y: 225
+        width: 202
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 95c65e0d46579fe489cb62b770c7c0c1
+      internalID: 96429302
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_10
+      rect:
+        serializedVersion: 2
+        x: 3934
+        y: 225
+        width: 199
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4089c273962fb284f8e5f033e1ab7cc9
+      internalID: -1719656928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_11
+      rect:
+        serializedVersion: 2
+        x: 4316
+        y: 225
+        width: 203
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1f77ce52ce55ce2418486bdc0a0e843d
+      internalID: 1108446668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_12
+      rect:
+        serializedVersion: 2
+        x: 4699
+        y: 225
+        width: 202
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eb1005dc7a30be148a7b63124b8c65b1
+      internalID: 407179221
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_13
+      rect:
+        serializedVersion: 2
+        x: 5085
+        y: 225
+        width: 203
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 36c897e833760574ead48cf2605dd5fb
+      internalID: -566221052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_14
+      rect:
+        serializedVersion: 2
+        x: 5468
+        y: 225
+        width: 202
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b361ba6ef9766f545be0ec237560f355
+      internalID: 54061830
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_15
+      rect:
+        serializedVersion: 2
+        x: 5854
+        y: 225
+        width: 199
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 64441981cbdeb7a41bf6973a523d0ca7
+      internalID: -64228518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_16
+      rect:
+        serializedVersion: 2
+        x: 6236
+        y: 225
+        width: 203
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a456b1259355b744aba302d722213df
+      internalID: 169167207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_17
+      rect:
+        serializedVersion: 2
+        x: 6619
+        y: 225
+        width: 202
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b702aa19b3236046bd3cb36df26e6ee
+      internalID: -723943974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_18
+      rect:
+        serializedVersion: 2
+        x: 7005
+        y: 225
+        width: 203
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73f2d0014590d304b828319e03809947
+      internalID: -1515895160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_19
+      rect:
+        serializedVersion: 2
+        x: 7388
+        y: 225
+        width: 202
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad348b2a3b3bbeb4db11a38a0c2a4198
+      internalID: 1716541456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_20
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 8
+        width: 199
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ef796775473bf440be511d4c6aa408e
+      internalID: -1603528012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_21
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 8
+        width: 203
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b8c65c1a48a548242958367ca946708c
+      internalID: 1668775651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_22
+      rect:
+        serializedVersion: 2
+        x: 859
+        y: 8
+        width: 202
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e388da39f7d92045a600301482b279f
+      internalID: 1043050098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_23
+      rect:
+        serializedVersion: 2
+        x: 1245
+        y: 8
+        width: 203
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c5e2651b4a3a884449724d17191c0cd6
+      internalID: 751322973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_24
+      rect:
+        serializedVersion: 2
+        x: 1628
+        y: 8
+        width: 202
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 026343e4433ec5a4d803a7d9e0390b62
+      internalID: 156899835
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_25
+      rect:
+        serializedVersion: 2
+        x: 2014
+        y: 8
+        width: 199
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b23840758747f944ab081a304e4d0c33
+      internalID: 576161529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_26
+      rect:
+        serializedVersion: 2
+        x: 2396
+        y: 8
+        width: 203
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53fc6e3a26e60144da5ca4a91d8dbf19
+      internalID: -1812610429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_27
+      rect:
+        serializedVersion: 2
+        x: 2779
+        y: 8
+        width: 202
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b9a9e10d8f08504eb816f5d842d83a9
+      internalID: -1332509374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_28
+      rect:
+        serializedVersion: 2
+        x: 3165
+        y: 8
+        width: 203
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 577f22bcce202924c8841a331ad24ba8
+      internalID: 765235536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_29
+      rect:
+        serializedVersion: 2
+        x: 3548
+        y: 8
+        width: 202
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: df62431661188c048b93d5e6ce1de708
+      internalID: 1363883667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_30
+      rect:
+        serializedVersion: 2
+        x: 3934
+        y: 8
+        width: 199
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 12a75313f1ef12046aae54ea36105be7
+      internalID: 1109381983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_31
+      rect:
+        serializedVersion: 2
+        x: 4316
+        y: 8
+        width: 203
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f278a3507b76a054196d7434cd5972a8
+      internalID: -1626013811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_32
+      rect:
+        serializedVersion: 2
+        x: 4699
+        y: 8
+        width: 202
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a139d4d88c76f948a69886963da5e51
+      internalID: -1955595144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Go Bag Middle Pouch-Sheet_33
+      rect:
+        serializedVersion: 2
+        x: 5085
+        y: 8
+        width: 203
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 217fa60a1466f9b438efe427e1284ae1
+      internalID: 1114920866
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: b713aad99fc681f4a97731650856b523
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Go Bag Middle Pouch-Sheet_0: -1695274407
+      Go Bag Middle Pouch-Sheet_1: -1522870028
+      Go Bag Middle Pouch-Sheet_10: -1719656928
+      Go Bag Middle Pouch-Sheet_11: 1108446668
+      Go Bag Middle Pouch-Sheet_12: 407179221
+      Go Bag Middle Pouch-Sheet_13: -566221052
+      Go Bag Middle Pouch-Sheet_14: 54061830
+      Go Bag Middle Pouch-Sheet_15: -64228518
+      Go Bag Middle Pouch-Sheet_16: 169167207
+      Go Bag Middle Pouch-Sheet_17: -723943974
+      Go Bag Middle Pouch-Sheet_18: -1515895160
+      Go Bag Middle Pouch-Sheet_19: 1716541456
+      Go Bag Middle Pouch-Sheet_2: -1353949034
+      Go Bag Middle Pouch-Sheet_20: -1603528012
+      Go Bag Middle Pouch-Sheet_21: 1668775651
+      Go Bag Middle Pouch-Sheet_22: 1043050098
+      Go Bag Middle Pouch-Sheet_23: 751322973
+      Go Bag Middle Pouch-Sheet_24: 156899835
+      Go Bag Middle Pouch-Sheet_25: 576161529
+      Go Bag Middle Pouch-Sheet_26: -1812610429
+      Go Bag Middle Pouch-Sheet_27: -1332509374
+      Go Bag Middle Pouch-Sheet_28: 765235536
+      Go Bag Middle Pouch-Sheet_29: 1363883667
+      Go Bag Middle Pouch-Sheet_3: 1873287710
+      Go Bag Middle Pouch-Sheet_30: 1109381983
+      Go Bag Middle Pouch-Sheet_31: -1626013811
+      Go Bag Middle Pouch-Sheet_32: -1955595144
+      Go Bag Middle Pouch-Sheet_33: 1114920866
+      Go Bag Middle Pouch-Sheet_4: -426509037
+      Go Bag Middle Pouch-Sheet_5: 1730488276
+      Go Bag Middle Pouch-Sheet_6: -1266538043
+      Go Bag Middle Pouch-Sheet_7: 1169451688
+      Go Bag Middle Pouch-Sheet_8: -822040335
+      Go Bag Middle Pouch-Sheet_9: 96429302
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

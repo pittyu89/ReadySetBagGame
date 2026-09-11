@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "975675266823",
+    "project_id": "readysetbag-da917",
+    "storage_bucket": "readysetbag-da917.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:975675266823:android:97a102af22ef102eac57a2",
+        "android_client_info": {
+          "package_name": "com.dev.readysetbag"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaw3ZO9j0NCJQj3MnrJgByhe8ITabjsrI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
