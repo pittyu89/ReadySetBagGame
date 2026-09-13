@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 /// <summary>
 /// Shows a popup "Open Door" / "Close Door" button when the player is near a door.
@@ -11,7 +10,19 @@ public class DoorProximityHandler : MonoBehaviour
 {
     [Header("UI References (optional — auto-created if empty)")]
     [SerializeField] private Button doorButton;
-    [SerializeField] private TextMeshProUGUI doorButtonText;
+
+    [Header("Button Sprites")]
+    [Tooltip("The sprites carry their own OPEN / CLOSE label, so the button has no text.")]
+    [SerializeField] private Sprite openSprite;
+    [SerializeField] private Sprite openPressedSprite;
+    [SerializeField] private Sprite closeSprite;
+    [SerializeField] private Sprite closePressedSprite;
+
+    [Header("Button Layout")]
+    [Tooltip("Offset from the middle of the screen, beside the player, in canvas units.")]
+    [SerializeField] private Vector2 buttonPosition = new Vector2(155f, 5f);
+    [Tooltip("Twice-ish the 96x32 sprite, kept at its 3:1 shape so the pixels stay even.")]
+    [SerializeField] private Vector2 buttonSize = new Vector2(156f, 52f);
 
     [Header("Settings")]
     [Tooltip("Distance from the door's surface, so touching the door reads as ~0 " +
@@ -29,7 +40,7 @@ public class DoorProximityHandler : MonoBehaviour
     private DoorToggle nearestDoor;
     private Transform playerTransform;
     private GameObject buttonRoot;
-    private TextMeshProUGUI doorButtonTextShadow;
+    private Image buttonImage;
 
     void Start()
     {
@@ -52,7 +63,10 @@ public class DoorProximityHandler : MonoBehaviour
         if (doorButton == null)
             CreateDoorButton();
         else
+        {
             buttonRoot = doorButton.gameObject;
+            buttonImage = doorButton.targetGraphic as Image;
+        }
 
         // Wire up the click listener
         doorButton.onClick.AddListener(OnDoorButtonClicked);
@@ -139,12 +153,20 @@ public class DoorProximityHandler : MonoBehaviour
         if (buttonRoot.transform.GetSiblingIndex() != 0)
             buttonRoot.transform.SetAsFirstSibling();
 
-        // Update label based on door state
-        string label = nearestDoor.IsOpen ? "Close Door" : "Open Door";
-        if (doorButtonText != null)
-            doorButtonText.text = label;
-        if (doorButtonTextShadow != null)
-            doorButtonTextShadow.text = label;
+        // Swap between the OPEN and CLOSE art based on door state
+        bool open = nearestDoor.IsOpen;
+        Sprite normal = open ? closeSprite : openSprite;
+        Sprite pressed = open ? closePressedSprite : openPressedSprite;
+
+        if (buttonImage != null && normal != null && buttonImage.sprite != normal)
+            buttonImage.sprite = normal;
+
+        SpriteState state = doorButton.spriteState;
+        if (state.pressedSprite != pressed)
+        {
+            state.pressedSprite = pressed;
+            doorButton.spriteState = state;
+        }
     }
 
     private void HideButton()
@@ -164,8 +186,9 @@ public class DoorProximityHandler : MonoBehaviour
     }
 
     /// <summary>
-    /// Creates a retro-styled popup button anchored to the bottom-center of the screen.
-    /// Layered panels give a beveled 3D look with warm retro colors.
+    /// Creates the door button from the DoorSheet sprites, beside the player in the middle of
+    /// the screen. The art already has its bevel and label, so the button is a single image
+    /// that swaps to its pressed frame while held.
     /// </summary>
     private void CreateDoorButton()
     {
@@ -182,113 +205,29 @@ public class DoorProximityHandler : MonoBehaviour
             canvasObj.AddComponent<GraphicRaycaster>();
         }
 
-        // Load Jersey 25 font from Resources
-        TMP_FontAsset jerseyFont = Resources.Load<TMP_FontAsset>("Fonts/Jersey25-Regular SDF");
-
-        // --- Retro color palette (white button, black text) ---
-        Color darkBorder    = new Color(0.15f, 0.15f, 0.15f, 1f);   // dark gray border
-        Color shadowColor   = new Color(0.70f, 0.70f, 0.70f, 1f);   // light gray (bottom/right bevel)
-        Color faceColor     = new Color(1f, 1f, 1f, 1f);             // white face
-        Color highlightEdge = new Color(0.95f, 0.95f, 0.95f, 1f);   // near-white highlight (top/left bevel)
-        Color textColor     = new Color(0.1f, 0.1f, 0.1f, 1f);      // near-black text
-        Color textShadowCol = new Color(0.6f, 0.6f, 0.6f, 0.5f);    // subtle gray text shadow
-
-        // --- Outer container (root) ---
         buttonRoot = new GameObject("OpenDoorButton");
         buttonRoot.transform.SetParent(canvas.transform, false);
         // Render behind all other UI on this canvas
         buttonRoot.transform.SetAsFirstSibling();
 
         RectTransform rootRect = buttonRoot.AddComponent<RectTransform>();
-        rootRect.anchorMin = new Vector2(0.5f, 0f);
-        rootRect.anchorMax = new Vector2(0.5f, 0f);
-        rootRect.pivot = new Vector2(0.5f, 0f);
-        rootRect.anchoredPosition = new Vector2(0f, 50f);
-        rootRect.sizeDelta = new Vector2(220f, 58f);
+        rootRect.anchorMin = new Vector2(0.5f, 0.5f);
+        rootRect.anchorMax = new Vector2(0.5f, 0.5f);
+        rootRect.pivot = new Vector2(0.5f, 0.5f);
+        rootRect.anchoredPosition = buttonPosition;
+        rootRect.sizeDelta = buttonSize;
 
-        // Layer 1: Dark outer border
-        Image borderImage = buttonRoot.AddComponent<Image>();
-        borderImage.color = darkBorder;
+        buttonImage = buttonRoot.AddComponent<Image>();
+        buttonImage.sprite = openSprite;
+        buttonImage.preserveAspect = true;
 
-        // Layer 2: Highlight edge (top-left bevel) — inset 2px
-        GameObject highlightObj = CreateUIChild("HighlightEdge", buttonRoot.transform, highlightEdge, 2f);
-
-        // Layer 3: Shadow edge (bottom-right bevel) — inset 3px from root
-        GameObject shadowObj = CreateUIChild("ShadowEdge", buttonRoot.transform, shadowColor, 3f);
-        RectTransform shadowRect = shadowObj.GetComponent<RectTransform>();
-        shadowRect.offsetMin = new Vector2(5f, 3f);
-        shadowRect.offsetMax = new Vector2(-3f, -5f);
-
-        // Layer 4: Button face — inset 4px
-        GameObject faceObj = CreateUIChild("ButtonFace", buttonRoot.transform, faceColor, 4f);
-
-        // The Button component targets the face for color tinting
+        // Sprite swap rather than a colour tint: the sheet has its own pressed frame
         doorButton = buttonRoot.AddComponent<Button>();
-        doorButton.targetGraphic = faceObj.GetComponent<Image>();
-        ColorBlock colors = doorButton.colors;
-        colors.normalColor = faceColor;
-        colors.highlightedColor = new Color(0.90f, 0.90f, 0.90f, 1f);
-        colors.pressedColor = new Color(0.75f, 0.75f, 0.75f, 1f);
-        colors.selectedColor = faceColor;
-        doorButton.colors = colors;
-
-        // --- Text shadow (offset 1px down-right) ---
-        GameObject textShadowObj = new GameObject("TextShadow");
-        textShadowObj.transform.SetParent(faceObj.transform, false);
-        RectTransform tShadowRect = textShadowObj.AddComponent<RectTransform>();
-        tShadowRect.anchorMin = Vector2.zero;
-        tShadowRect.anchorMax = Vector2.one;
-        tShadowRect.offsetMin = new Vector2(1f, -1f);
-        tShadowRect.offsetMax = new Vector2(1f, -1f);
-        TextMeshProUGUI shadowText = textShadowObj.AddComponent<TextMeshProUGUI>();
-        shadowText.text = "Open Door";
-        shadowText.fontSize = 28;
-        shadowText.fontStyle = FontStyles.UpperCase;
-        shadowText.alignment = TextAlignmentOptions.Center;
-        shadowText.color = textShadowCol;
-        shadowText.raycastTarget = false;
-        if (jerseyFont != null) shadowText.font = jerseyFont;
-
-        // --- Main text ---
-        GameObject textObj = new GameObject("Text");
-        textObj.transform.SetParent(faceObj.transform, false);
-        RectTransform textRect = textObj.AddComponent<RectTransform>();
-        textRect.anchorMin = Vector2.zero;
-        textRect.anchorMax = Vector2.one;
-        textRect.offsetMin = Vector2.zero;
-        textRect.offsetMax = Vector2.zero;
-        doorButtonText = textObj.AddComponent<TextMeshProUGUI>();
-        doorButtonText.text = "Open Door";
-        doorButtonText.fontSize = 28;
-        doorButtonText.fontStyle = FontStyles.UpperCase;
-        doorButtonText.alignment = TextAlignmentOptions.Center;
-        doorButtonText.color = textColor;
-        doorButtonText.raycastTarget = false;
-        if (jerseyFont != null) doorButtonText.font = jerseyFont;
-
-        // Keep a reference to the shadow text so we can update it
-        doorButtonTextShadow = shadowText;
-    }
-
-    /// <summary>
-    /// Helper to create a child UI panel with a solid color, inset by a uniform margin.
-    /// </summary>
-    private GameObject CreateUIChild(string name, Transform parent, Color color, float inset)
-    {
-        GameObject obj = new GameObject(name);
-        obj.transform.SetParent(parent, false);
-
-        RectTransform rect = obj.AddComponent<RectTransform>();
-        rect.anchorMin = Vector2.zero;
-        rect.anchorMax = Vector2.one;
-        rect.offsetMin = new Vector2(inset, inset);
-        rect.offsetMax = new Vector2(-inset, -inset);
-
-        Image img = obj.AddComponent<Image>();
-        img.color = color;
-        img.raycastTarget = false;
-
-        return obj;
+        doorButton.targetGraphic = buttonImage;
+        doorButton.transition = Selectable.Transition.SpriteSwap;
+        SpriteState state = new SpriteState();
+        state.pressedSprite = openPressedSprite;
+        doorButton.spriteState = state;
     }
 
     /// <summary>

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 /// Handles drag-and-drop functionality for inventory items between grids.
 /// Attach this to item UI elements to make them draggable.
 /// </summary>
-public class InventoryItemDragHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     // Static flag to prevent multiple items from being dragged at once
     private static bool isItemCurrentlyBeingDragged = false;
@@ -183,17 +183,14 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerDownHandler, IPoi
     private CanvasGroup descriptionPanelCanvasGroup;
     private Coroutine descriptionAnimationCoroutine;
     
-    // For hold detection
     [Header("Description Popup")]
-    [Tooltip("How long the item must be held before the description popup appears.")]
-    [SerializeField] private float holdDuration = 0.5f;
-
     [Tooltip("Gap in UI units between the item and the popup.")]
     [SerializeField] private float panelGap = 15f;
 
-    private float pointerDownTime;
-    private bool isHolding = false;
-    
+    // True between this item opening its description and asking for it to close, so a second
+    // tap closes it even while the pop-in is still animating.
+    private bool descriptionOpen = false;
+
     // For inventory panel reference
     private InventoryPanelHandler inventoryPanelHandler;
     private static InventoryPanelHandler sharedPanelHandler;
@@ -241,21 +238,34 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerDownHandler, IPoi
 
     void Update()
     {
-        // Nothing to poll unless this item is the one being held down. Checked first so the
-        // other items in the bag do no work at all.
-        if (!isHolding)
+        // Nothing to poll unless this item's description is the one open. Checked first so the
+        // other items in the bag do no work at all. descriptionPanel can legitimately be null
+        // when the scene has no DescriptionPanel.
+        if (panelOwner != this || descriptionPanel == null || !descriptionPanel.activeSelf)
             return;
 
-        // descriptionPanel can legitimately be null when the scene has no DescriptionPanel;
-        // dereferencing it here used to throw once per frame per item.
-        if (descriptionPanel == null || descriptionPanel.activeSelf)
+        // While this item is being dragged the popup follows it, and OnEndDrag closes it
+        if (didBeginDrag)
             return;
 
-        if (Time.time - pointerDownTime >= holdDuration)
-        {
-            ShowDescriptionPanel();
-            UpdateDescriptionPanelPosition();
-        }
+        // A tap anywhere other than this item closes its description. Taps on the item itself
+        // are left to OnPointerClick, which toggles it. The old Input Manager also reports
+        // touches as mouse button 0, so this covers phones too.
+        if (Input.GetMouseButtonDown(0) && !IsScreenPointOverItem(Input.mousePosition))
+            HideDescriptionPanel();
+    }
+
+    private bool IsScreenPointOverItem(Vector2 screenPoint)
+    {
+        if (rectTransform == null)
+            return false;
+
+        Canvas canvas = GetComponentInParent<Canvas>();
+        Camera cam = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay
+            ? canvas.rootCanvas.worldCamera
+            : null;
+
+        return RectTransformUtility.RectangleContainsScreenPoint(rectTransform, screenPoint, cam);
     }
 
     void OnDisable()
@@ -280,25 +290,25 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerDownHandler, IPoi
         // coroutine dies before it can deactivate the panel. ForceHide clears panelOwner.
         if (panelOwner == this)
             ForceHideDescriptionPanel();
-
-        isHolding = false;
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    /// <summary>
+    /// A tap on the item toggles its description. Unity does not send a click once a drag has
+    /// started, so dragging an item never opens or closes the popup by accident.
+    /// </summary>
+    public void OnPointerClick(PointerEventData eventData)
     {
-        if (itemUI == null)
+        if (itemUI == null || descriptionPanel == null || eventData.dragging)
             return;
 
-        // Start tracking hold time
-        pointerDownTime = Time.time;
-        isHolding = true;
-    }
+        if (panelOwner == this && descriptionOpen)
+        {
+            HideDescriptionPanel();
+            return;
+        }
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        // Hide description panel when releasing
-        HideDescriptionPanel();
-        isHolding = false;
+        ShowDescriptionPanel();
+        UpdateDescriptionPanelPosition();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -313,9 +323,6 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerDownHandler, IPoi
         // Mark that we're now dragging an item, and that THIS handler is the owner of that drag
         isItemCurrentlyBeingDragged = true;
         didBeginDrag = true;
-
-        // Stop the hold timer (description panel will stay visible)
-        isHolding = false;
 
         // Store the source grid display
         sourceGrid = GetComponentInParent<InventoryGridDisplay>();
@@ -489,8 +496,14 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerDownHandler, IPoi
         if (weightText != null)
             weightText.text = $"{item.weightKg:0.##} kg";
 
+        // Tapping one item while another's description is still fading out: that fade would
+        // switch the shared panel off underneath this one when it finished, so stop it first.
+        if (panelOwner != null && panelOwner != this)
+            panelOwner.StopPanelAnimation();
+
         // This handler now owns the shared panel; see panelOwner.
         panelOwner = this;
+        descriptionOpen = true;
 
         // Stop any existing animation and start the popup animation
         if (descriptionAnimationCoroutine != null)
@@ -620,8 +633,21 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerDownHandler, IPoi
         return sharedCanvasRect;
     }
 
+    private void StopPanelAnimation()
+    {
+        descriptionOpen = false;
+
+        if (descriptionAnimationCoroutine != null)
+        {
+            StopCoroutine(descriptionAnimationCoroutine);
+            descriptionAnimationCoroutine = null;
+        }
+    }
+
     private void HideDescriptionPanel()
     {
+        descriptionOpen = false;
+
         if (descriptionPanel == null)
             return;
 

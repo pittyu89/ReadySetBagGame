@@ -179,6 +179,11 @@ public class QuizHandler : MonoBehaviour
     [Tooltip("The question whose correct answer is this item hands over to the minigame " +
              "once its feedback has finished.")]
     [SerializeField] private string batteriesMinigameItemName = "Batteries";
+    [Tooltip("Runs after the spare clothes question, whether the answer was right or wrong.")]
+    [SerializeField] private ClothesMinigame clothesMinigame;
+    [Tooltip("The question whose correct answer is this item hands over to the minigame " +
+             "once its feedback has finished.")]
+    [SerializeField] private string clothesMinigameItemName = "Spare Clothes";
 
     [Header("Scoring")]
     [Tooltip("Par time for the 15 urgency points, as a fraction of the difficulty's limit. " +
@@ -848,6 +853,9 @@ public class QuizHandler : MonoBehaviour
         if (batteriesMinigame != null && QuestionOwnsMinigame(answerBoxIndex, batteriesMinigameItemName))
             yield return StartCoroutine(batteriesMinigame.Play());
 
+        if (clothesMinigame != null && QuestionOwnsMinigame(answerBoxIndex, clothesMinigameItemName))
+            yield return StartCoroutine(clothesMinigame.Play());
+
         // The practical half of this question is done — either its minigame has just played
         // through, or it never had one. Counted for right and wrong answers alike.
         tasksCompleted++;
@@ -1054,6 +1062,12 @@ public class QuizHandler : MonoBehaviour
                     item.itemName, ItemImportance.Nuisance, item.weightKg));
             }
         }
+
+        // Whatever made it into the bag is now registered in the Journal for the next game
+        List<string> packedNames = new List<string>();
+        foreach (DrillScore.PackedItem packed in packedAtOpen)
+            packedNames.Add(packed.Name);
+        JournalProgress.Unlock(packedNames);
     }
 
     /// <summary>
