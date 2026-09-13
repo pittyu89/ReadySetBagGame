@@ -169,6 +169,16 @@ public class QuizHandler : MonoBehaviour
     [Tooltip("The question whose correct answer is this item hands over to the minigame " +
              "once its feedback has finished.")]
     [SerializeField] private string penAndPaperMinigameItemName = "Pen & Paper";
+    [Tooltip("Runs after the important documents question, whether the answer was right or wrong.")]
+    [SerializeField] private ImportantDocumentsMinigame importantDocumentsMinigame;
+    [Tooltip("The question whose correct answer is this item hands over to the minigame " +
+             "once its feedback has finished.")]
+    [SerializeField] private string importantDocumentsMinigameItemName = "Important Documents";
+    [Tooltip("Runs after the batteries question, whether the answer was right or wrong.")]
+    [SerializeField] private BatteriesMinigame batteriesMinigame;
+    [Tooltip("The question whose correct answer is this item hands over to the minigame " +
+             "once its feedback has finished.")]
+    [SerializeField] private string batteriesMinigameItemName = "Batteries";
 
     [Header("Scoring")]
     [Tooltip("Par time for the 15 urgency points, as a fraction of the difficulty's limit. " +
@@ -831,6 +841,12 @@ public class QuizHandler : MonoBehaviour
 
         if (penAndPaperMinigame != null && QuestionOwnsMinigame(answerBoxIndex, penAndPaperMinigameItemName))
             yield return StartCoroutine(penAndPaperMinigame.Play());
+
+        if (importantDocumentsMinigame != null && QuestionOwnsMinigame(answerBoxIndex, importantDocumentsMinigameItemName))
+            yield return StartCoroutine(importantDocumentsMinigame.Play());
+
+        if (batteriesMinigame != null && QuestionOwnsMinigame(answerBoxIndex, batteriesMinigameItemName))
+            yield return StartCoroutine(batteriesMinigame.Play());
 
         // The practical half of this question is done — either its minigame has just played
         // through, or it never had one. Counted for right and wrong answers alike.
