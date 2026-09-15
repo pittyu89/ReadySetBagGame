@@ -39,7 +39,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject offlineModeHelpPanel;
     [SerializeField] private GameObject joinRoomPanel;
     [SerializeField] private GameObject difficultyPanel;
-    [Tooltip("The menu's left sidebar - hidden while the full-screen difficulty panel is open.")]
+    [Tooltip("The menu's left sidebar - hidden while the full-screen play menu panels are open.")]
     [SerializeField] private GameObject leftPanelBackground;
 
     [Header("Play Menu Buttons")]
@@ -100,7 +100,7 @@ public class UIManager : MonoBehaviour
 
         // Setup play menu button listeners
         if (playButton != null)
-            playButton.onClick.AddListener(() => { PlayButtonAudio(); ShowPlayMenu(); });
+            playButton.onClick.AddListener(() => { PlayButtonAudio(); PlayMainMenuOutro(ShowPlayMenu); });
 
         if (teacherSessionQuestionButton != null)
             teacherSessionQuestionButton.onClick.AddListener(ShowTeacherSessionHelp);
@@ -109,10 +109,11 @@ public class UIManager : MonoBehaviour
             offlineModeQuestionButton.onClick.AddListener(ShowOfflineModeHelp);
 
         if (teacherSessionPlayButton != null)
-            teacherSessionPlayButton.onClick.AddListener(ShowJoinRoomPanel);
+            // BACK stays on screen between game mode and join room, so only the cards leave
+            teacherSessionPlayButton.onClick.AddListener(() => PlayScreenOutro(ShowJoinRoomPanel, teacherSessionPanel, offlineModePanel));
 
         if (offlineModePlayButton != null)
-            offlineModePlayButton.onClick.AddListener(ShowDifficultyPanel);
+            offlineModePlayButton.onClick.AddListener(() => PlayScreenOutro(ShowDifficultyPanel, teacherSessionPanel, offlineModePanel, backArrowButton.gameObject));
 
         if (startGameButton != null)
             startGameButton.onClick.AddListener(() => { PlayButtonAudio(); PlayDifficultyOutro(StartGame); });
@@ -121,7 +122,7 @@ public class UIManager : MonoBehaviour
             difficultyBackButton.onClick.AddListener(() => { PlayButtonAudio(); PlayDifficultyOutro(GoBack); });
 
         if (backArrowButton != null)
-            backArrowButton.onClick.AddListener(GoBack);
+            backArrowButton.onClick.AddListener(OnBackPressed);
 
         if (teacherSessionHelpCloseButton != null)
             teacherSessionHelpCloseButton.onClick.AddListener(GoBack);
@@ -204,10 +205,84 @@ public class UIManager : MonoBehaviour
             playerCard.SetActive(false);
         SetMainMenuButtonsVisible(false);
 
+        // The game mode screen is full width - no sidebar behind it
+        if (leftPanelBackground != null)
+            leftPanelBackground.SetActive(false);
+
         teacherSessionPanel.SetActive(true);
         offlineModePanel.SetActive(true);
         backArrowButton.gameObject.SetActive(true);
         navigationStack.Push("playMenu");
+    }
+
+    /// <summary>
+    /// Reverses the main menu intro (menu items and player card) before leaving the main menu.
+    /// </summary>
+    private void PlayMainMenuOutro(System.Action onComplete)
+    {
+        MainMenuIntroAnimator introAnimator = GetComponent<MainMenuIntroAnimator>();
+
+        if (introAnimator != null)
+            introAnimator.PlayOutro(onComplete);
+        else
+            onComplete();
+    }
+
+    private bool screenTransitioning;
+
+    /// <summary>
+    /// Plays the leave-animation of every given screen that has a UIScreenTransition, then runs
+    /// <paramref name="onComplete"/> once all of them have finished. Taps are ignored meanwhile.
+    /// </summary>
+    private void PlayScreenOutro(System.Action onComplete, params GameObject[] screens)
+    {
+        if (screenTransitioning)
+            return;
+
+        var transitions = new List<UIScreenTransition>();
+        foreach (GameObject screen in screens)
+        {
+            UIScreenTransition transition = screen != null ? screen.GetComponent<UIScreenTransition>() : null;
+            if (transition != null && transition.isActiveAndEnabled)
+                transitions.Add(transition);
+        }
+
+        if (transitions.Count == 0)
+        {
+            onComplete();
+            return;
+        }
+
+        screenTransitioning = true;
+        int pending = transitions.Count;
+
+        foreach (UIScreenTransition transition in transitions)
+        {
+            transition.PlayOut(() =>
+            {
+                pending--;
+                if (pending > 0)
+                    return;
+
+                screenTransitioning = false;
+                onComplete();
+            });
+        }
+    }
+
+    /// <summary>
+    /// The shared BACK button: animates the current play menu screen out before going back.
+    /// </summary>
+    private void OnBackPressed()
+    {
+        string currentScreen = navigationStack.Count > 0 ? navigationStack.Peek() : "";
+
+        if (currentScreen == "playMenu")
+            PlayScreenOutro(GoBack, teacherSessionPanel, offlineModePanel, backArrowButton.gameObject);
+        else if (currentScreen == "joinRoom")
+            PlayScreenOutro(GoBack, joinRoomPanel);
+        else
+            GoBack();
     }
 
     private void ShowTeacherSessionHelp()
@@ -245,6 +320,13 @@ public class UIManager : MonoBehaviour
                 playerCard.SetActive(true);
             SetMainMenuButtonsVisible(true);
             backArrowButton.gameObject.SetActive(false);
+            if (leftPanelBackground != null)
+                leftPanelBackground.SetActive(true);
+
+            // PLAY's outro left the menu and card hidden - bring them back in
+            MainMenuIntroAnimator introAnimator = GetComponent<MainMenuIntroAnimator>();
+            if (introAnimator != null)
+                introAnimator.ReplayIntro();
         }
         else if (currentScreen == "joinRoom")
         {
@@ -260,8 +342,6 @@ public class UIManager : MonoBehaviour
             teacherSessionPanel.SetActive(true);
             offlineModePanel.SetActive(true);
             backArrowButton.gameObject.SetActive(true);
-            if (leftPanelBackground != null)
-                leftPanelBackground.SetActive(true);
         }
         else if (currentScreen == "teacherSessionHelp")
         {

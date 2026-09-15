@@ -10,8 +10,18 @@ public class SessionJoinManager : MonoBehaviour
 {
     [SerializeField] private TMP_InputField sessionCodeInput;
     [SerializeField] private UnityEngine.UI.Button joinButton;
+    [Tooltip("Error / info messages (session not found, guests, ...).")]
     [SerializeField] private TextMeshProUGUI waitingForTeacherText;
     [SerializeField] private AudioClip joinSessionAudio;
+
+    [Header("Join States")]
+    [Tooltip("Shown before joining: the Enter Code title and the code field.")]
+    [SerializeField] private GameObject enterCodeGroup;
+    [Tooltip("Shown after joining: the Waiting For Teacher title.")]
+    [SerializeField] private GameObject waitingGroup;
+    [SerializeField] private TextMeshProUGUI joinButtonText;
+    [SerializeField] private string joinLabel = "JOIN";
+    [SerializeField] private string joinedLabel = "JOINED";
 
     private FirebaseFirestore db;
     private string studentId;
@@ -24,6 +34,7 @@ public class SessionJoinManager : MonoBehaviour
     private void Start()
     {
         db = FirebaseFirestore.DefaultInstance;
+        SetJoinedState(false);
 
         // Check if user is a guest
         bool isGuest = PlayerPrefs.GetString("IsGuest", "false") == "true";
@@ -121,16 +132,34 @@ public class SessionJoinManager : MonoBehaviour
             // Listen for session changes (difficulty, status)
             ListenToSession(currentSessionId);
 
-            SetStatusText("Waiting for Teacher...");
             isJoined = true;
             joinButton.interactable = false;
             sessionCodeInput.interactable = false;
+            SetJoinedState(true);
         }
         catch (System.Exception ex)
         {
             joinButton.interactable = true;
             SetStatusText("Something went wrong.");
         }
+    }
+
+    /// <summary>
+    /// Swaps the panel between "Enter Code" (field + JOIN) and "Waiting For Teacher..." (JOINED).
+    /// </summary>
+    private void SetJoinedState(bool joined)
+    {
+        if (enterCodeGroup != null)
+            enterCodeGroup.SetActive(!joined);
+
+        if (waitingGroup != null)
+            waitingGroup.SetActive(joined);
+
+        if (joinButtonText != null)
+            joinButtonText.text = joined ? joinedLabel : joinLabel;
+
+        if (joined && waitingForTeacherText != null)
+            waitingForTeacherText.gameObject.SetActive(false);
     }
 
     private void SetStatusText(string message)
@@ -243,6 +272,7 @@ public class SessionJoinManager : MonoBehaviour
             joinButton.interactable = true;
         if (sessionCodeInput != null)
             sessionCodeInput.interactable = true;
+        SetJoinedState(false);
     }
 
     private void OnDestroy()
