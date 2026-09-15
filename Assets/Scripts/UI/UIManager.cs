@@ -39,6 +39,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject offlineModeHelpPanel;
     [SerializeField] private GameObject joinRoomPanel;
     [SerializeField] private GameObject difficultyPanel;
+    [Tooltip("The menu's left sidebar - hidden while the full-screen difficulty panel is open.")]
+    [SerializeField] private GameObject leftPanelBackground;
 
     [Header("Play Menu Buttons")]
     [SerializeField] private Button playButton;         // Main PLAY button
@@ -48,6 +50,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button offlineModePlayButton;  // Offline Mode PLAY button
     [SerializeField] private Button startGameButton;    // START button on difficulty panel
     [SerializeField] private Button backArrowButton;
+    [SerializeField] private Button difficultyBackButton;   // BACK button on difficulty panel
     [SerializeField] private Button teacherSessionHelpCloseButton;
     [SerializeField] private Button offlineModeHelpCloseButton;
 
@@ -112,7 +115,10 @@ public class UIManager : MonoBehaviour
             offlineModePlayButton.onClick.AddListener(ShowDifficultyPanel);
 
         if (startGameButton != null)
-            startGameButton.onClick.AddListener(StartGame);
+            startGameButton.onClick.AddListener(() => { PlayButtonAudio(); PlayDifficultyOutro(StartGame); });
+
+        if (difficultyBackButton != null)
+            difficultyBackButton.onClick.AddListener(() => { PlayButtonAudio(); PlayDifficultyOutro(GoBack); });
 
         if (backArrowButton != null)
             backArrowButton.onClick.AddListener(GoBack);
@@ -253,6 +259,9 @@ public class UIManager : MonoBehaviour
             HideAllPanels();
             teacherSessionPanel.SetActive(true);
             offlineModePanel.SetActive(true);
+            backArrowButton.gameObject.SetActive(true);
+            if (leftPanelBackground != null)
+                leftPanelBackground.SetActive(true);
         }
         else if (currentScreen == "teacherSessionHelp")
         {
@@ -280,7 +289,26 @@ public class UIManager : MonoBehaviour
     {
         navigationStack.Push("difficulty");
         HideAllPanels();
+        // The difficulty panel has its own BACK button
+        backArrowButton.gameObject.SetActive(false);
+        if (leftPanelBackground != null)
+            leftPanelBackground.SetActive(false);
         difficultyPanel.SetActive(true);
+    }
+
+    /// <summary>
+    /// Lets the difficulty panel slide its bases out before leaving it.
+    /// </summary>
+    private void PlayDifficultyOutro(System.Action onComplete)
+    {
+        DifficultyPanelManager manager = difficultyPanel != null
+            ? difficultyPanel.GetComponent<DifficultyPanelManager>()
+            : null;
+
+        if (manager != null && manager.isActiveAndEnabled)
+            manager.PlayOutro(onComplete);
+        else
+            onComplete();
     }
 
     private void StartGame()

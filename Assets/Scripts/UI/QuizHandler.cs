@@ -57,7 +57,7 @@ public class QuizHandler : MonoBehaviour
     [Tooltip("Seconds the player gets to answer each question before it is marked wrong. " +
              "Counted from when the question has finished typing, not from when it starts, " +
              "so every question gets the same window whatever its length.")]
-    [SerializeField] private float questionTimeLimit = 15f;
+    [SerializeField] private float questionTimeLimit = 20f;
     [Tooltip("Countdown readout for the current question. Optional - the limit still " +
              "applies if nothing is assigned.")]
     [SerializeField] private TextMeshProUGUI questionTimerText;
@@ -65,6 +65,15 @@ public class QuizHandler : MonoBehaviour
     [SerializeField] private float questionTimerWarningThreshold = 5f;
     [SerializeField] private Color questionTimerNormalColor = Color.white;
     [SerializeField] private Color questionTimerWarningColor = new Color(0.90f, 0.30f, 0.28f, 1f);
+
+    [Header("Minigame Timer")]
+    [Tooltip("Seconds the player gets to finish a minigame. When it runs out the minigame " +
+             "is closed where it stands and the quiz moves on, without counting the task " +
+             "as done. 0 turns the limit off.")]
+    [SerializeField] private float minigameTimeLimit = 20f;
+    [Tooltip("Countdown readout for the running minigame. Sits above the minigame panels, " +
+             "so it lives on the Canvas rather than inside the quiz. Optional.")]
+    [SerializeField] private TextMeshProUGUI minigameTimerText;
 
     [Header("Timing")]
     [Tooltip("Seconds between characters while the question, and any feedback, types in. " +
@@ -294,6 +303,12 @@ public class QuizHandler : MonoBehaviour
     private Coroutine typewriterRoutine;
     private Coroutine questionTimerRoutine;
 
+    // Set by the wrapper around a minigame's Play once it returns on its own
+    private bool minigameRunning = false;
+
+    // True if any minigame for the question just answered was cut off by its timer
+    private bool minigameTimedOut = false;
+
     // The earthquake preparedness questions - arranged from easiest to hardest beginner
     // difficulty. Add to this list and the round grows to match: the length drives how many
     // questions are asked, the score denominator, and the debug picker's dropdown.
@@ -454,6 +469,9 @@ public class QuizHandler : MonoBehaviour
 
         if (questionTimerText != null)
             questionTimerText.gameObject.SetActive(false);
+
+        if (minigameTimerText != null)
+            minigameTimerText.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -672,14 +690,79 @@ public class QuizHandler : MonoBehaviour
 
     private void UpdateQuestionTimerDisplay(float remaining)
     {
-        if (questionTimerText == null)
+        UpdateTimerLabel(questionTimerText, remaining);
+    }
+
+    /// <summary>
+    /// Writes whole seconds into a countdown label, in the warning colour near the end.
+    /// Shared by the question and minigame timers so the two read the same.
+    /// </summary>
+    private void UpdateTimerLabel(TextMeshProUGUI label, float remaining)
+    {
+        if (label == null)
             return;
 
         float clamped = Mathf.Max(0f, remaining);
-        questionTimerText.text = Mathf.CeilToInt(clamped).ToString();
-        questionTimerText.color = clamped <= questionTimerWarningThreshold
+        label.text = Mathf.CeilToInt(clamped).ToString();
+        label.color = clamped <= questionTimerWarningThreshold
             ? questionTimerWarningColor
             : questionTimerNormalColor;
+    }
+
+    /// <summary>
+    /// Plays a minigame against <see cref="minigameTimeLimit"/>. If the minigame finishes
+    /// first this simply returns with it; if the clock wins, the minigame's coroutine is
+    /// stopped, <paramref name="forceClose"/> tears its panel down, and
+    /// <see cref="minigameTimedOut"/> is raised so the task is not counted.
+    /// Scaled time, like the question timer, so the pause menu holds it too.
+    /// </summary>
+    private IEnumerator PlayTimedMinigame(IEnumerator play, System.Action forceClose)
+    {
+        minigameRunning = true;
+        Coroutine routine = StartCoroutine(WatchMinigame(play));
+
+        // A minigame with nothing to do can return inside StartCoroutine itself
+        if (!minigameRunning)
+            yield break;
+
+        float remaining = minigameTimeLimit;
+        bool timed = minigameTimeLimit > 0f;
+
+        if (minigameTimerText != null && timed)
+        {
+            UpdateTimerLabel(minigameTimerText, remaining);
+            minigameTimerText.gameObject.SetActive(true);
+        }
+
+        while (minigameRunning)
+        {
+            yield return null;
+
+            if (!timed || !minigameRunning)
+                continue;
+
+            remaining -= Time.deltaTime;
+            UpdateTimerLabel(minigameTimerText, remaining);
+
+            if (remaining <= 0f)
+            {
+                StopCoroutine(routine);
+                minigameRunning = false;
+                minigameTimedOut = true;
+
+                if (forceClose != null)
+                    forceClose();
+            }
+        }
+
+        if (minigameTimerText != null)
+            minigameTimerText.gameObject.SetActive(false);
+    }
+
+    private IEnumerator WatchMinigame(IEnumerator play)
+    {
+        yield return play;
+        minigameRunning = false;
     }
 
     /// <summary>
@@ -799,66 +882,70 @@ public class QuizHandler : MonoBehaviour
         if (answerBox != null)
             answerBox.ClearBox();
 
+        minigameTimedOut = false;
+
         // Runs on the question itself, not the answer — right or wrong, the player still
         // pours the water and still blows the whistle. Uses the index of the question just
         // answered, since currentQuestionIndex has already moved on.
         if (waterMinigame != null && QuestionOwnsMinigame(answerBoxIndex, waterMinigameItemName))
-            yield return StartCoroutine(waterMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(waterMinigame.Play(), waterMinigame.ForceClose));
 
         if (whistleMinigame != null && QuestionOwnsMinigame(answerBoxIndex, whistleMinigameItemName))
-            yield return StartCoroutine(whistleMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(whistleMinigame.Play(), whistleMinigame.ForceClose));
 
         if (flashlightMinigame != null && QuestionOwnsMinigame(answerBoxIndex, flashlightMinigameItemNames))
-            yield return StartCoroutine(flashlightMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(flashlightMinigame.Play(), flashlightMinigame.ForceClose));
 
         if (glowstickMinigame != null && QuestionOwnsMinigame(answerBoxIndex, glowstickMinigameItemName))
-            yield return StartCoroutine(glowstickMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(glowstickMinigame.Play(), glowstickMinigame.ForceClose));
 
         if (dustMaskMinigame != null && QuestionOwnsMinigame(answerBoxIndex, dustMaskMinigameItemName))
-            yield return StartCoroutine(dustMaskMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(dustMaskMinigame.Play(), dustMaskMinigame.ForceClose));
 
         if (firstAidMinigame != null && QuestionOwnsMinigame(answerBoxIndex, firstAidMinigameItemName))
-            yield return StartCoroutine(firstAidMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(firstAidMinigame.Play(), firstAidMinigame.ForceClose));
 
         if (pocketKnifeMinigame != null && QuestionOwnsMinigame(answerBoxIndex, pocketKnifeMinigameItemName))
-            yield return StartCoroutine(pocketKnifeMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(pocketKnifeMinigame.Play(), pocketKnifeMinigame.ForceClose));
 
         if (ropeKnotMinigame != null && QuestionOwnsMinigame(answerBoxIndex, ropeKnotMinigameItemName))
-            yield return StartCoroutine(ropeKnotMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(ropeKnotMinigame.Play(), ropeKnotMinigame.ForceClose));
 
         if (medicationMinigame != null && QuestionOwnsMinigame(answerBoxIndex, medicationMinigameItemName))
-            yield return StartCoroutine(medicationMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(medicationMinigame.Play(), medicationMinigame.ForceClose));
 
         if (ziplockMinigame != null && QuestionOwnsMinigame(answerBoxIndex, ziplockMinigameItemName))
-            yield return StartCoroutine(ziplockMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(ziplockMinigame.Play(), ziplockMinigame.ForceClose));
 
         if (thermalBlanketMinigame != null && QuestionOwnsMinigame(answerBoxIndex, thermalBlanketMinigameItemName))
-            yield return StartCoroutine(thermalBlanketMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(thermalBlanketMinigame.Play(), thermalBlanketMinigame.ForceClose));
 
         if (radioMinigame != null && QuestionOwnsMinigame(answerBoxIndex, radioMinigameItemName))
-            yield return StartCoroutine(radioMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(radioMinigame.Play(), radioMinigame.ForceClose));
 
         if (contactCardMinigame != null && QuestionOwnsMinigame(answerBoxIndex, contactCardMinigameItemName))
-            yield return StartCoroutine(contactCardMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(contactCardMinigame.Play(), contactCardMinigame.ForceClose));
 
         if (cannedFoodMinigame != null && QuestionOwnsMinigame(answerBoxIndex, cannedFoodMinigameItemNames))
-            yield return StartCoroutine(cannedFoodMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(cannedFoodMinigame.Play(), cannedFoodMinigame.ForceClose));
 
         if (penAndPaperMinigame != null && QuestionOwnsMinigame(answerBoxIndex, penAndPaperMinigameItemName))
-            yield return StartCoroutine(penAndPaperMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(penAndPaperMinigame.Play(), penAndPaperMinigame.ForceClose));
 
         if (importantDocumentsMinigame != null && QuestionOwnsMinigame(answerBoxIndex, importantDocumentsMinigameItemName))
-            yield return StartCoroutine(importantDocumentsMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(importantDocumentsMinigame.Play(), importantDocumentsMinigame.ForceClose));
 
         if (batteriesMinigame != null && QuestionOwnsMinigame(answerBoxIndex, batteriesMinigameItemName))
-            yield return StartCoroutine(batteriesMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(batteriesMinigame.Play(), batteriesMinigame.ForceClose));
 
         if (clothesMinigame != null && QuestionOwnsMinigame(answerBoxIndex, clothesMinigameItemName))
-            yield return StartCoroutine(clothesMinigame.Play());
+            yield return StartCoroutine(PlayTimedMinigame(clothesMinigame.Play(), clothesMinigame.ForceClose));
 
         // The practical half of this question is done — either its minigame has just played
-        // through, or it never had one. Counted for right and wrong answers alike.
-        tasksCompleted++;
+        // through, or it never had one. Counted for right and wrong answers alike, but not
+        // when the minigame timer ran out before the player finished it.
+        if (!minigameTimedOut)
+            tasksCompleted++;
 
         if (currentQuestionIndex >= TotalQuestions)
         {

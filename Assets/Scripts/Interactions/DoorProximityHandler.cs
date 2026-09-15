@@ -112,6 +112,9 @@ public class DoorProximityHandler : MonoBehaviour
             // A door on a hidden floor is not reachable
             if (!door.gameObject.activeInHierarchy) continue;
 
+            // Locked on this difficulty, so there is nothing to offer
+            if (!door.CanBeUsed) continue;
+
             // Reject doors on another floor before the flat distance check, which cannot
             // tell them apart: upstairs doors share the exact X/Z of the ones below.
             if (Mathf.Abs(playerTransform.position.y - door.transform.position.y) > verticalReach)

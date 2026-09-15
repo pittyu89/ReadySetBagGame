@@ -45,10 +45,12 @@ public class CharacterSpawner : MonoBehaviour
             Destroy(existingPlayer);
         }
 
-        // Set the spawned character as the cinemachine follow target
+        // Follow and look at the spawned character. LookAt is also what the camera's wall
+        // collider keeps line of sight to, so without it the camera passes through walls.
         if (cinemachineCamera != null)
         {
             cinemachineCamera.Follow = spawnedCharacter.transform;
+            cinemachineCamera.LookAt = spawnedCharacter.transform;
         }
     }
 

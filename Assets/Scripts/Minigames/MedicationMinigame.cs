@@ -1046,4 +1046,15 @@ public class MedicationMinigame : MonoBehaviour
 
         group.alpha = to;
     }
+
+    /// <summary>
+    /// Shuts the minigame down mid-play, for when the quiz's minigame timer runs out.
+    /// QuizHandler stops the Play coroutine itself; this clears everything it left up.
+    /// </summary>
+    public void ForceClose()
+    {
+        StopAllCoroutines();
+        Close();
+        isPlaying = false;
+    }
 }

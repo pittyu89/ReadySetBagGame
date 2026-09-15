@@ -12,10 +12,40 @@ public class DoorToggle : MonoBehaviour
     public bool IsOpen => isOpen;
     [SerializeField] private float rotationDuration = 0.5f; // Time in seconds for door to rotate
     [SerializeField] private AudioClip openDoorSFX;
+    [Tooltip("Difficulties this door can be opened on (beginner, intermediate, advanced). " +
+             "Leave empty for a door that opens on every difficulty.")]
+    [SerializeField] private string[] allowedDifficulties = new string[0];
     private Coroutine rotationCoroutine;
+
+    private const string DIFFICULTY_PREF = "SessionDifficulty";
+
+    /// <summary>
+    /// False when this session's difficulty is not one the door is allowed on. The door
+    /// stays shut and DoorProximityHandler offers no button for it.
+    /// </summary>
+    public bool CanBeUsed
+    {
+        get
+        {
+            if (allowedDifficulties == null || allowedDifficulties.Length == 0)
+                return true;
+
+            string difficulty = PlayerPrefs.GetString(DIFFICULTY_PREF, "beginner");
+            foreach (string allowed in allowedDifficulties)
+            {
+                if (string.Equals(allowed, difficulty, System.StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+    }
 
     public void ToggleDoor()
     {
+        if (!CanBeUsed)
+            return;
+
         // Stop any existing rotation
         if (rotationCoroutine != null)
         {

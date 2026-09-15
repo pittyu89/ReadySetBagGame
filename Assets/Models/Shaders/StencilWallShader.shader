@@ -26,57 +26,6 @@ Shader "Custom/StencilWall"
             float  _Smoothness;
             float  _Metallic;
         CBUFFER_END
-
-        // Set globally from RevealSphere.cs. Kept outside UnityPerMaterial because they are
-        // per-frame globals, not per-material data.
-        float4 _RevealCenter;      // xyz = character world position
-        float  _RevealRadius;      // 0 = no cutout
-        float  _RevealDepthPad;    // extends the cut past the character, through wall thickness
-        float  _RevealGrazeCutoff; // 0 = keep every wall seen through the hole, 1 = drop all
-
-        // Cuts a cone running from the camera to the character, rather than a sphere sitting on
-        // the character. A world-space sphere centres its hole where it is perpendicularly
-        // nearest the wall, which is a different screen position from the character behind it -
-        // so the character drifts off-centre in the opening. Testing against the
-        // camera->character axis keeps the hole centred on the character, always.
-        void ApplyRevealCutout(float3 positionWS, float3 normalWS)
-        {
-            if (_RevealRadius <= 0.0)
-                return;
-
-            float3 axis        = _RevealCenter.xyz - _WorldSpaceCameraPos;
-            float  camToPlayer = length(axis);
-            float3 axisDir     = axis / max(camToPlayer, 1e-4);
-
-            float3 toFrag = positionWS - _WorldSpaceCameraPos;
-            float  along  = dot(toFrag, axisDir);
-
-            if (along <= 0.0)
-                return;
-
-            float perp = length(toFrag - axisDir * along);
-
-            // A cone, not a cylinder: the opening narrows toward the camera in step with
-            // perspective, so the hole holds a constant size on screen however near the wall is.
-            float allowed = _RevealRadius * (along / camToPlayer);
-
-            if (perp >= allowed)
-                return;
-
-            // Between the camera and the character, plus enough to clear the thickness of the
-            // wall they are stood against: cut straight out.
-            if (along < camToPlayer + _RevealDepthPad)
-                discard;
-
-            // Past the character, inside the opening. Walls we see face-on are the room's own
-            // walls and should stay - they are what makes the hole read as a room. Walls we
-            // only catch edge-on are slivers of wall side poking in, so drop those.
-            float3 viewDir = normalize(_WorldSpaceCameraPos - positionWS);
-            float  facing  = abs(dot(normalize(normalWS), viewDir));
-
-            if (facing < _RevealGrazeCutoff)
-                discard;
-        }
         ENDHLSL
 
         // ------------------------------------------------------------------
@@ -149,8 +98,6 @@ Shader "Custom/StencilWall"
 
             half4 frag(Varyings IN) : SV_Target
             {
-                ApplyRevealCutout(IN.positionWS, IN.normalWS);
-
                 half4 texColor = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv);
                 half4 albedo   = texColor * _BaseColor;
 
@@ -195,9 +142,7 @@ Shader "Custom/StencilWall"
         }
 
         // ------------------------------------------------------------------
-        // Shadow casting. Deliberately does NOT apply the reveal cutout: the cutaway is a
-        // camera-side effect, so the wall must keep blocking light. Cutting it here too would
-        // drag a patch of sunlight across the floor wherever the character walked.
+        // Shadow casting.
         // ------------------------------------------------------------------
         Pass
         {
@@ -255,8 +200,7 @@ Shader "Custom/StencilWall"
         }
 
         // ------------------------------------------------------------------
-        // Depth + normals. Feeds screen-space ambient occlusion. This one DOES apply the
-        // cutout, so AO matches what is actually visible through the opening.
+        // Depth + normals. Feeds screen-space ambient occlusion.
         // ------------------------------------------------------------------
         Pass
         {
@@ -292,7 +236,6 @@ Shader "Custom/StencilWall"
 
             half4 DepthNormalsFrag(DNVaryings IN) : SV_Target
             {
-                ApplyRevealCutout(IN.positionWS, IN.normalWS);
                 return half4(normalize(IN.normalWS), 0.0);
             }
             ENDHLSL
@@ -335,7 +278,6 @@ Shader "Custom/StencilWall"
 
             half4 DepthOnlyFrag(DOVaryings IN) : SV_Target
             {
-                ApplyRevealCutout(IN.positionWS, IN.normalWS);
                 return 0;
             }
             ENDHLSL

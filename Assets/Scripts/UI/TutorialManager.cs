@@ -28,9 +28,9 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private string[] titles = new string[] { };
     [SerializeField] private string[] descriptions = new string[] { };
     [SerializeField] private Sprite[] images = new Sprite[] { };
-    [SerializeField] private float[] tutorialTitleWidths = new float[] { 200, 250, 280, 560, 360, 220, 420, 200 };
-
-    private float originalTutorialTitleY = 0f;
+    [SerializeField] private float minTitleWidth = 217f;
+    [SerializeField] private float maxTitleWidth = 240f;
+    [SerializeField] private float titlePadding = 40f;
 
     void Start()
     {
@@ -89,38 +89,21 @@ public class TutorialManager : MonoBehaviour
         if (tutorialTitleText != null)
             tutorialTitleText.text = titles[currentTutorialIndex];
 
-        if (tutorialDescription != null)
+        if (tutorialDescription != null && currentTutorialIndex < descriptions.Length)
             tutorialDescription.text = descriptions[currentTutorialIndex];
 
-        if (tutorialImage != null && images[currentTutorialIndex] != null)
+        if (tutorialImage != null && currentTutorialIndex < images.Length && images[currentTutorialIndex] != null)
             tutorialImage.sprite = images[currentTutorialIndex];
 
-        // Adjust tutorialTitle anchor for 6th tutorial (index 5)
-        if (tutorialTitle != null)
+        // The title pill hugs its text within the design widths; long titles
+        // shrink their font (TMP auto-size) instead of stretching the pill
+        if (tutorialTitle != null && tutorialTitleText != null)
         {
             RectTransform titleRect = tutorialTitle.GetComponent<RectTransform>();
-            
-            // Set anchor and pivot to bottom center on page 6, top center otherwise
-            if (currentTutorialIndex == 5)
-            {
-                titleRect.anchorMin = new Vector2(0.5f, 0f);
-                titleRect.anchorMax = new Vector2(0.5f, 0f);
-                titleRect.pivot = new Vector2(0.5f, 0f);
-            }
-            else
-            {
-                titleRect.anchorMin = new Vector2(0.5f, 1f);
-                titleRect.anchorMax = new Vector2(0.5f, 1f);
-                titleRect.pivot = new Vector2(0.5f, 1f);
-            }
-
-            // Set width based on page
-            if (currentTutorialIndex < tutorialTitleWidths.Length)
-            {
-                Vector2 sizeDelta = titleRect.sizeDelta;
-                sizeDelta.x = tutorialTitleWidths[currentTutorialIndex];
-                titleRect.sizeDelta = sizeDelta;
-            }
+            Vector2 sizeDelta = titleRect.sizeDelta;
+            float preferred = tutorialTitleText.GetPreferredValues(titles[currentTutorialIndex]).x + titlePadding * 2f;
+            sizeDelta.x = Mathf.Clamp(preferred, minTitleWidth, maxTitleWidth);
+            titleRect.sizeDelta = sizeDelta;
         }
 
         // Hide left button at start
@@ -131,9 +114,9 @@ public class TutorialManager : MonoBehaviour
         if (rightButton != null)
             rightButton.gameObject.SetActive(currentTutorialIndex < titles.Length - 1);
 
-        // Hide skip button at end
+        // Skip is only offered on the first page
         if (skipButton != null)
-            skipButton.gameObject.SetActive(currentTutorialIndex < titles.Length - 1);
+            skipButton.gameObject.SetActive(currentTutorialIndex == 0);
 
         // Show start button only at the end
         if (startButton != null)

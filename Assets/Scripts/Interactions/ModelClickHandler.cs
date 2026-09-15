@@ -8,8 +8,13 @@ public class ModelClickHandler : MonoBehaviour
     [Tooltip("Max height difference between player and prop. Stops you reaching furniture on " +
              "another floor, since upstairs props sit directly above the ground-floor ones.")]
     [SerializeField] private float verticalReach = 3f;
+    [Tooltip("How far the pointer may move, as a fraction of screen height, and still count " +
+             "as a tap rather than a camera drag.")]
+    [SerializeField] private float tapMaxMovement = 0.02f;
     private InventoryPanelHandler inventoryPanelHandler;
     private Transform playerTransform;
+    private Vector2 pressPosition;
+    private bool pressStartedOverUI;
 
     /// <summary>Reach values are read by ClickableHighlightManager so the highlight and the
     /// click always agree on what is reachable.</summary>
@@ -33,12 +38,19 @@ public class ModelClickHandler : MonoBehaviour
 
     void Update()
     {
-        // Check for mobile touch input
+        // Clicks fire on release, and only if the pointer barely moved: holding and dragging
+        // the screen orbits the camera (CameraOrbitController), and a drag that happens to
+        // start on a prop must not open it.
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
 
             if (touch.phase == TouchPhase.Began)
+            {
+                pressPosition = touch.position;
+                pressStartedOverUI = IsPointerOverUI(touch.fingerId);
+            }
+            else if (touch.phase == TouchPhase.Ended && IsTap(touch.position))
             {
                 HandleTouchClick(touch.position);
             }
@@ -46,18 +58,34 @@ public class ModelClickHandler : MonoBehaviour
         // Check for mouse input only on non-mobile platforms (for testing in editor)
         else if (Input.GetMouseButtonDown(0))
         {
+            pressPosition = Input.mousePosition;
+            pressStartedOverUI = IsPointerOverUI(-1);
+        }
+        else if (Input.GetMouseButtonUp(0) && IsTap(Input.mousePosition))
+        {
             HandleTouchClick(Input.mousePosition);
         }
+    }
+
+    private bool IsTap(Vector2 releasePosition)
+    {
+        float maxMove = tapMaxMovement * Screen.height;
+        return !pressStartedOverUI && (releasePosition - pressPosition).sqrMagnitude <= maxMove * maxMove;
+    }
+
+    private static bool IsPointerOverUI(int pointerId)
+    {
+        if (EventSystem.current == null)
+            return false;
+        return pointerId < 0
+            ? EventSystem.current.IsPointerOverGameObject()
+            : EventSystem.current.IsPointerOverGameObject(pointerId);
     }
 
     private void HandleTouchClick(Vector2 clickPosition)
     {
         // Can't click models until gobag is picked up
         if (!GoBagFloater.IsBagPickedUp())
-            return;
-
-        // Don't click through UI - check if pointer is over any UI element
-        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;
 
         Ray ray = mainCamera.ScreenPointToRay(clickPosition);

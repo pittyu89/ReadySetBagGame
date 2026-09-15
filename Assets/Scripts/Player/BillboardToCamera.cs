@@ -9,8 +9,9 @@ public class BillboardToCamera : MonoBehaviour
     [SerializeField] private bool yawOnly = true;
 
     [Tooltip("Counteracts the foreshortening of standing the sprite upright. Viewed from a " +
-             "40 degree camera an upright plane loses cos(40) = 0.77 of its height, so ~1.3 " +
-             "restores the original on-screen size. Only applied when yawOnly is on.")]
+             "camera pitched down by N degrees an upright plane shows cos(N) of its height, so " +
+             "1/cos(N) restores the original on-screen size (~1.03 for the 14 degree " +
+             "third-person camera). Only applied when yawOnly is on.")]
     [SerializeField] private float uprightHeightCompensation = 1.3f;
 
     private Camera mainCamera;

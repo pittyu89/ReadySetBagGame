@@ -114,59 +114,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!1 &4310635035035244368
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3765284787981404135}
-  - component: {fileID: 9090803823751751368}
-  m_Layer: 7
-  m_Name: RevealSphere
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3765284787981404135
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4310635035035244368}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 2.5, y: 2.0833335, z: 2.0833335}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 6629975122885015486}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9090803823751751368
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4310635035035244368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e76c89ca62865249941c48e0bdd5248, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RevealSphere
-  target: {fileID: 4310635035035244368}
-  wallLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  scaleDuration: 0.2
-  revealedScale: 2.8
-  fitPadding: 1.6
-  revealDepthPad: 0
-  grazeCutoff: 0
 --- !u!1 &4710518777523976073
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,7 +148,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5623971849847859024}
-  - {fileID: 3765284787981404135}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &8945469549173600986
@@ -261,7 +207,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   yawOnly: 1
-  uprightHeightCompensation: 1.13
+  uprightHeightCompensation: 1.03
 --- !u!114 &4254947178538688580
 MonoBehaviour:
   m_ObjectHideFlags: 0

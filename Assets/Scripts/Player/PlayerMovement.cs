@@ -19,6 +19,11 @@ public class PlayerMovement : MonoBehaviour
 
     private CharacterController controller;
     private Vector3 moveDirection;
+
+    // Raw stick/keyboard input. The walk animations are picked from this rather than from the
+    // world-space moveDirection, because the camera can orbit: the sprite always faces the
+    // camera, so "walking left" means left on screen, not toward world -X.
+    private Vector2 inputDirection;
     private Vector3 velocity = Vector3.zero;
     private bool isRunning;
     private AudioSource footstepAudioSource;
@@ -100,6 +105,7 @@ public class PlayerMovement : MonoBehaviour
         right.Normalize();
 
         moveDirection = (forward * vertical + right * horizontal).normalized;
+        inputDirection = new Vector2(horizontal, vertical);
     }
 
     void MoveCharacter()
@@ -163,9 +169,9 @@ public class PlayerMovement : MonoBehaviour
             {
                 PlayFootsteps();
                 
-                if (Mathf.Abs(moveDirection.x) > Mathf.Abs(moveDirection.z))
+                if (Mathf.Abs(inputDirection.x) > Mathf.Abs(inputDirection.y))
                 {
-                    if (moveDirection.x > 0)
+                    if (inputDirection.x > 0)
                     {
                         animator.Play("WalkRight");
                     }
@@ -176,7 +182,7 @@ public class PlayerMovement : MonoBehaviour
                 }
                 else
                 {
-                    if (moveDirection.z > 0)
+                    if (inputDirection.y > 0)
                     {
                         animator.Play("WalkUp");
                     }
