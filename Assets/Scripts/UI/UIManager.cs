@@ -113,7 +113,8 @@ public class UIManager : MonoBehaviour
             teacherSessionPlayButton.onClick.AddListener(() => PlayScreenOutro(ShowJoinRoomPanel, teacherSessionPanel, offlineModePanel));
 
         if (offlineModePlayButton != null)
-            offlineModePlayButton.onClick.AddListener(() => PlayScreenOutro(ShowDifficultyPanel, teacherSessionPanel, offlineModePanel, backArrowButton.gameObject));
+            // BACK doesn't animate here: the difficulty panel has its own BACK in the same spot
+            offlineModePlayButton.onClick.AddListener(() => PlayScreenOutro(ShowDifficultyPanel, teacherSessionPanel, offlineModePanel));
 
         if (startGameButton != null)
             startGameButton.onClick.AddListener(() => { PlayButtonAudio(); PlayDifficultyOutro(StartGame); });
@@ -130,12 +131,11 @@ public class UIManager : MonoBehaviour
         if (offlineModeHelpCloseButton != null)
             offlineModeHelpCloseButton.onClick.AddListener(GoBack);
 
-        // BGM is started by VideoBackgroundIntro after the loading screen finishes.
+        // BGM is started by VideoBackgroundIntro.
     }
 
     /// <summary>
-    /// Starts the main menu background music. Called by VideoBackgroundIntro once the
-    /// loading screen is done so music doesn't play over the loading video.
+    /// Starts the main menu background music. Called by VideoBackgroundIntro.
     /// </summary>
     public void PlayMainMenuBGM()
     {
@@ -341,6 +341,12 @@ public class UIManager : MonoBehaviour
             HideAllPanels();
             teacherSessionPanel.SetActive(true);
             offlineModePanel.SetActive(true);
+
+            // Coming back from the difficulty panel, whose BACK sat in the same spot, so this
+            // BACK simply reappears instead of sliding in
+            UIScreenTransition backTransition = backArrowButton.GetComponent<UIScreenTransition>();
+            if (backTransition != null)
+                backTransition.SkipNextPlayIn();
             backArrowButton.gameObject.SetActive(true);
         }
         else if (currentScreen == "teacherSessionHelp")
@@ -397,7 +403,7 @@ public class UIManager : MonoBehaviour
         PlayerPrefs.DeleteKey("SessionCode");
         PlayerPrefs.Save();
         
-        SceneManager.LoadScene("LoadingScene");
+        SceneManager.LoadScene("GameScene");
     }
 
     // Reset the current left menu panel tracking (called when panels close)

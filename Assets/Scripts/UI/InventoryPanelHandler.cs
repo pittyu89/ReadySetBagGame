@@ -39,10 +39,15 @@ public class InventoryPanelHandler : MonoBehaviour
     [SerializeField] private SmallBagController smallBag;
     [Tooltip("HUD bag button icon used with the Small Bag.")]
     [SerializeField] private Sprite smallBagButtonIcon;
+    [Tooltip("Shown instead of the standard (orange) bag when the Medium Bag was picked.")]
+    [SerializeField] private MediumBagController mediumBag;
+    [Tooltip("HUD bag button icon used with the Medium Bag.")]
+    [SerializeField] private Sprite mediumBagButtonIcon;
 
     // Matches the order of the go-bag picker on the difficulty panel
     private const int STANDARD_BAG = 0;
     private const int SMALL_BAG = 1;
+    private const int MEDIUM_BAG = 2;
 
     [Header("Audio")]
     [SerializeField] private AudioClip openTopBagAudio;
@@ -132,29 +137,44 @@ public class InventoryPanelHandler : MonoBehaviour
     }
 
     /// <summary>
-    /// Shows the bag picked on the difficulty panel. The Medium Bag isn't built yet, so anything
-    /// other than the Small Bag uses the standard bag.
+    /// Shows the bag picked on the difficulty panel, falling back to the standard bag if the
+    /// picked one isn't set up in this scene.
     /// </summary>
     private void ApplySelectedBag()
     {
         int selected = PlayerPrefs.GetInt(DifficultyPanelManager.SELECTED_GO_BAG_KEY, STANDARD_BAG);
         bool useSmallBag = selected == SMALL_BAG && smallBag != null;
+        bool useMediumBag = selected == MEDIUM_BAG && mediumBag != null;
 
         if (BagAnimator != null)
-            BagAnimator.gameObject.SetActive(!useSmallBag);
+            BagAnimator.gameObject.SetActive(!useSmallBag && !useMediumBag);
 
         if (smallBag != null)
             smallBag.gameObject.SetActive(useSmallBag);
 
-        if (useSmallBag && bagButton != null && smallBagButtonIcon != null)
+        if (mediumBag != null)
+            mediumBag.gameObject.SetActive(useMediumBag);
+
+        Sprite icon = useSmallBag ? smallBagButtonIcon : useMediumBag ? mediumBagButtonIcon : null;
+        if (icon != null && bagButton != null)
         {
-            Image icon = bagButton.GetComponent<Image>();
-            if (icon != null)
+            Image image = bagButton.GetComponent<Image>();
+            if (image != null)
             {
-                icon.sprite = smallBagButtonIcon;
-                icon.preserveAspect = true;
+                image.sprite = icon;
+                image.preserveAspect = true;
             }
         }
+    }
+
+    /// <summary>Lets the Small / Medium Bag reshuffle their slot contents when a storage opens.</summary>
+    private void NotifyBagsStorageOpened()
+    {
+        if (smallBag != null && smallBag.isActiveAndEnabled)
+            smallBag.OnStorageOpened();
+
+        if (mediumBag != null && mediumBag.isActiveAndEnabled)
+            mediumBag.OnStorageOpened();
     }
 
     public void OpenInventory()
@@ -184,9 +204,8 @@ public class InventoryPanelHandler : MonoBehaviour
             // Sprite provided, it's from a model click (split screen mode)
             SetSplitScreenMode(modelSprite);
 
-            // Every storage opened reshuffles the Small Bag's contents
-            if (smallBag != null && smallBag.isActiveAndEnabled)
-                smallBag.OnStorageOpened();
+            // Every storage opened reshuffles the Small / Medium Bag's slots
+            NotifyBagsStorageOpened();
         }
 
         // Rebind animator and reset to idle state
@@ -242,9 +261,8 @@ public class InventoryPanelHandler : MonoBehaviour
         // Set up split screen mode with storage
         SetSplitScreenMode(modelSprite);
 
-        // Every storage opened reshuffles the Small Bag's contents
-        if (smallBag != null && smallBag.isActiveAndEnabled)
-            smallBag.OnStorageOpened();
+        // Every storage opened reshuffles the Small / Medium Bag's slots
+        NotifyBagsStorageOpened();
 
         // Set model display size from ClickableModel
         if (model != null && modelDisplayImage != null)

@@ -55,13 +55,25 @@ public class BlobShadow : MonoBehaviour
     [Tooltip("Pulls the silhouette back under the feet.")]
     [SerializeField] private float contactBias = 0.18f;
 
+    [Tooltip("How far the shadow may lean along the sprite's own plane before it's held back. " +
+             "When the sun lines up with the sprite's edge, a true projection collapses to a " +
+             "sliver; this keeps at least this much of the shadow falling behind or in front.")]
+    [SerializeField, Range(0f, 1f)] private float minShadowSpread = 0.4f;
+
     [Header("Height Response")]
     [SerializeField] private float growWithHeight = 0.35f;
     [SerializeField] private float fadeHeight = 3.5f;
 
     private Transform quad;
+    private MeshFilter quadFilter;
     private MeshRenderer quadRenderer;
     private Material quadMaterial;
+    private Mesh blobMesh;
+    private Mesh silhouetteMesh;
+    private readonly Vector3[] silhouetteVerts = new Vector3[4];
+
+    private static readonly int[] UpFacingTris   = { 0, 2, 1, 0, 3, 2 };
+    private static readonly int[] DownFacingTris = { 0, 1, 2, 0, 2, 3 };
 
     private static readonly int ColorID      = Shader.PropertyToID("_Color");
     private static readonly int FalloffID    = Shader.PropertyToID("_Falloff");
@@ -87,9 +99,17 @@ public class BlobShadow : MonoBehaviour
 
     private void OnDestroy()
     {
+        DestroyOwned(blobMesh);
+        DestroyOwned(silhouetteMesh);
         if (quad == null) return;
-        if (Application.isPlaying) Destroy(quad.gameObject);
-        else DestroyImmediate(quad.gameObject);
+        DestroyOwned(quad.gameObject);
+    }
+
+    private static void DestroyOwned(Object obj)
+    {
+        if (obj == null) return;
+        if (Application.isPlaying) Destroy(obj);
+        else DestroyImmediate(obj);
     }
 
     private void EnsureQuad()
@@ -100,8 +120,9 @@ public class BlobShadow : MonoBehaviour
         go.hideFlags = HideFlags.DontSave;
         quad = go.transform;
 
-        var mf = go.AddComponent<MeshFilter>();
-        mf.sharedMesh = BuildGroundQuad();
+        quadFilter = go.AddComponent<MeshFilter>();
+        blobMesh = BuildGroundQuad();
+        quadFilter.sharedMesh = blobMesh;
 
         quadRenderer = go.AddComponent<MeshRenderer>();
         quadRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -136,6 +157,32 @@ public class BlobShadow : MonoBehaviour
         mesh.triangles = new[] { 0, 2, 1, 0, 3, 2 };
         mesh.RecalculateBounds();
         return mesh;
+    }
+
+    /// <summary>
+    /// Writes this frame's silhouette corners into the shadow mesh. Corners are near-left,
+    /// near-right, far-right, far-left, so U runs along the sprite's width and V away from the
+    /// feet, as the shader expects. The winding is picked so the face always points up.
+    /// </summary>
+    private void UpdateSilhouetteMesh(bool upFacingWinding)
+    {
+        if (silhouetteMesh == null)
+        {
+            silhouetteMesh = new Mesh { name = "BlobShadowSilhouette", hideFlags = HideFlags.DontSave };
+            silhouetteMesh.MarkDynamic();
+            silhouetteMesh.vertices = silhouetteVerts;
+            silhouetteMesh.uv = new[]
+            {
+                new Vector2(0f, 0f), new Vector2(1f, 0f),
+                new Vector2(1f, 1f), new Vector2(0f, 1f)
+            };
+            silhouetteMesh.normals = new[] { Vector3.up, Vector3.up, Vector3.up, Vector3.up };
+        }
+
+        silhouetteMesh.vertices = silhouetteVerts;
+        silhouetteMesh.triangles = upFacingWinding ? UpFacingTris : DownFacingTris;
+        silhouetteMesh.RecalculateBounds();
+        quadFilter.sharedMesh = silhouetteMesh;
     }
 
     private Vector3 ResolveShadowDirection()
@@ -229,16 +276,45 @@ public class BlobShadow : MonoBehaviour
         if (asSilhouette)
         {
             Sprite sp = spriteSource.sprite;
+            Transform spriteTf = spriteSource.transform;
 
-            Vector3 away = ResolveShadowDirection();
-            quad.rotation = Quaternion.LookRotation(away, hit.normal);
+            // The shadow of an upright flat sprite: its base runs along the sprite's own
+            // right axis, so it turns with the sprite as the camera orbits, and it stretches
+            // away from the light. Building it on the sprite's axes (rather than a rectangle
+            // square to the light) also keeps the silhouette from mirroring when the shadow
+            // falls toward the camera.
+            Vector3 right = Vector3.ProjectOnPlane(spriteTf.right, hit.normal);
+            if (right.sqrMagnitude < 1e-4f) right = Vector3.ProjectOnPlane(Vector3.right, hit.normal);
+            right.Normalize();
 
-            Vector3 spriteSize = spriteSource.bounds.size;
-            float w = spriteSize.x + grow;
-            float l = spriteSize.y * lengthSquash + grow;
-            quad.localScale = new Vector3(w, 1f, l);
+            Vector3 away = Vector3.ProjectOnPlane(ResolveShadowDirection(), hit.normal).normalized;
+            Vector3 behind = Vector3.Cross(hit.normal, right).normalized;
+            float spread = Vector3.Dot(away, behind);
+            if (Mathf.Abs(spread) < minShadowSpread)
+            {
+                float side = spread < 0f ? -1f : 1f;
+                float along = Vector3.Dot(away, right);
+                along = Mathf.Sign(along) * Mathf.Sqrt(Mathf.Max(0f, 1f - minShadowSpread * minShadowSpread));
+                away = (right * along + behind * side * minShadowSpread).normalized;
+            }
 
-            quad.position = hit.point + hit.normal * surfaceOffset + away * (l * 0.5f - contactBias);
+            Vector3 lossy = spriteTf.lossyScale;
+            float w = sp.bounds.size.x * Mathf.Abs(lossy.x) + grow;
+            float l = sp.bounds.size.y * Mathf.Abs(lossy.y) * lengthSquash + grow;
+
+            quad.position = hit.point + hit.normal * surfaceOffset;
+            quad.rotation = Quaternion.identity;
+            quad.localScale = Vector3.one;
+
+            Vector3 near = -away * contactBias;
+            Vector3 halfW = right * (w * 0.5f);
+            Vector3 length = away * l;
+            silhouetteVerts[0] = near - halfW;
+            silhouetteVerts[1] = near + halfW;
+            silhouetteVerts[2] = near + halfW + length;
+            silhouetteVerts[3] = near - halfW + length;
+
+            UpdateSilhouetteMesh(Vector3.Dot(Vector3.Cross(right, away), hit.normal) < 0f);
 
             if (quadMaterial != null)
             {
@@ -258,6 +334,7 @@ public class BlobShadow : MonoBehaviour
         }
         else
         {
+            quadFilter.sharedMesh = blobMesh;
             quad.position = hit.point + hit.normal * surfaceOffset;
             quad.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
             float size = baseSize + grow;

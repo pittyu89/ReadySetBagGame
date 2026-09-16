@@ -27,6 +27,7 @@ public class UIScreenTransition : MonoBehaviour
     private CanvasGroup[] groups;
     private CanvasGroup rootGroup;
     private Coroutine running;
+    private bool skipNextPlayIn;
 
     /// <summary>True while the screen is animating in or out.</summary>
     public bool IsPlaying => running != null;
@@ -64,8 +65,36 @@ public class UIScreenTransition : MonoBehaviour
 
     void OnEnable()
     {
+        if (skipNextPlayIn)
+        {
+            skipNextPlayIn = false;
+            ShowImmediately();
+            return;
+        }
+
         if (playOnEnable)
             PlayIn();
+    }
+
+    /// <summary>
+    /// The next time this screen is enabled it appears already in place, with no animation.
+    /// </summary>
+    public void SkipNextPlayIn()
+    {
+        skipNextPlayIn = true;
+    }
+
+    /// <summary>Snaps every element to its resting position, fully visible.</summary>
+    public void ShowImmediately()
+    {
+        if (running != null)
+        {
+            StopCoroutine(running);
+            running = null;
+        }
+
+        Apply(Length());
+        rootGroup.blocksRaycasts = true;
     }
 
     void OnDisable()

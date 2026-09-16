@@ -49,7 +49,7 @@ public class MainMenuIntroAnimator : MonoBehaviour
     private bool outroPlaying;
 
     [Tooltip("When true, the intro waits for PlayIntro() to be called (e.g. by " +
-             "VideoBackgroundIntro after the loading screen). When false, it auto-plays in Start.")]
+             "VideoBackgroundIntro). When false, it auto-plays in Start.")]
     [SerializeField] private bool waitForTrigger = true;
 
     // Hide everything in Awake so nothing flashes on the first rendered frame

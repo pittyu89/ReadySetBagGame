@@ -73,11 +73,11 @@ public class SceneNavigator : MonoBehaviour
     }
 
     /// <summary>
-    /// Load LoadingScene (used before GameScene).
+    /// Load GameScene.
     /// </summary>
-    public void GoToLoadingScene()
+    public void GoToGameScene()
     {
-        SceneManager.LoadScene("LoadingScene");
+        SceneManager.LoadScene("GameScene");
     }
 
     private void PrepareMainMenuVideo()

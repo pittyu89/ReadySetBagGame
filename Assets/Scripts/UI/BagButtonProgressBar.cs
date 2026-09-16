@@ -74,12 +74,23 @@ public class BagButtonProgressBar : MonoBehaviour
             targetFillPercentage = 0f; // No limit set
         }
 
+        // The button is hidden while the inventory is open; OnEnable animates to the target instead
+        if (!isActiveAndEnabled)
+            return;
+
         // Stop any existing animation and start a new one
         if (animationCoroutine != null)
         {
             StopCoroutine(animationCoroutine);
         }
         animationCoroutine = StartCoroutine(AnimateFillAmount(targetFillPercentage));
+    }
+
+    void OnEnable()
+    {
+        // Catch up on weight changes made while the button was hidden
+        if (!Mathf.Approximately(currentFillPercentage, targetFillPercentage))
+            animationCoroutine = StartCoroutine(AnimateFillAmount(targetFillPercentage));
     }
 
     private IEnumerator AnimateFillAmount(float targetFill)

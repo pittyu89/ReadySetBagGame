@@ -256,7 +256,7 @@ public class SessionJoinManager : MonoBehaviour
 
     private void LoadGameScene()
     {
-        SceneManager.LoadScene("LoadingScene");
+        SceneManager.LoadScene("GameScene");
     }
 
     private void StopListening()

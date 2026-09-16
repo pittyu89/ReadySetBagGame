@@ -18,6 +18,13 @@ public class DifficultyPanelManager : MonoBehaviour
     [SerializeField] private RenderTexture difficultyRT;
     [Tooltip("Shows DifficultyRT. Its UV rect is cropped so the video fills the slanted frame without stretching.")]
     [SerializeField] private RawImage previewImage;
+    [Tooltip("How far the selected difficulty's bar slides out to the right.")]
+    [SerializeField] private float selectedShift = 22f;
+    [SerializeField] private float selectDuration = 0.28f;
+    [Tooltip("Fade out, then back in, as the title and description change.")]
+    [SerializeField] private float textFadeDuration = 0.14f;
+    [Tooltip("How far the new title and description rise as they fade in.")]
+    [SerializeField] private float textRise = 14f;
 
     [Header("Go-Bag")]
     [SerializeField] private Button bagLeftButton;
@@ -53,6 +60,13 @@ public class DifficultyPanelManager : MonoBehaviour
     private Vector2 bagHomePosition;
     private Coroutine bagSwap;
 
+    // Resting positions, captured before any selection offsets are applied
+    private Vector2[] difficultyButtonHomes;
+    private Vector2 titleHome;
+    private Vector2 descriptionHome;
+    private Coroutine selectAnimation;
+    private Coroutine textAnimation;
+
     private readonly string[] difficultyNames = { "Beginner", "Intermediate", "Advanced" };
     private readonly string[] difficultyKeys = { "beginner", "intermediate", "advanced" };
     private readonly string[] difficultyDescriptions =
@@ -75,12 +89,22 @@ public class DifficultyPanelManager : MonoBehaviour
         if (panelGroup == null)
             panelGroup = gameObject.AddComponent<CanvasGroup>();
 
+        difficultyButtonHomes = new Vector2[difficultyButtons.Length];
         for (int i = 0; i < difficultyButtons.Length; i++)
         {
             int index = i;
             if (difficultyButtons[i] != null)
+            {
+                difficultyButtonHomes[i] = ((RectTransform)difficultyButtons[i].transform).anchoredPosition;
                 difficultyButtons[i].onClick.AddListener(() => SelectDifficulty(index));
+            }
         }
+
+        if (difficultyTitle != null)
+            titleHome = difficultyTitle.rectTransform.anchoredPosition;
+
+        if (difficultyDescription != null)
+            descriptionHome = difficultyDescription.rectTransform.anchoredPosition;
 
         if (bagLeftButton != null)
             bagLeftButton.onClick.AddListener(PreviousBag);
@@ -108,6 +132,7 @@ public class DifficultyPanelManager : MonoBehaviour
 
         FitPreviewToFrame();
         UpdateDifficultyDisplay();
+        SnapDifficultyVisuals();
         UpdateBagDisplay();
 
         transition = StartCoroutine(PlayIntro());
@@ -116,6 +141,11 @@ public class DifficultyPanelManager : MonoBehaviour
     void OnDisable()
     {
         transition = null;
+
+        // Coroutines die with the panel - don't leave a half-slid bar or faded text behind
+        selectAnimation = null;
+        textAnimation = null;
+        SnapDifficultyVisuals();
 
         // Coroutines die with the panel - don't leave a half-slid bag behind
         if (bagSwap != null)
@@ -147,7 +177,135 @@ public class DifficultyPanelManager : MonoBehaviour
             return;
 
         currentDifficultyIndex = index;
-        UpdateDifficultyDisplay();
+        UpdateDifficultyDisplay(animateText: isActiveAndEnabled);
+
+        if (!isActiveAndEnabled)
+        {
+            SnapDifficultyVisuals();
+            return;
+        }
+
+        // Starts from wherever the bars are, so a quick second tap redirects smoothly
+        if (selectAnimation != null)
+            StopCoroutine(selectAnimation);
+        selectAnimation = StartCoroutine(AnimateDifficultyBars());
+    }
+
+    /// <summary>
+    /// The chosen bar slides out to the right with a small overshoot and warms to the
+    /// selected colour, while the others slide home and cool back down.
+    /// </summary>
+    private IEnumerator AnimateDifficultyBars()
+    {
+        int count = difficultyButtons.Length;
+        var startPositions = new Vector2[count];
+        var startColors = new Color[count];
+
+        for (int i = 0; i < count; i++)
+        {
+            if (difficultyButtons[i] == null) continue;
+            startPositions[i] = ((RectTransform)difficultyButtons[i].transform).anchoredPosition;
+            startColors[i] = BarGraphic(i) != null ? BarGraphic(i).color : unselectedColor;
+        }
+
+        yield return Animate(selectDuration, t =>
+        {
+            for (int i = 0; i < count; i++)
+            {
+                if (difficultyButtons[i] == null) continue;
+
+                bool selected = i == currentDifficultyIndex;
+                var rt = (RectTransform)difficultyButtons[i].transform;
+                Vector2 target = DifficultyButtonTarget(i);
+
+                // Only the arriving bar overshoots; the others just ease home
+                float move = selected ? EaseOutBack(t) : EaseOutCubic(t);
+                rt.anchoredPosition = Vector2.LerpUnclamped(startPositions[i], target, move);
+
+                TintDifficulty(i, Color.Lerp(startColors[i], selected ? selectedColor : unselectedColor, EaseOutCubic(t)));
+            }
+        });
+
+        selectAnimation = null;
+        SnapDifficultyBars();
+    }
+
+    /// <summary>Fades the title and description out, swaps the words, then fades them in rising.</summary>
+    private IEnumerator AnimateDifficultyText(string title, string description)
+    {
+        float startAlpha = difficultyTitle != null ? difficultyTitle.alpha
+            : difficultyDescription != null ? difficultyDescription.alpha : 1f;
+
+        yield return Animate(textFadeDuration * startAlpha, t => SetDifficultyTextAlpha(Mathf.Lerp(startAlpha, 0f, t), 0f));
+
+        if (difficultyTitle != null) difficultyTitle.text = title;
+        if (difficultyDescription != null) difficultyDescription.text = description;
+
+        yield return Animate(textFadeDuration, t =>
+        {
+            float ease = EaseOutCubic(t);
+            SetDifficultyTextAlpha(ease, textRise * (1f - ease));
+        });
+
+        textAnimation = null;
+    }
+
+    private void SetDifficultyTextAlpha(float alpha, float drop)
+    {
+        if (difficultyTitle != null)
+        {
+            difficultyTitle.alpha = alpha;
+            difficultyTitle.rectTransform.anchoredPosition = titleHome + Vector2.down * drop;
+        }
+
+        if (difficultyDescription != null)
+        {
+            difficultyDescription.alpha = alpha;
+            difficultyDescription.rectTransform.anchoredPosition = descriptionHome + Vector2.down * drop;
+        }
+    }
+
+    /// <summary>Puts every bar, tint and text straight into its resting state for the current selection.</summary>
+    private void SnapDifficultyVisuals()
+    {
+        SnapDifficultyBars();
+
+        if (difficultyTitle != null) difficultyTitle.text = difficultyNames[currentDifficultyIndex];
+        if (difficultyDescription != null) difficultyDescription.text = difficultyDescriptions[currentDifficultyIndex];
+        SetDifficultyTextAlpha(1f, 0f);
+    }
+
+    private void SnapDifficultyBars()
+    {
+        if (difficultyButtonHomes == null)
+            return;
+
+        for (int i = 0; i < difficultyButtons.Length; i++)
+        {
+            if (difficultyButtons[i] == null) continue;
+            ((RectTransform)difficultyButtons[i].transform).anchoredPosition = DifficultyButtonTarget(i);
+            TintDifficulty(i, i == currentDifficultyIndex ? selectedColor : unselectedColor);
+        }
+    }
+
+    private Vector2 DifficultyButtonTarget(int index)
+    {
+        Vector2 home = difficultyButtonHomes[index];
+        return index == currentDifficultyIndex ? home + Vector2.right * selectedShift : home;
+    }
+
+    private Graphic BarGraphic(int index)
+    {
+        return difficultyButtons[index] != null ? difficultyButtons[index].targetGraphic : null;
+    }
+
+    private void TintDifficulty(int index, Color tint)
+    {
+        if (BarGraphic(index) != null)
+            BarGraphic(index).color = tint;
+
+        if (index < difficultyStripes.Length && difficultyStripes[index] != null)
+            difficultyStripes[index].color = tint;
     }
 
     private void NextBag()
@@ -236,24 +394,27 @@ public class DifficultyPanelManager : MonoBehaviour
         graphic.color = c;
     }
 
-    private void UpdateDifficultyDisplay()
+    /// <summary>
+    /// Switches the preview video and saves the choice. Bar tints and positions are handled
+    /// by SnapDifficultyVisuals / AnimateDifficultyBars; the text here, unless animated.
+    /// </summary>
+    private void UpdateDifficultyDisplay(bool animateText = false)
     {
-        for (int i = 0; i < difficultyButtons.Length; i++)
+        if (animateText)
         {
-            Color tint = i == currentDifficultyIndex ? selectedColor : unselectedColor;
-
-            if (difficultyButtons[i] != null && difficultyButtons[i].targetGraphic != null)
-                difficultyButtons[i].targetGraphic.color = tint;
-
-            if (i < difficultyStripes.Length && difficultyStripes[i] != null)
-                difficultyStripes[i].color = tint;
+            if (textAnimation != null)
+                StopCoroutine(textAnimation);
+            textAnimation = StartCoroutine(AnimateDifficultyText(
+                difficultyNames[currentDifficultyIndex], difficultyDescriptions[currentDifficultyIndex]));
         }
+        else
+        {
+            if (difficultyTitle != null)
+                difficultyTitle.text = difficultyNames[currentDifficultyIndex];
 
-        if (difficultyTitle != null)
-            difficultyTitle.text = difficultyNames[currentDifficultyIndex];
-
-        if (difficultyDescription != null)
-            difficultyDescription.text = difficultyDescriptions[currentDifficultyIndex];
+            if (difficultyDescription != null)
+                difficultyDescription.text = difficultyDescriptions[currentDifficultyIndex];
+        }
 
         // Play the preview video through VideoManager
         if (VideoManager.Instance != null)
@@ -287,7 +448,7 @@ public class DifficultyPanelManager : MonoBehaviour
         if (bagNameText != null)
             bagNameText.text = currentBagIndex < bagNames.Length ? bagNames[currentBagIndex] : string.Empty;
 
-        // Only remembered for now - the game scene doesn't read it yet
+        // Read in the game scene by InventoryPanelHandler and GoBagFloater
         PlayerPrefs.SetInt(SELECTED_GO_BAG_KEY, currentBagIndex);
         PlayerPrefs.Save();
     }
@@ -322,20 +483,22 @@ public class DifficultyPanelManager : MonoBehaviour
 
     private IEnumerator PlayIntro()
     {
-        panelGroup.interactable = false;
+        // Taps are blocked rather than the buttons made non-interactable - non-interactable
+        // buttons draw in their faded "disabled" tint, so BACK and START would dim mid-transition
+        panelGroup.blocksRaycasts = false;
         SetFade(0f);
         SetBaseOffset(1f);
 
         yield return Animate(slideDuration, t => SetBaseOffset(1f - EaseOutCubic(t)));
         yield return Animate(fadeDuration, SetFade);
 
-        panelGroup.interactable = true;
+        panelGroup.blocksRaycasts = true;
         transition = null;
     }
 
     private IEnumerator PlayOutroRoutine(Action onComplete)
     {
-        panelGroup.interactable = false;
+        panelGroup.blocksRaycasts = false;
 
         yield return Animate(fadeDuration, t => SetFade(1f - t));
         yield return Animate(slideDuration, t => SetBaseOffset(EaseInCubic(t)));
@@ -348,7 +511,7 @@ public class DifficultyPanelManager : MonoBehaviour
         {
             SetBaseOffset(0f);
             SetFade(1f);
-            panelGroup.interactable = true;
+            panelGroup.blocksRaycasts = true;
         }
     }
 
