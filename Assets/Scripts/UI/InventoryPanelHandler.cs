@@ -142,7 +142,7 @@ public class InventoryPanelHandler : MonoBehaviour
     /// </summary>
     private void ApplySelectedBag()
     {
-        int selected = PlayerPrefs.GetInt(DifficultyPanelManager.SELECTED_GO_BAG_KEY, STANDARD_BAG);
+        int selected = DifficultyPanelManager.GetActiveGoBag();
         bool useSmallBag = selected == SMALL_BAG && smallBag != null;
         bool useMediumBag = selected == MEDIUM_BAG && mediumBag != null;
 

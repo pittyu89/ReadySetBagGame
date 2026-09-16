@@ -1059,6 +1059,9 @@ public class QuizHandler : MonoBehaviour
         PlayerPrefs.SetString("LastDrillBadge", drill.Badge);
         PlayerPrefs.Save();
 
+        // Teacher sessions report the run to the dashboard (offline practice does nothing here)
+        SessionResultUploader.Submit(drill, score, TotalQuestions, remainingTime, totalTime, difficulty);
+
         // Show results panel
         if (resultsPanel != null)
         {

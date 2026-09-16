@@ -177,11 +177,13 @@ public class SessionJoinManager : MonoBehaviour
         {
             var sessionRef = db.Collection("sessions").Document(sessionId);
 
-            // Create player data
+            // Create player data. "uid" is what the Firestore rules check: a student may only
+            // add an entry for themselves.
             var playerData = new Dictionary<string, object>
             {
                 { "studentId", studentId },
                 { "username", studentUsername },
+                { "uid", Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser?.UserId ?? "" },
                 { "joinedAt", System.DateTime.UtcNow }
             };
 
@@ -195,6 +197,8 @@ public class SessionJoinManager : MonoBehaviour
         }
         catch (System.Exception ex)
         {
+            Debug.LogWarning($"Joining session {sessionId} failed: {ex.Message}");
+            throw;
         }
     }
 
@@ -231,9 +235,18 @@ public class SessionJoinManager : MonoBehaviour
                             string difficulty = data.ContainsKey("difficulty") ? 
                                 data["difficulty"].ToString() : "beginner";
 
-                            // Save to PlayerPrefs for GameScene
+                            // Save to PlayerPrefs for GameScene. The session id and its teacher
+                            // go into the result the game sends when the drill ends.
                             PlayerPrefs.SetString("SessionDifficulty", difficulty);
                             PlayerPrefs.SetString("SessionCode", currentSessionCode);
+                            PlayerPrefs.SetString(SessionResultUploader.SESSION_ID_KEY, sessionId);
+                            PlayerPrefs.SetString(SessionResultUploader.SESSION_TEACHER_KEY,
+                                data.ContainsKey("teacherId") ? data["teacherId"].ToString() : "");
+
+                            // The go-bag the teacher picked for the class (sessions made
+                            // before the picker existed use the standard bag)
+                            string bagType = data.ContainsKey("bagType") ? data["bagType"].ToString() : "standard";
+                            PlayerPrefs.SetInt(DifficultyPanelManager.SESSION_GO_BAG_KEY, GoBagIndexFor(bagType));
                             PlayerPrefs.Save();
 
                             // Stop listening
@@ -252,6 +265,17 @@ public class SessionJoinManager : MonoBehaviour
                     }
                 }
             });
+    }
+
+    /// <summary>The dashboard's bagType names, in the difficulty panel's bag order.</summary>
+    private static int GoBagIndexFor(string bagType)
+    {
+        switch ((bagType ?? "").ToLowerInvariant())
+        {
+            case "small": return 1;
+            case "medium": return 2;
+            default: return 0;
+        }
     }
 
     private void LoadGameScene()

@@ -50,6 +50,23 @@ public class DifficultyPanelManager : MonoBehaviour
 
     public const string SELECTED_GO_BAG_KEY = "SelectedGoBag";
 
+    /// <summary>The bag the teacher picked for the current session. Kept apart from the
+    /// player's own offline choice so a session doesn't overwrite it.</summary>
+    public const string SESSION_GO_BAG_KEY = "SessionGoBag";
+
+    /// <summary>
+    /// The bag this run uses (0 = Standard, 1 = Small, 2 = Medium): the teacher's pick in a
+    /// teacher session, otherwise whatever the player chose on this panel.
+    /// </summary>
+    public static int GetActiveGoBag()
+    {
+        bool inTeacherSession = !string.IsNullOrEmpty(PlayerPrefs.GetString("SessionCode", ""));
+        if (inTeacherSession && PlayerPrefs.HasKey(SESSION_GO_BAG_KEY))
+            return PlayerPrefs.GetInt(SESSION_GO_BAG_KEY, 0);
+
+        return PlayerPrefs.GetInt(SELECTED_GO_BAG_KEY, 0);
+    }
+
     private int currentDifficultyIndex = 0;
     private int currentBagIndex = 0;
     private CanvasGroup panelGroup;

@@ -51,7 +51,7 @@ public class GoBagFloater : MonoBehaviour
     private bool ApplySelectedBagSprite()
     {
         Sprite bagSprite = null;
-        switch (PlayerPrefs.GetInt(DifficultyPanelManager.SELECTED_GO_BAG_KEY, 0))
+        switch (DifficultyPanelManager.GetActiveGoBag())
         {
             case SMALL_BAG: bagSprite = smallBagSprite; break;
             case MEDIUM_BAG: bagSprite = mediumBagSprite; break;
@@ -197,7 +197,7 @@ public class GoBagFloater : MonoBehaviour
     private RuntimeAnimatorController GetCarryingController(bool isMale)
     {
         RuntimeAnimatorController chosen = null;
-        switch (PlayerPrefs.GetInt(DifficultyPanelManager.SELECTED_GO_BAG_KEY, 0))
+        switch (DifficultyPanelManager.GetActiveGoBag())
         {
             case SMALL_BAG:
                 chosen = isMale ? maleSmallBagAnimatorController : femaleSmallBagAnimatorController;

@@ -1570,7 +1570,7 @@ RectTransform:
   m_GameObject: {fileID: 203559353}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9909819, y: 0.9909819, z: 1}
+  m_LocalScale: {x: 0.95210445, y: 0.95210445, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 278902837}
@@ -5558,16 +5558,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuIntroAnimator
   menuContent: {fileID: 203559354}
-  menuStartDelay: 0.1
-  menuFadeDuration: 0.55
-  menuStagger: 0.1
+  menuStartDelay: 0.05
+  menuFadeDuration: 0.35
+  menuStagger: 0.06
   menuSlideDistance: 28
   leftPanel: {fileID: 1870290063}
   panelStartDelay: 0
   panelSlideDuration: 0.5
   playerCard: {fileID: 132359282}
-  cardStartDelay: 0.15
-  cardSlideDuration: 1
+  cardStartDelay: 0.1
+  cardSlideDuration: 0.6
   cardSlideDistance: 0
   waitForTrigger: 1
 --- !u!1 &847582777

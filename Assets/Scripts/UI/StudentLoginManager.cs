@@ -39,6 +39,7 @@ public class StudentLoginManager : MonoBehaviour
             PlayerPrefs.DeleteKey("StudentName");
             PlayerPrefs.DeleteKey("StudentUsername");
             PlayerPrefs.DeleteKey("TeacherId");
+            PlayerPrefs.DeleteKey("StudentSection");
             PlayerPrefs.Save();
         }
     }
@@ -77,11 +78,13 @@ public class StudentLoginManager : MonoBehaviour
             AuthResult authResult = await auth.SignInWithEmailAndPasswordAsync(studentEmail, password);
             Firebase.Auth.FirebaseUser user = authResult.User;
 
-            // Now query Firestore for student with matching username to get additional data
+            // Look up this student's profile. It is found by Auth uid rather than username: the
+            // Firestore rules only let a student read their own record, and a query has to
+            // be limited to that record for the rules to allow it.
             QuerySnapshot snapshot = null;
             try
             {
-                Query query = db.Collection("students").WhereEqualTo("username", username);
+                Query query = db.Collection("students").WhereEqualTo("authUid", user.UserId).Limit(1);
                 snapshot = await query.GetSnapshotAsync();
             }
             catch (System.Exception firebaseQueryEx)
@@ -114,14 +117,16 @@ public class StudentLoginManager : MonoBehaviour
             // Authentication successful - save student info and load MainScene
             DocumentSnapshot studentDoc = snapshot.Documents.First();
             string studentId = studentDoc.Id;
-            string displayName = studentDoc.GetValue<string>("displayName");
-            string teacherId = studentDoc.GetValue<string>("teacherId");
+            string displayName = GetStringOrEmpty(studentDoc, "displayName");
+            string teacherId = GetStringOrEmpty(studentDoc, "teacherId");
+            string section = GetStringOrEmpty(studentDoc, "section");
 
             // Save to PlayerPrefs for persistence
             PlayerPrefs.SetString("StudentId", studentId);
             PlayerPrefs.SetString("StudentName", displayName);
             PlayerPrefs.SetString("StudentUsername", username);
             PlayerPrefs.SetString("TeacherId", teacherId);
+            PlayerPrefs.SetString("StudentSection", section);
             PlayerPrefs.Save();
 
             // Load MainScene scene
@@ -163,6 +168,12 @@ public class StudentLoginManager : MonoBehaviour
         }
     }
 
+    private static string GetStringOrEmpty(DocumentSnapshot doc, string field)
+    {
+        string value;
+        return doc.TryGetValue(field, out value) && value != null ? value : "";
+    }
+
     private void ShowError(string message)
     {
         if (errorText != null)
@@ -185,6 +196,7 @@ public class StudentLoginManager : MonoBehaviour
         PlayerPrefs.DeleteKey("StudentName");
         PlayerPrefs.DeleteKey("StudentUsername");
         PlayerPrefs.DeleteKey("TeacherId");
+        PlayerPrefs.DeleteKey("StudentSection");
         PlayerPrefs.Save();
     }
 

@@ -168,6 +168,13 @@ public class PauseManager : MonoBehaviour
         {
             timeStillRunningImage.gameObject.SetActive(isTeacherSession);
         }
+
+        // A teacher session is one run per student - its result goes to the dashboard - so
+        // restarting is for offline practice only
+        if (restartButton != null)
+        {
+            restartButton.gameObject.SetActive(!isTeacherSession);
+        }
     }
 
     private bool IsTeacherSession()
@@ -221,7 +228,7 @@ public class PauseManager : MonoBehaviour
         if (continueButton != null)
             continueButton.gameObject.SetActive(true);
         if (restartButton != null)
-            restartButton.gameObject.SetActive(true);
+            restartButton.gameObject.SetActive(!IsTeacherSession());
         if (exitButton != null)
             exitButton.gameObject.SetActive(true);
         if (optionButton != null)
