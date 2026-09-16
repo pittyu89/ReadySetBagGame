@@ -139,6 +139,7 @@ public class SessionJoinManager : MonoBehaviour
         }
         catch (System.Exception ex)
         {
+            Debug.LogWarning($"Joining session {sessionCode} failed: {ex.Message}");
             joinButton.interactable = true;
             SetStatusText("Something went wrong.");
         }
