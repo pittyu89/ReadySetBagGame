@@ -177,6 +177,7 @@ public class SessionJoinManager : MonoBehaviour
         try
         {
             var sessionRef = db.Collection("sessions").Document(sessionId);
+            string uid = Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser?.UserId ?? "";
 
             // Create player data. "uid" is what the Firestore rules check: a student may only
             // add an entry for themselves.
@@ -184,14 +185,17 @@ public class SessionJoinManager : MonoBehaviour
             {
                 { "studentId", studentId },
                 { "username", studentUsername },
-                { "uid", Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser?.UserId ?? "" },
+                { "uid", uid },
                 { "joinedAt", System.DateTime.UtcNow }
             };
 
-            // Add to playersList array using ArrayUnion - pass as array element
+            // Add to playersList array using ArrayUnion - pass as array element.
+            // playerUids mirrors the uids as a plain list: the rules use it to let everyone who
+            // joined read the session's results for the leaderboard.
             var updateData = new Dictionary<string, object>
             {
-                { "playersList", FieldValue.ArrayUnion(new object[] { playerData }) }
+                { "playersList", FieldValue.ArrayUnion(new object[] { playerData }) },
+                { "playerUids", FieldValue.ArrayUnion(new object[] { uid }) }
             };
 
             await sessionRef.UpdateAsync(updateData);
@@ -281,7 +285,7 @@ public class SessionJoinManager : MonoBehaviour
 
     private void LoadGameScene()
     {
-        SceneManager.LoadScene("GameScene");
+        LoadingScreen.LoadScene("GameScene");
     }
 
     private void StopListening()

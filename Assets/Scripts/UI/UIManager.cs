@@ -35,8 +35,6 @@ public class UIManager : MonoBehaviour
     [Header("Play Menu Panels")]
     [SerializeField] private GameObject teacherSessionPanel;
     [SerializeField] private GameObject offlineModePanel;
-    [SerializeField] private GameObject teacherSessionHelpPanel;
-    [SerializeField] private GameObject offlineModeHelpPanel;
     [SerializeField] private GameObject joinRoomPanel;
     [SerializeField] private GameObject difficultyPanel;
     [Tooltip("The menu's left sidebar - hidden while the full-screen play menu panels are open.")]
@@ -44,15 +42,14 @@ public class UIManager : MonoBehaviour
 
     [Header("Play Menu Buttons")]
     [SerializeField] private Button playButton;         // Main PLAY button
-    [SerializeField] private Button teacherSessionQuestionButton;
-    [SerializeField] private Button offlineModeQuestionButton;
     [SerializeField] private Button teacherSessionPlayButton;
     [SerializeField] private Button offlineModePlayButton;  // Offline Mode PLAY button
+    [SerializeField] private Button gameModeNextButton;     // NEXT button - appears once a game mode is selected
+    [SerializeField] private GameObject teacherSessionDescription;
+    [SerializeField] private GameObject offlineModeDescription;
     [SerializeField] private Button startGameButton;    // START button on difficulty panel
     [SerializeField] private Button backArrowButton;
     [SerializeField] private Button difficultyBackButton;   // BACK button on difficulty panel
-    [SerializeField] private Button teacherSessionHelpCloseButton;
-    [SerializeField] private Button offlineModeHelpCloseButton;
 
     [Header("Audio")]
     [SerializeField] private AudioClip mainMenuBGM;
@@ -60,8 +57,11 @@ public class UIManager : MonoBehaviour
 
     private const string SELECTED_CHARACTER_SUFFIX = "_SelectedCharacter";
 
+    private enum GameMode { None, TeacherSession, OfflineMode }
+
     private GameObject currentLeftMenuPanel;
     private Stack<string> navigationStack = new Stack<string>();
+    private GameMode selectedGameMode = GameMode.None;
 
     void Start()
     {
@@ -102,34 +102,25 @@ public class UIManager : MonoBehaviour
         if (playButton != null)
             playButton.onClick.AddListener(() => { PlayButtonAudio(); PlayMainMenuOutro(ShowPlayMenu); });
 
-        if (teacherSessionQuestionButton != null)
-            teacherSessionQuestionButton.onClick.AddListener(ShowTeacherSessionHelp);
-
-        if (offlineModeQuestionButton != null)
-            offlineModeQuestionButton.onClick.AddListener(ShowOfflineModeHelp);
-
+        // Tapping a game mode card only selects it (tapping it again deselects it) - NEXT opens it
         if (teacherSessionPlayButton != null)
-            // BACK stays on screen between game mode and join room, so only the cards leave
-            teacherSessionPlayButton.onClick.AddListener(() => PlayScreenOutro(ShowJoinRoomPanel, teacherSessionPanel, offlineModePanel));
+            teacherSessionPlayButton.onClick.AddListener(() => ToggleGameMode(GameMode.TeacherSession));
 
         if (offlineModePlayButton != null)
-            // BACK doesn't animate here: the difficulty panel has its own BACK in the same spot
-            offlineModePlayButton.onClick.AddListener(() => PlayScreenOutro(ShowDifficultyPanel, teacherSessionPanel, offlineModePanel));
+            offlineModePlayButton.onClick.AddListener(() => ToggleGameMode(GameMode.OfflineMode));
+
+        if (gameModeNextButton != null)
+            gameModeNextButton.onClick.AddListener(OnGameModeNextClicked);
 
         if (startGameButton != null)
-            startGameButton.onClick.AddListener(() => { PlayButtonAudio(); PlayDifficultyOutro(StartGame); });
+            // No outro here - the difficulty panel stays as it is for the loading wipe to sweep over
+            startGameButton.onClick.AddListener(() => { PlayButtonAudio(); StartGame(); });
 
         if (difficultyBackButton != null)
             difficultyBackButton.onClick.AddListener(() => { PlayButtonAudio(); PlayDifficultyOutro(GoBack); });
 
         if (backArrowButton != null)
             backArrowButton.onClick.AddListener(OnBackPressed);
-
-        if (teacherSessionHelpCloseButton != null)
-            teacherSessionHelpCloseButton.onClick.AddListener(GoBack);
-
-        if (offlineModeHelpCloseButton != null)
-            offlineModeHelpCloseButton.onClick.AddListener(GoBack);
 
         // BGM is started by VideoBackgroundIntro.
     }
@@ -158,10 +149,174 @@ public class UIManager : MonoBehaviour
         switchPanel.SetActive(false);
         teacherSessionPanel.SetActive(false);
         offlineModePanel.SetActive(false);
-        teacherSessionHelpPanel.SetActive(false);
-        offlineModeHelpPanel.SetActive(false);
         joinRoomPanel.SetActive(false);
         difficultyPanel.SetActive(false);
+        SelectGameMode(GameMode.None, false);
+    }
+
+    private void ToggleGameMode(GameMode mode)
+    {
+        SelectGameMode(selectedGameMode == mode ? GameMode.None : mode, true);
+    }
+
+    /// <summary>
+    /// Highlights the chosen game mode card, shows only its description, and shows NEXT
+    /// while a mode is selected. <see cref="GameMode.None"/> clears the selection.
+    /// </summary>
+    private void SelectGameMode(GameMode mode, bool animate)
+    {
+        selectedGameMode = mode;
+
+        SetGameModeCardSelected(teacherSessionPlayButton, teacherSessionDescription, mode == GameMode.TeacherSession, animate);
+        SetGameModeCardSelected(offlineModePlayButton, offlineModeDescription, mode == GameMode.OfflineMode, animate);
+        SetNextButtonVisible(mode != GameMode.None, animate);
+    }
+
+    private void SetNextButtonVisible(bool visible, bool animate)
+    {
+        if (gameModeNextButton == null)
+            return;
+
+        GameObject next = gameModeNextButton.gameObject;
+        UIScreenTransition transition = next.GetComponent<UIScreenTransition>();
+
+        if (visible)
+        {
+            if (!next.activeSelf)
+                next.SetActive(true);           // slides in on enable
+            else if (nextButtonHiding && transition != null)
+                transition.PlayIn();            // reselected while it was sliding out
+            nextButtonHiding = false;
+        }
+        else if (next.activeSelf && !nextButtonHiding)
+        {
+            if (animate && transition != null && transition.isActiveAndEnabled)
+            {
+                nextButtonHiding = true;
+                transition.PlayOut(() =>
+                {
+                    // PlayIn cancels this callback if a card is reselected mid-slide
+                    nextButtonHiding = false;
+                    next.SetActive(false);
+                });
+            }
+            else
+            {
+                next.SetActive(false);
+            }
+        }
+        else if (!animate)
+        {
+            nextButtonHiding = false;
+            next.SetActive(false);
+        }
+    }
+
+    private bool nextButtonHiding;
+
+    private const float DescriptionAnimDuration = 0.25f;
+    private const float DescriptionAnimRise = 16f;
+    private readonly Dictionary<GameObject, Vector2> descriptionHomes = new Dictionary<GameObject, Vector2>();
+    private readonly Dictionary<GameObject, Coroutine> descriptionAnims = new Dictionary<GameObject, Coroutine>();
+
+    /// <summary>
+    /// Fades a card description in while rising into place, or fades it back down and hides it.
+    /// </summary>
+    private void SetDescriptionVisible(GameObject description, bool visible, bool animate)
+    {
+        RectTransform rect = (RectTransform)description.transform;
+        if (!descriptionHomes.ContainsKey(description))
+            descriptionHomes[description] = rect.anchoredPosition;
+
+        CanvasGroup group = description.GetComponent<CanvasGroup>();
+        if (group == null)
+            group = description.AddComponent<CanvasGroup>();
+        // Clicks go to the card underneath
+        group.blocksRaycasts = false;
+
+        Coroutine running;
+        if (descriptionAnims.TryGetValue(description, out running) && running != null)
+            StopCoroutine(running);
+        descriptionAnims[description] = null;
+
+        if (!animate || !isActiveAndEnabled || !description.transform.parent.gameObject.activeInHierarchy)
+        {
+            group.alpha = visible ? 1f : 0f;
+            rect.anchoredPosition = descriptionHomes[description];
+            description.SetActive(visible);
+            return;
+        }
+
+        if (!visible && !description.activeSelf)
+            return;
+
+        if (visible && !description.activeSelf)
+        {
+            group.alpha = 0f;
+            description.SetActive(true);
+        }
+
+        descriptionAnims[description] = StartCoroutine(AnimateDescription(description, rect, group, visible));
+    }
+
+    private System.Collections.IEnumerator AnimateDescription(GameObject description, RectTransform rect, CanvasGroup group, bool visible)
+    {
+        Vector2 home = descriptionHomes[description];
+        // Continue from wherever an interrupted animation left off
+        float progress = visible ? group.alpha : 1f - group.alpha;
+
+        while (progress < 1f)
+        {
+            float step = Mathf.Min(Time.unscaledDeltaTime, 1f / 20f);
+            progress = Mathf.Min(progress + step / DescriptionAnimDuration, 1f);
+
+            float shown = visible ? progress : 1f - progress;
+            float eased = 1f - Mathf.Pow(1f - shown, 3f);
+            group.alpha = shown;
+            rect.anchoredPosition = home + Vector2.down * DescriptionAnimRise * (1f - eased);
+            yield return null;
+        }
+
+        if (!visible)
+        {
+            description.SetActive(false);
+            rect.anchoredPosition = home;
+        }
+
+        descriptionAnims[description] = null;
+    }
+
+    private void SetGameModeCardSelected(Button card, GameObject description, bool selected, bool animate)
+    {
+        if (description != null)
+            SetDescriptionVisible(description, selected, animate);
+
+        if (card == null)
+            return;
+
+        // The card's red fill is revealed by its tint: see-through unless selected or pressed
+        Color shown = Color.white;
+        Color hidden = new Color(1f, 1f, 1f, 0f);
+
+        ColorBlock colors = card.colors;
+        colors.normalColor = selected ? shown : hidden;
+        colors.highlightedColor = selected ? shown : hidden;
+        colors.selectedColor = selected ? shown : hidden;
+        colors.pressedColor = shown;
+        card.colors = colors;
+    }
+
+    private void OnGameModeNextClicked()
+    {
+        if (selectedGameMode == GameMode.None)
+            return;
+
+        if (selectedGameMode == GameMode.TeacherSession)
+            // BACK stays on screen between game mode and join room, so only the cards and NEXT leave
+            PlayScreenOutro(ShowJoinRoomPanel, teacherSessionPanel, offlineModePanel, gameModeNextButton.gameObject);
+        else
+            // BACK doesn't animate here: the difficulty panel has its own BACK in the same spot
+            PlayScreenOutro(ShowDifficultyPanel, teacherSessionPanel, offlineModePanel, gameModeNextButton.gameObject);
     }
 
     private void ToggleLeftMenuPanel(GameObject panel, string panelName)
@@ -169,7 +324,7 @@ public class UIManager : MonoBehaviour
         // If the panel is already open, close it
         if (currentLeftMenuPanel == panel)
         {
-            panel.SetActive(false);
+            PopupPanelTransition.Hide(panel);
             currentLeftMenuPanel = null;
         }
         // If another panel is open, close it and open the new one
@@ -177,10 +332,10 @@ public class UIManager : MonoBehaviour
         {
             if (currentLeftMenuPanel != null)
             {
-                currentLeftMenuPanel.SetActive(false);
+                PopupPanelTransition.Hide(currentLeftMenuPanel);
             }
-            
-            panel.SetActive(true);
+
+            PopupPanelTransition.Show(panel);
             currentLeftMenuPanel = panel;
         }
     }
@@ -189,7 +344,7 @@ public class UIManager : MonoBehaviour
     {
         if (currentLeftMenuPanel != null)
         {
-            currentLeftMenuPanel.SetActive(false);
+            PopupPanelTransition.Hide(currentLeftMenuPanel);
             currentLeftMenuPanel = null;
         }
     }
@@ -278,23 +433,11 @@ public class UIManager : MonoBehaviour
         string currentScreen = navigationStack.Count > 0 ? navigationStack.Peek() : "";
 
         if (currentScreen == "playMenu")
-            PlayScreenOutro(GoBack, teacherSessionPanel, offlineModePanel, backArrowButton.gameObject);
+            PlayScreenOutro(GoBack, teacherSessionPanel, offlineModePanel, backArrowButton.gameObject, gameModeNextButton != null ? gameModeNextButton.gameObject : null);
         else if (currentScreen == "joinRoom")
             PlayScreenOutro(GoBack, joinRoomPanel);
         else
             GoBack();
-    }
-
-    private void ShowTeacherSessionHelp()
-    {
-        navigationStack.Push("teacherSessionHelp");
-        teacherSessionHelpPanel.SetActive(true);
-    }
-
-    private void ShowOfflineModeHelp()
-    {
-        navigationStack.Push("offlineModeHelp");
-        offlineModeHelpPanel.SetActive(true);
     }
 
     private void ShowJoinRoomPanel()
@@ -302,6 +445,7 @@ public class UIManager : MonoBehaviour
         navigationStack.Push("joinRoom");
         teacherSessionPanel.SetActive(false);
         offlineModePanel.SetActive(false);
+        SelectGameMode(GameMode.None, false);
         joinRoomPanel.SetActive(true);
     }
 
@@ -349,26 +493,6 @@ public class UIManager : MonoBehaviour
                 backTransition.SkipNextPlayIn();
             backArrowButton.gameObject.SetActive(true);
         }
-        else if (currentScreen == "teacherSessionHelp")
-        {
-            // Return to play menu (Teacher Session and Offline Mode)
-            teacherSessionHelpPanel.SetActive(false);
-            teacherSessionPanel.SetActive(true);
-            offlineModePanel.SetActive(true);
-        }
-        else if (currentScreen == "offlineModeHelp")
-        {
-            // Return to play menu (Teacher Session and Offline Mode)
-            offlineModeHelpPanel.SetActive(false);
-            teacherSessionPanel.SetActive(true);
-            offlineModePanel.SetActive(true);
-        }
-    }
-
-    // This can be called by the close buttons on help panels
-    public void CloseHelpPanel()
-    {
-        GoBack();
     }
 
     private void ShowDifficultyPanel()
@@ -402,8 +526,8 @@ public class UIManager : MonoBehaviour
         // Clear SessionCode for offline mode (don't treat it as a teacher session)
         PlayerPrefs.DeleteKey("SessionCode");
         PlayerPrefs.Save();
-        
-        SceneManager.LoadScene("GameScene");
+
+        LoadingScreen.LoadScene("GameScene");
     }
 
     // Reset the current left menu panel tracking (called when panels close)

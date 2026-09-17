@@ -218,6 +218,12 @@ public class PlayerMovement : MonoBehaviour
         this.enabled = enabled;
     }
 
+    private void OnDisable()
+    {
+        // A disabled controller doesn't update, so it would never stop the looping steps
+        StopFootsteps();
+    }
+
     private void OnDestroy()
     {
         StopFootsteps();

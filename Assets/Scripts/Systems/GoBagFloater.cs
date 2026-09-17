@@ -16,9 +16,21 @@ public class GoBagFloater : MonoBehaviour
     [SerializeField] private RuntimeAnimatorController femaleMediumBagAnimatorController;
     [Tooltip("Shown floating instead of the shine animation when the Medium Bag is chosen.")]
     [SerializeField] private Sprite mediumBagSprite;
-    [Tooltip("Size of the small/medium bag sprite relative to the box the shine animation fills.")]
-    [SerializeField] private float bagSpriteScale = 1f;
+    [Tooltip("World size of every go-bag, floating or held overhead: each bag fits inside a square this big, keeping its own proportions.")]
+    [SerializeField] private float bagWorldSize = 1f;
     [SerializeField] private AudioClip pickupAudio;
+
+    [Header("Pickup Pose")]
+    [SerializeField] private Sprite femalePickupSprite;
+    [SerializeField] private Sprite malePickupSprite;
+    [Tooltip("The standard bag, held overhead in the pickup pose.")]
+    [SerializeField] private Sprite standardBagSprite;
+    [Tooltip("How long the game stays paused on the pose.")]
+    [SerializeField] private float pickupPoseDuration = 1.2f;
+    [Tooltip("Where the bottom-centre of the bag held overhead sits, in pixels (+y is up): x from the middle of the head, y from the centre of the 32x48 female pickup image - a little way into the hair.")]
+    [SerializeField] private Vector2 femaleHeldBagBottom = new Vector2(0f, 7f);
+    [Tooltip("Same for the male pickup image, whose hair sits two pixels higher.")]
+    [SerializeField] private Vector2 maleHeldBagBottom = new Vector2(0f, 9f);
 
     private const string SELECTED_CHARACTER_SUFFIX = "_SelectedCharacter";
 
@@ -37,56 +49,89 @@ public class GoBagFloater : MonoBehaviour
     {
         instance = this;
         animator = GetComponent<Animator>();
-        if (!ApplySelectedBagSprite())
+
+        Sprite bagSprite = FloatingBagSprite();
+        if (bagSprite == null)
             animator.Play("Shine");
+
+        ApplyBagSize(bagSprite);
         startPosition = transform.position;
     }
 
     /// <summary>
-    /// Swaps the shine animation for a still sprite of the bag chosen in the difficulty panel.
-    /// The sprite is scaled to fit the box the shine frames fill, since the bag sheets use a
-    /// different pixels-per-unit, and the collider is scaled back so the pickup trigger keeps
-    /// its size. Returns false for the standard bag, which keeps the shine.
+    /// A still sprite of the Small or Medium bag chosen in the difficulty panel, or null for
+    /// the standard bag, which keeps its shine animation.
     /// </summary>
-    private bool ApplySelectedBagSprite()
+    private Sprite FloatingBagSprite()
     {
-        Sprite bagSprite = null;
         switch (DifficultyPanelManager.GetActiveGoBag())
         {
-            case SMALL_BAG: bagSprite = smallBagSprite; break;
-            case MEDIUM_BAG: bagSprite = mediumBagSprite; break;
+            case SMALL_BAG: return smallBagSprite;
+            case MEDIUM_BAG: return mediumBagSprite;
+            default: return null;
+        }
+    }
+
+    /// <summary>
+    /// Sizes the floating bag to <see cref="bagWorldSize"/> with an even scale, so it keeps its
+    /// real proportions (the scene object was squashed) and matches the bag held overhead.
+    /// The pickup trigger keeps its world size, and the bag is lifted clear of the floor.
+    /// </summary>
+    private void ApplyBagSize(Sprite bagSprite)
+    {
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null)
+            return;
+
+        if (bagSprite != null)
+        {
+            animator.enabled = false;
+            spriteRenderer.sprite = bagSprite;
         }
 
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-        if (bagSprite == null || spriteRenderer == null)
-            return false;
+        Sprite measured = spriteRenderer.sprite;
+        if (measured == null)
+            return;
 
-        Vector2 box = spriteRenderer.sprite != null ? (Vector2)spriteRenderer.sprite.bounds.size : Vector2.one;
-        Vector2 size = bagSprite.bounds.size;
-        float factor = Mathf.Min(box.x / size.x, box.y / size.y) * bagSpriteScale;
+        Vector2 min, max;
+        VisibleBounds(measured, out min, out max);
+        Vector2 size = max - min;
+        if (size.x <= 0f || size.y <= 0f)
+            return;
 
-        animator.enabled = false;
-        spriteRenderer.sprite = bagSprite;
-        transform.localScale *= factor;
+        Vector3 oldScale = transform.localScale;
+        float scale = bagWorldSize / Mathf.Max(size.x, size.y);
+        transform.localScale = Vector3.one * scale;
 
         BoxCollider box3D = GetComponent<BoxCollider>();
         if (box3D != null)
         {
-            box3D.size /= factor;
-            box3D.center /= factor;
+            Vector3 keepWorld = new Vector3(oldScale.x / scale, oldScale.y / scale, oldScale.z / scale);
+            box3D.size = Vector3.Scale(box3D.size, keepWorld);
+            box3D.center = Vector3.Scale(box3D.center, keepWorld);
         }
 
         // A bigger sprite grows downward from its centre pivot - lift it so its bottom clears
         // the floor, then pull the collider back so the trigger stays put
-        float lift = GetFloorClearance(transform.position.y + bagSprite.bounds.min.y * transform.lossyScale.y);
+        float lift = GetFloorClearance(transform.position.y + min.y * scale);
         if (lift > 0f)
         {
             transform.position += Vector3.up * lift;
             if (box3D != null)
-                box3D.center -= Vector3.up * (lift / transform.lossyScale.y);
+                box3D.center -= Vector3.up * (lift / scale);
         }
+    }
 
-        return true;
+    /// <summary>The bag's visible pixels in sprite-local units: the tight mesh skips the sheets' padding.</summary>
+    public static void VisibleBounds(Sprite sprite, out Vector2 min, out Vector2 max)
+    {
+        min = new Vector2(float.MaxValue, float.MaxValue);
+        max = new Vector2(float.MinValue, float.MinValue);
+        foreach (Vector2 v in sprite.vertices)
+        {
+            min = Vector2.Min(min, v);
+            max = Vector2.Max(max, v);
+        }
     }
 
     void Update()
@@ -136,35 +181,87 @@ public class GoBagFloater : MonoBehaviour
                 SoundManager.Instance.PlaySFX(pickupAudio);
             }
             
-            // Get player gender
-            string playerGender = GetPlayerGender();
-            
-            // Change player animator controller based on gender and chosen bag (search in children)
+            bool isMale = GetPlayerGender() == "Male";
             Animator playerAnimator = collision.GetComponentInChildren<Animator>();
-            if (playerAnimator != null)
+            PlayerMovement movement = collision.GetComponent<PlayerMovement>();
+
+            // The bag is in the character's hands now - hide it, but keep this object alive
+            // until the pose is over so it can finish the pickup
+            HideBag();
+
+            Sprite pose = isMale ? malePickupSprite : femalePickupSprite;
+            if (playerAnimator == null || pose == null)
             {
-                RuntimeAnimatorController controller = GetCarryingController(playerGender == "Male");
-                if (controller != null)
-                {
-                    playerAnimator.runtimeAnimatorController = controller;
-                }
-            }
-            
-            // Start the timer
-            Timer timer = FindObjectOfType<Timer>();
-            if (timer != null)
-            {
-                timer.StartTimer();
+                FinishPickup(playerAnimator, isMale, movement);
+                return;
             }
 
-            // Show the bag button
-            InventoryPanelHandler handler = FindObjectOfType<InventoryPanelHandler>();
-            if (handler != null)
-                handler.ShowBagButton();
-            
-            // Disable the go bag
-            gameObject.SetActive(false);
+            if (movement != null)
+                movement.SetMovementEnabled(false);
+
+            // The pose sprite is drawn at the same pixels-per-unit as the walk sheets
+            float pixel = 1f / pose.pixelsPerUnit;
+            Sprite heldBag = GetHeldBagSprite();
+            Vector2 bottom = (isMale ? maleHeldBagBottom : femaleHeldBagBottom) * pixel;
+
+            BagPickupPose.Play(playerAnimator.gameObject, pose, heldBag, bottom, bagWorldSize, pickupPoseDuration,
+                               () => FinishPickup(playerAnimator, isMale, movement));
         }
+    }
+
+    /// <summary>The chosen bag, drawn held overhead in the pickup pose (both poses have raised, empty hands).</summary>
+    private Sprite GetHeldBagSprite()
+    {
+        switch (DifficultyPanelManager.GetActiveGoBag())
+        {
+            case SMALL_BAG: return smallBagSprite;
+            case MEDIUM_BAG: return mediumBagSprite;
+            default: return standardBagSprite;
+        }
+    }
+
+    private void HideBag()
+    {
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+            r.enabled = false;
+        foreach (Collider c in GetComponentsInChildren<Collider>())
+            c.enabled = false;
+        if (animator != null)
+            animator.enabled = false;
+
+        BlobShadow shadow = GetComponent<BlobShadow>();
+        if (shadow != null)
+            shadow.enabled = false;
+    }
+
+    /// <summary>Hands control back after the pose: carrying animations, the timer and the bag button.</summary>
+    private void FinishPickup(Animator playerAnimator, bool isMale, PlayerMovement movement)
+    {
+        // Change player animator controller based on gender and chosen bag
+        if (playerAnimator != null)
+        {
+            RuntimeAnimatorController controller = GetCarryingController(isMale);
+            if (controller != null)
+                playerAnimator.runtimeAnimatorController = controller;
+        }
+
+        if (movement != null)
+            movement.SetMovementEnabled(true);
+
+        // Start the timer
+        Timer timer = FindObjectOfType<Timer>();
+        if (timer != null)
+        {
+            timer.StartTimer();
+        }
+
+        // Show the bag button
+        InventoryPanelHandler handler = FindObjectOfType<InventoryPanelHandler>();
+        if (handler != null)
+            handler.ShowBagButton();
+
+        // Disable the go bag
+        gameObject.SetActive(false);
     }
 
     /// <summary>

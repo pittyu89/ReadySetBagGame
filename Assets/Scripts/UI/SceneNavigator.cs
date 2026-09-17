@@ -73,11 +73,11 @@ public class SceneNavigator : MonoBehaviour
     }
 
     /// <summary>
-    /// Load GameScene.
+    /// Load GameScene behind the loading screen transition.
     /// </summary>
     public void GoToGameScene()
     {
-        SceneManager.LoadScene("GameScene");
+        LoadingScreen.LoadScene("GameScene");
     }
 
     private void PrepareMainMenuVideo()

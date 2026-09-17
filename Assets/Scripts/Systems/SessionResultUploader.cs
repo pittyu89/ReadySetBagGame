@@ -98,6 +98,9 @@ public static class SessionResultUploader
             { "section", section ?? "" },
             { "score", drill.FinalScore },
             { "completionTime", completionTime },
+            // Exact time left (to the hundredth) for the in-game leaderboard; completionTime stays
+            // whole seconds for the dashboards
+            { "timeLeft", Math.Round(Mathf.Clamp(remainingTime, 0f, 7200f), 2) },
             // Teacher sessions allow a single run, so this is always the first attempt
             { "attempts", 1 },
             { "stage", StageFor(drill.FinalScore) },

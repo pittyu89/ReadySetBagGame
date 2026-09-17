@@ -127,6 +127,7 @@ GameObject:
   - component: {fileID: 2622303383021144381}
   - component: {fileID: 6859973082301966898}
   - component: {fileID: 4254947178538688580}
+  - component: {fileID: 153614426552203310}
   m_Layer: 0
   m_Name: FemaleCharacter
   m_TagString: Player
@@ -239,5 +240,30 @@ MonoBehaviour:
   edgeBlur: 0.03
   lengthFade: 0.55
   contactBias: 0.18
+  minShadowSpread: 0.4
   growWithHeight: 0.35
   fadeHeight: 3.5
+--- !u!114 &153614426552203310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4710518777523976073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a60c08ef7ab6ac448b03cd5dad8f8fcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DustTrail
+  frames:
+  - {fileID: -5294026334478247828, guid: 6ad4d1b72cbdf0b408630882e2d2d3b2, type: 3}
+  - {fileID: -6622841083217622238, guid: 6ad4d1b72cbdf0b408630882e2d2d3b2, type: 3}
+  - {fileID: -6464215946706206362, guid: 6ad4d1b72cbdf0b408630882e2d2d3b2, type: 3}
+  - {fileID: 7705883810510091988, guid: 6ad4d1b72cbdf0b408630882e2d2d3b2, type: 3}
+  spacing: 0.6
+  minSpeed: 0.5
+  lifetime: 0.4
+  puffScale: 1.5
+  rise: 0.12
+  behindOffset: 0.15
+  floorLift: 0.04

@@ -22,7 +22,9 @@ public class MainMenuIntroAnimator : MonoBehaviour
     [Tooltip("LeftPanelBackground - slides in from the left edge at the start of the intro.")]
     [SerializeField] private RectTransform leftPanel;
     [SerializeField] private float panelStartDelay = 0f;
-    [SerializeField] private float panelSlideDuration = 0.5f;
+    [SerializeField] private float panelSlideDuration = 0.25f;
+    [Tooltip("How long the panel takes to slide back out once the menu content has faded away.")]
+    [SerializeField] private float panelExitDuration = 0.25f;
 
     [Header("Player Card Slide")]
     [SerializeField] private RectTransform playerCard;
@@ -150,34 +152,74 @@ public class MainMenuIntroAnimator : MonoBehaviour
         SetGroupVisible(cardGroup, 1f, false);
 
         // Walk the intro's own timeline from its end back to zero, so every item and the card
-        // retrace exactly the curve they came in on
-        float length = IntroLength();
-        float time = length;
+        // retrace exactly the curve they came in on. The menu items sit inside the panel, so it
+        // holds still until the first item - the last to fade - is all but gone
+        float time = IntroLength();
+        float panelLeaveTime = menuGroups.Count > 0
+            ? menuStartDelay + menuFadeDuration * PanelLeaveAtItemProgress
+            : time;
 
-        while (time > 0f)
+        float panelElapsed = -1f;   // < 0 while the panel is still waiting
+        bool panelDone = leftPanel == null;
+
+        while (time > 0f || !panelDone)
         {
-            time -= Step();
-            ApplyIntroTime(Mathf.Max(time, 0f));
+            float step = Step();
+
+            if (time > 0f)
+            {
+                time -= step;
+                ApplyIntroTime(Mathf.Max(time, 0f));
+            }
+
+            if (!panelDone && panelElapsed < 0f && time <= panelLeaveTime)
+                panelElapsed = 0f;
+
+            if (!panelDone && panelElapsed >= 0f)
+            {
+                panelElapsed += step;
+                float progress = panelExitDuration > 0f ? Mathf.Clamp01(panelElapsed / panelExitDuration) : 1f;
+
+                // Not the intro curve reversed: that ease-in quart barely moves for the first
+                // half, which read as the panel lagging behind
+                leftPanel.anchoredPosition = Vector2.LerpUnclamped(panelTargetPos, panelStartPos, EaseInQuad(progress));
+                panelDone = progress >= 1f;
+            }
+
             yield return null;
         }
 
         ApplyIntroTime(0f);
+        if (leftPanel != null)
+            leftPanel.anchoredPosition = panelStartPos;
+
         outroPlaying = false;
         onComplete?.Invoke();
     }
 
-    /// <summary>Seconds from PlayIntro until the last menu item and the card have settled.</summary>
+    /// <summary>
+    /// Seconds from the content starting (see <see cref="ContentDelay"/>) until the last menu
+    /// item and the card have settled. The panel moves on its own, outside this timeline.
+    /// </summary>
     private float IntroLength()
     {
         float menuEnd = menuGroups.Count > 0
             ? menuStartDelay + (menuGroups.Count - 1) * Mathf.Max(menuStagger, 0f) + menuFadeDuration
             : 0f;
         float cardEnd = playerCard != null ? cardStartDelay + cardSlideDuration : 0f;
-        float panelEnd = leftPanel != null ? panelStartDelay + panelSlideDuration : 0f;
-        return Mathf.Max(menuEnd, Mathf.Max(cardEnd, panelEnd));
+        return Mathf.Max(menuEnd, cardEnd);
     }
 
-    /// <summary>Poses the menu and card as they look <paramref name="time"/> seconds into the intro.</summary>
+    /// <summary>
+    /// How long the menu and card wait for the panel: the menu items sit inside it, so they
+    /// only start once it has nearly slid into place.
+    /// </summary>
+    private float ContentDelay()
+    {
+        return leftPanel != null ? panelStartDelay + panelSlideDuration * ContentShowAtPanelProgress : 0f;
+    }
+
+    /// <summary>Poses the menu and card as they look <paramref name="time"/> seconds into the content's intro.</summary>
     private void ApplyIntroTime(float time)
     {
         for (int i = 0; i < menuGroups.Count; i++)
@@ -203,12 +245,6 @@ public class MainMenuIntroAnimator : MonoBehaviour
 
             if (cardGroup != null)
                 cardGroup.alpha = SmoothStep(Mathf.Clamp01(progress / 0.6f));
-        }
-
-        if (leftPanel != null)
-        {
-            float progress = panelSlideDuration > 0f ? Mathf.Clamp01((time - panelStartDelay) / panelSlideDuration) : (time >= panelStartDelay ? 1f : 0f);
-            leftPanel.anchoredPosition = Vector2.LerpUnclamped(panelStartPos, panelTargetPos, EaseOutQuart(progress));
         }
     }
 
@@ -380,10 +416,32 @@ public class MainMenuIntroAnimator : MonoBehaviour
         return 1f - inv * inv * inv * inv;
     }
 
+    // How far the first menu item's fade-in has rewound (1 = fully shown) when the panel
+    // starts leaving. At 0.2 the item is under 10% opaque, too faint to see it being carried off
+    private const float PanelLeaveAtItemProgress = 0.2f;
+
+    // The mirror of that on the way in: the content starts once the panel is this far through
+    // its slide - by then it has covered 96% of the distance, so the items don't ride in on it
+    private const float ContentShowAtPanelProgress = 0.8f;
+
+    /// <summary>Picks up speed as it goes, without the long stall of a steeper ease-in.</summary>
+    private static float EaseInQuad(float t)
+    {
+        return t * t;
+    }
+
+    /// <summary>The reverse of <see cref="EaseInQuad"/>: quick off the mark, settling into place.</summary>
+    private static float EaseOutQuad(float t)
+    {
+        float inv = 1f - t;
+        return 1f - inv * inv;
+    }
+
     private IEnumerator FadeMenuSequence()
     {
-        if (menuStartDelay > 0f)
-            yield return new WaitForSecondsRealtime(menuStartDelay);
+        float delay = ContentDelay() + menuStartDelay;
+        if (delay > 0f)
+            yield return new WaitForSecondsRealtime(delay);
 
         for (int i = 0; i < menuGroups.Count; i++)
         {
@@ -440,8 +498,10 @@ public class MainMenuIntroAnimator : MonoBehaviour
 
     private IEnumerator SlideCardIn()
     {
-        if (cardStartDelay > 0f)
-            yield return new WaitForSecondsRealtime(cardStartDelay);
+        // Waits for the panel too, so it still lands together with the last menu item
+        float delay = ContentDelay() + cardStartDelay;
+        if (delay > 0f)
+            yield return new WaitForSecondsRealtime(delay);
 
         float elapsed = 0f;
 
@@ -476,8 +536,9 @@ public class MainMenuIntroAnimator : MonoBehaviour
             elapsed += Step();
             float progress = Mathf.Clamp01(elapsed / panelSlideDuration);
 
+            // Mirrors the exit's ease-in quad, so the panel comes and goes at the same pace
             if (leftPanel != null)
-                leftPanel.anchoredPosition = Vector2.LerpUnclamped(panelStartPos, panelTargetPos, EaseOutQuart(progress));
+                leftPanel.anchoredPosition = Vector2.LerpUnclamped(panelStartPos, panelTargetPos, EaseOutQuad(progress));
 
             yield return null;
         }

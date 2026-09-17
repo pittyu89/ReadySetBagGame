@@ -1069,7 +1069,7 @@ public class QuizHandler : MonoBehaviour
             ResultsPanel panelHandler = resultsPanel.GetComponent<ResultsPanel>();
             if (panelHandler != null)
             {
-                panelHandler.DisplayResults(score, TotalQuestions, remainingTime, difficulty, drill);
+                panelHandler.DisplayResults(score, TotalQuestions, remainingTime, totalTime, difficulty, drill);
             }
         }
 

@@ -189,22 +189,13 @@ public class PauseManager : MonoBehaviour
         HideMainPauseButtons();
 
         // Show the sub-panel
-        if (subPanel != null)
-        {
-            subPanel.SetActive(true);
-        }
+        PopupPanelTransition.Show(subPanel);
     }
 
     private void HideSubPanel(GameObject subPanel)
     {
-        // Hide the sub-panel
-        if (subPanel != null)
-        {
-            subPanel.SetActive(false);
-        }
-
-        // Show main pause buttons again
-        ShowMainPauseButtons();
+        // Show main pause buttons again once the sub-panel has slid away
+        PopupPanelTransition.Hide(subPanel, ShowMainPauseButtons);
     }
 
     private void HideMainPauseButtons()
