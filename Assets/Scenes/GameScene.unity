@@ -27862,6 +27862,8 @@ MonoBehaviour:
     count: 2
   - supplyItem: {fileID: 11400000, guid: 2956c4ff54895404aa15e302788d2d46, type: 2}
     count: 1
+  - supplyItem: {fileID: 11400000, guid: faf47bc6c4f1fb44f947d270ab829a67, type: 2}
+    count: 1
   extraParts: []
 --- !u!1 &830837274
 GameObject:
@@ -61929,8 +61931,6 @@ MonoBehaviour:
   startingItems:
   - supplyItem: {fileID: 11400000, guid: 6ec8c265b8b534b46b9bd708c5163ad4, type: 2}
     count: 3
-  - supplyItem: {fileID: 11400000, guid: faf47bc6c4f1fb44f947d270ab829a67, type: 2}
-    count: 1
   extraParts: []
 --- !u!64 &1909783749
 MeshCollider:
