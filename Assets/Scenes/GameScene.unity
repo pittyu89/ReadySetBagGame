@@ -15101,9 +15101,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 5618743637708422069, guid: 6126e6d8f67ac9b4f8a5333ca483a4c2, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: 4ee3b22f36a52494b8ae89245ed17d64, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 7b47abe7121f02143b165fd8cf4dcaee, type: 2}
     count: 1
-  - supplyItem: {fileID: 11400000, guid: 02f05484a83763c44b52d57cad362395, type: 2}
+  - supplyItem: {fileID: 11400000, guid: b3b9c9f56f5cf374d826593f8e69cb6c, type: 2}
     count: 1
   - supplyItem: {fileID: 11400000, guid: c73dacc22c283bb4181090fc78b57f17, type: 2}
     count: 2
@@ -23713,7 +23713,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StorageFurniture
   layout: {fileID: 875956574512840124, guid: df02b9bf0487f854ab42dc28baa5168b, type: 3}
-  startingItems: []
+  startingItems:
+  - supplyItem: {fileID: 11400000, guid: 7ced45e79589d624fbfbdd2a7b62cbae, type: 2}
+    count: 3
   extraParts: []
 --- !u!1 &712275815
 GameObject:
@@ -27856,8 +27858,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 875956574512840124, guid: df02b9bf0487f854ab42dc28baa5168b, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: faf47bc6c4f1fb44f947d270ab829a67, type: 2}
-    count: 1
+  - supplyItem: {fileID: 11400000, guid: f70a40d11530cf5438f601faca02a6ee, type: 2}
+    count: 2
   - supplyItem: {fileID: 11400000, guid: 2956c4ff54895404aa15e302788d2d46, type: 2}
     count: 1
   extraParts: []
@@ -30844,10 +30846,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 875956574512840124, guid: df02b9bf0487f854ab42dc28baa5168b, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: 3a071eb51f108594cb8e38c16d369bb7, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 75e7e7f1de01dbf43b6c2934762244ca, type: 2}
     count: 1
-  - supplyItem: {fileID: 11400000, guid: 7ced45e79589d624fbfbdd2a7b62cbae, type: 2}
-    count: 3
+  - supplyItem: {fileID: 11400000, guid: 918647ffde49e18418cbfca2b83f686e, type: 2}
+    count: 1
   extraParts: []
 --- !u!1 &913448674
 GameObject:
@@ -35547,8 +35549,8 @@ MonoBehaviour:
     count: 1
   - supplyItem: {fileID: 11400000, guid: ca43b3d47f9769b478d5f05fea541a88, type: 2}
     count: 3
-  - supplyItem: {fileID: 11400000, guid: 33bd0053ff92e6b4eaffa8cdb4cf62eb, type: 2}
-    count: 2
+  - supplyItem: {fileID: 11400000, guid: 4ee3b22f36a52494b8ae89245ed17d64, type: 2}
+    count: 1
   extraParts: []
 --- !u!1 &1087685863
 GameObject:
@@ -38665,13 +38667,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 5618743637708422069, guid: 6126e6d8f67ac9b4f8a5333ca483a4c2, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: 9459152fcfdd1e9459cef726c51af125, type: 2}
-    count: 1
   - supplyItem: {fileID: 11400000, guid: 019ef6c0dac563346b71468d10b8676e, type: 2}
     count: 1
-  - supplyItem: {fileID: 11400000, guid: 7b47abe7121f02143b165fd8cf4dcaee, type: 2}
-    count: 1
-  - supplyItem: {fileID: 11400000, guid: b3b9c9f56f5cf374d826593f8e69cb6c, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 9459152fcfdd1e9459cef726c51af125, type: 2}
     count: 1
   extraParts: []
 --- !u!1 &1218836231
@@ -39738,7 +39736,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 7158514907525454131, guid: e170d77d2d783de408dd0c4593fcd7ec, type: 3}
-  startingItems: []
+  startingItems:
+  - supplyItem: {fileID: 11400000, guid: 9cc595e1f0ae9e449bada309bdd992a1, type: 2}
+    count: 1
   extraParts: []
 --- !u!1 &1250261988
 GameObject:
@@ -42507,7 +42507,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 7158514907525454131, guid: e170d77d2d783de408dd0c4593fcd7ec, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: f58a31be3aa27ac43b3e37715111dd44, type: 2}
+  - supplyItem: {fileID: 11400000, guid: a27cb8f9ca53c874791a887a42b01c0e, type: 2}
     count: 1
   extraParts: []
 --- !u!1 &1359881406
@@ -43417,13 +43417,9 @@ MonoBehaviour:
   startingItems:
   - supplyItem: {fileID: 11400000, guid: 857c5107b7b824746b213a7e31cbc2ea, type: 2}
     count: 4
-  - supplyItem: {fileID: 11400000, guid: a27cb8f9ca53c874791a887a42b01c0e, type: 2}
-    count: 1
   - supplyItem: {fileID: 11400000, guid: 3b59618664f617e4382e3628663d9e4f, type: 2}
     count: 1
-  - supplyItem: {fileID: 11400000, guid: 75e7e7f1de01dbf43b6c2934762244ca, type: 2}
-    count: 1
-  - supplyItem: {fileID: 11400000, guid: 918647ffde49e18418cbfca2b83f686e, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 3a071eb51f108594cb8e38c16d369bb7, type: 2}
     count: 1
   extraParts: []
 --- !u!1 &1410000724 stripped
@@ -45064,7 +45060,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StorageFurniture
   layout: {fileID: 7415090990296999209, guid: 051f8bc62ee50e641ad69d45f1105027, type: 3}
-  startingItems: []
+  startingItems:
+  - supplyItem: {fileID: 11400000, guid: f58a31be3aa27ac43b3e37715111dd44, type: 2}
+    count: 1
+  - supplyItem: {fileID: 11400000, guid: 2f0d9775a9280cb4c86568bd886f4656, type: 2}
+    count: 1
   extraParts:
   - {fileID: 552079512}
   - {fileID: 552079510}
@@ -56744,6 +56744,8 @@ MonoBehaviour:
   startingItems:
   - supplyItem: {fileID: 11400000, guid: dd543eff738e90d47960ec2e4b0d2228, type: 2}
     count: 1
+  - supplyItem: {fileID: 11400000, guid: 33bd0053ff92e6b4eaffa8cdb4cf62eb, type: 2}
+    count: 2
   extraParts: []
 --- !u!1 &1779336378
 GameObject:
@@ -57782,12 +57784,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 875956574512840124, guid: df02b9bf0487f854ab42dc28baa5168b, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: fa112e13c006d8140b58d93b2ef80f65, type: 2}
-    count: 3
   - supplyItem: {fileID: 11400000, guid: 5937ac359090e8641970a5c14e7459b4, type: 2}
     count: 2
-  - supplyItem: {fileID: 11400000, guid: f70a40d11530cf5438f601faca02a6ee, type: 2}
-    count: 2
+  - supplyItem: {fileID: 11400000, guid: fa112e13c006d8140b58d93b2ef80f65, type: 2}
+    count: 3
   extraParts: []
 --- !u!1 &1802321130
 GameObject:
@@ -61774,9 +61774,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 7158514907525454131, guid: e170d77d2d783de408dd0c4593fcd7ec, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: 2f0d9775a9280cb4c86568bd886f4656, type: 2}
-    count: 1
-  - supplyItem: {fileID: 11400000, guid: 9cc595e1f0ae9e449bada309bdd992a1, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 02f05484a83763c44b52d57cad362395, type: 2}
     count: 1
   extraParts: []
 --- !u!1 &1909605986
@@ -61931,6 +61929,8 @@ MonoBehaviour:
   startingItems:
   - supplyItem: {fileID: 11400000, guid: 6ec8c265b8b534b46b9bd708c5163ad4, type: 2}
     count: 3
+  - supplyItem: {fileID: 11400000, guid: faf47bc6c4f1fb44f947d270ab829a67, type: 2}
+    count: 1
   extraParts: []
 --- !u!64 &1909783749
 MeshCollider:

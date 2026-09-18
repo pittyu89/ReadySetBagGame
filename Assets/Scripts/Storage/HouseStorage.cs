@@ -5,10 +5,11 @@ using UnityEngine;
 /// Puts the house's supply items into its furniture at the start of a drill.
 ///
 /// On Beginner every piece of furniture holds its own authored <see cref="StorageFurniture.StartingItems"/>,
-/// so a new player can learn where things live. On the harder difficulties the items from
-/// every open area of the house are pooled and spread at random across the furniture in those
-/// areas - including the garage and upstairs furniture those difficulties unlock - so the
-/// search is different every run and cannot be memorised.
+/// put where people would expect to find them, so a new player can learn where things live.
+/// On the harder difficulties the items from every open area of the house are pooled and
+/// spread at random across the furniture in those areas - including the garage and upstairs
+/// furniture those difficulties unlock - with at least one item in each, so the search is
+/// different every run and cannot be memorised.
 ///
 /// Runs once per scene, the first time any furniture's compartments are asked for, and fills
 /// every piece of furniture in one go so a shuffle can move items between them.
@@ -64,9 +65,23 @@ public static class HouseStorage
         if (!shuffle)
             return;
 
-        // Biggest first, so the bulky items still find room before the small ones scatter
-        // into every gap; items of the same size are in random order.
+        // First, one item into every open piece of furniture, so no search comes up empty
+        Shuffle(open);
         Shuffle(pool);
+        foreach (StorageFurniture furniture in open)
+        {
+            for (int i = 0; i < pool.Count; i++)
+            {
+                if (furniture.TryStore(pool[i]))
+                {
+                    pool.RemoveAt(i);
+                    break;
+                }
+            }
+        }
+
+        // Then the rest, biggest first, so the bulky items still find room before the small
+        // ones scatter into every gap; items of the same size are in random order.
         pool.Sort((a, b) => (b.width * b.height).CompareTo(a.width * a.height));
 
         foreach (InventoryItem item in pool)
