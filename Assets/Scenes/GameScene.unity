@@ -1819,6 +1819,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 1890043777817888559, guid: a46d62aa5eb818145bfc7f218891a5ff, type: 3}
   startingItems: []
+  extraParts: []
 --- !u!1 &55836030
 GameObject:
   m_ObjectHideFlags: 0
@@ -3215,6 +3216,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 110732545}
   m_CullTransparentMesh: 1
+--- !u!114 &114216764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552079527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 540a1d266b82f664591ca82eb92dba56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StorageFurniture
+  layout: {fileID: 7415090990296999209, guid: 051f8bc62ee50e641ad69d45f1105027, type: 3}
+  startingItems: []
+  extraParts:
+  - {fileID: 552079529}
+  - {fileID: 552079528}
+  - {fileID: 552079526}
+  - {fileID: 552079525}
 --- !u!1 &122651350
 GameObject:
   m_ObjectHideFlags: 0
@@ -11086,6 +11106,10 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1405634729}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4435099165455383813, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1448486212}
     - targetCorrespondingSourceObject: {fileID: 3691783333927097438, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       insertIndex: -1
@@ -11106,6 +11130,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 826316317}
+    - targetCorrespondingSourceObject: {fileID: 8888276354642709141, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 707518700}
     - targetCorrespondingSourceObject: {fileID: 4143771078247872896, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       insertIndex: -1
@@ -11230,6 +11258,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 924941545}
+    - targetCorrespondingSourceObject: {fileID: 6218202424118752107, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1939305353}
+    - targetCorrespondingSourceObject: {fileID: 4375923345202563540, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 552079538}
     - targetCorrespondingSourceObject: {fileID: 8464214984001809511, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       insertIndex: -1
@@ -11238,6 +11274,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 299697189}
+    - targetCorrespondingSourceObject: {fileID: 8886350434369102864, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 114216764}
     - targetCorrespondingSourceObject: {fileID: 4835106417119464440, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       insertIndex: -1
@@ -11246,6 +11286,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1450700540}
+    - targetCorrespondingSourceObject: {fileID: 3035317618676374041, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1715611631}
     - targetCorrespondingSourceObject: {fileID: 6162537986266483908, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       insertIndex: -1
@@ -12624,6 +12668,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 7877497868888152156, guid: 8ef8a92998fde38499aa2cfacdf8bad1, type: 3}
   startingItems: []
+  extraParts: []
 --- !u!1 &300629214
 GameObject:
   m_ObjectHideFlags: 0
@@ -13736,6 +13781,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 5618743637708422069, guid: 6126e6d8f67ac9b4f8a5333ca483a4c2, type: 3}
   startingItems: []
+  extraParts: []
 --- !u!1 &334559422
 GameObject:
   m_ObjectHideFlags: 0
@@ -15061,6 +15107,7 @@ MonoBehaviour:
     count: 1
   - supplyItem: {fileID: 11400000, guid: c73dacc22c283bb4181090fc78b57f17, type: 2}
     count: 2
+  extraParts: []
 --- !u!1 &405456661
 GameObject:
   m_ObjectHideFlags: 0
@@ -18749,6 +18796,209 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 551469740}
   m_CullTransparentMesh: 1
+--- !u!1 &552079507 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8888276354642709141, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079508 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 8870811300731441193, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079509 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 8210344499032743230, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079510 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 8797082539128955676, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &552079511 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4435099165455383813, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079512 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 1374477805267874214, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079513 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 8615739617705412564, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079514 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 7699586362055703179, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &552079515 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3035317618676374041, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079516 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 8240785576019974044, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079517 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 5204181612735937206, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079518 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 325485745096854456, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079519 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 963344336783232213, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079520 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 2427450224318659071, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079521 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 1511973131660183194, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079522 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 7338215097253046111, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079523 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 5522198306684598702, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079524 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 2168209283013110844, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079525 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 1348675187371611740, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079526 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 905263937014691847, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &552079527 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8886350434369102864, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079528 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 3521188494021901866, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079529 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 5144245092325162545, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079530 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 380954399717297138, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079531 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 2073894759737469955, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079532 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 8510924024521989075, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &552079533 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6218202424118752107, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079534 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 919979818710562075, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079535 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 2137685516706546157, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &552079536 stripped
+MeshCollider:
+  m_CorrespondingSourceObject: {fileID: 5049956588468406593, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &552079537 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4375923345202563540, guid: 3abad698c646a9a4aad77f5ee9a434bd,
+    type: 3}
+  m_PrefabInstance: {fileID: 241768859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &552079538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552079537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 540a1d266b82f664591ca82eb92dba56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StorageFurniture
+  layout: {fileID: 7415090990296999209, guid: 051f8bc62ee50e641ad69d45f1105027, type: 3}
+  startingItems: []
+  extraParts:
+  - {fileID: 552079536}
+  - {fileID: 552079530}
 --- !u!1 &555373952 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1333408368186969865, guid: 3abad698c646a9a4aad77f5ee9a434bd,
@@ -18775,6 +19025,7 @@ MonoBehaviour:
     count: 1
   - supplyItem: {fileID: 11400000, guid: 9a6c214b1ca3d744ba9b29f8c283bd0c, type: 2}
     count: 1
+  extraParts: []
 --- !u!1 &559592657
 GameObject:
   m_ObjectHideFlags: 0
@@ -23449,6 +23700,21 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 241768859}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &707518700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552079507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 540a1d266b82f664591ca82eb92dba56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StorageFurniture
+  layout: {fileID: 875956574512840124, guid: df02b9bf0487f854ab42dc28baa5168b, type: 3}
+  startingItems: []
+  extraParts: []
 --- !u!1 &712275815
 GameObject:
   m_ObjectHideFlags: 0
@@ -27594,6 +27860,7 @@ MonoBehaviour:
     count: 1
   - supplyItem: {fileID: 11400000, guid: 2956c4ff54895404aa15e302788d2d46, type: 2}
     count: 1
+  extraParts: []
 --- !u!1 &830837274
 GameObject:
   m_ObjectHideFlags: 0
@@ -30581,6 +30848,7 @@ MonoBehaviour:
     count: 1
   - supplyItem: {fileID: 11400000, guid: 7ced45e79589d624fbfbdd2a7b62cbae, type: 2}
     count: 3
+  extraParts: []
 --- !u!1 &913448674
 GameObject:
   m_ObjectHideFlags: 0
@@ -30989,6 +31257,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 1890043777817888559, guid: a46d62aa5eb818145bfc7f218891a5ff, type: 3}
   startingItems: []
+  extraParts: []
 --- !u!1 &927179443
 GameObject:
   m_ObjectHideFlags: 0
@@ -35280,6 +35549,7 @@ MonoBehaviour:
     count: 3
   - supplyItem: {fileID: 11400000, guid: 33bd0053ff92e6b4eaffa8cdb4cf62eb, type: 2}
     count: 2
+  extraParts: []
 --- !u!1 &1087685863
 GameObject:
   m_ObjectHideFlags: 0
@@ -38403,6 +38673,7 @@ MonoBehaviour:
     count: 1
   - supplyItem: {fileID: 11400000, guid: b3b9c9f56f5cf374d826593f8e69cb6c, type: 2}
     count: 1
+  extraParts: []
 --- !u!1 &1218836231
 GameObject:
   m_ObjectHideFlags: 0
@@ -39468,6 +39739,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 7158514907525454131, guid: e170d77d2d783de408dd0c4593fcd7ec, type: 3}
   startingItems: []
+  extraParts: []
 --- !u!1 &1250261988
 GameObject:
   m_ObjectHideFlags: 0
@@ -42237,6 +42509,7 @@ MonoBehaviour:
   startingItems:
   - supplyItem: {fileID: 11400000, guid: f58a31be3aa27ac43b3e37715111dd44, type: 2}
     count: 1
+  extraParts: []
 --- !u!1 &1359881406
 GameObject:
   m_ObjectHideFlags: 0
@@ -43152,6 +43425,7 @@ MonoBehaviour:
     count: 1
   - supplyItem: {fileID: 11400000, guid: 918647ffde49e18418cbfca2b83f686e, type: 2}
     count: 1
+  extraParts: []
 --- !u!1 &1410000724 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6981012853175297034, guid: 7f9bb14e56d475d4aa6b54df54d11d3e,
@@ -44777,6 +45051,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1442210884}
   m_CullTransparentMesh: 1
+--- !u!114 &1448486212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552079511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 540a1d266b82f664591ca82eb92dba56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StorageFurniture
+  layout: {fileID: 7415090990296999209, guid: 051f8bc62ee50e641ad69d45f1105027, type: 3}
+  startingItems: []
+  extraParts:
+  - {fileID: 552079512}
+  - {fileID: 552079510}
+  - {fileID: 552079509}
+  - {fileID: 552079508}
 --- !u!1 &1450700535 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 975873396456573636, guid: 3abad698c646a9a4aad77f5ee9a434bd,
@@ -44797,6 +45090,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 1890043777817888559, guid: a46d62aa5eb818145bfc7f218891a5ff, type: 3}
   startingItems: []
+  extraParts: []
 --- !u!1 &1453191882
 GameObject:
   m_ObjectHideFlags: 0
@@ -49413,6 +49707,7 @@ MonoBehaviour:
     count: 1
   - supplyItem: {fileID: 11400000, guid: b328324556b656b4a930b01ff1ee6edb, type: 2}
     count: 2
+  extraParts: []
 --- !u!1 &1591669719
 GameObject:
   m_ObjectHideFlags: 0
@@ -53820,6 +54115,32 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1714759575}
   m_CullTransparentMesh: 1
+--- !u!114 &1715611631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552079515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 540a1d266b82f664591ca82eb92dba56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StorageFurniture
+  layout: {fileID: 7415090990296999209, guid: 051f8bc62ee50e641ad69d45f1105027, type: 3}
+  startingItems: []
+  extraParts:
+  - {fileID: 552079524}
+  - {fileID: 552079523}
+  - {fileID: 552079522}
+  - {fileID: 552079521}
+  - {fileID: 552079520}
+  - {fileID: 552079519}
+  - {fileID: 552079518}
+  - {fileID: 552079517}
+  - {fileID: 552079516}
+  - {fileID: 552079514}
+  - {fileID: 552079513}
 --- !u!1 &1716283210
 GameObject:
   m_ObjectHideFlags: 0
@@ -56423,6 +56744,7 @@ MonoBehaviour:
   startingItems:
   - supplyItem: {fileID: 11400000, guid: dd543eff738e90d47960ec2e4b0d2228, type: 2}
     count: 1
+  extraParts: []
 --- !u!1 &1779336378
 GameObject:
   m_ObjectHideFlags: 0
@@ -57466,6 +57788,7 @@ MonoBehaviour:
     count: 2
   - supplyItem: {fileID: 11400000, guid: f70a40d11530cf5438f601faca02a6ee, type: 2}
     count: 2
+  extraParts: []
 --- !u!1 &1802321130
 GameObject:
   m_ObjectHideFlags: 0
@@ -61455,6 +61778,7 @@ MonoBehaviour:
     count: 1
   - supplyItem: {fileID: 11400000, guid: 9cc595e1f0ae9e449bada309bdd992a1, type: 2}
     count: 1
+  extraParts: []
 --- !u!1 &1909605986
 GameObject:
   m_ObjectHideFlags: 0
@@ -61607,6 +61931,7 @@ MonoBehaviour:
   startingItems:
   - supplyItem: {fileID: 11400000, guid: 6ec8c265b8b534b46b9bd708c5163ad4, type: 2}
     count: 3
+  extraParts: []
 --- !u!64 &1909783749
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -62841,6 +63166,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1939305353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552079533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 540a1d266b82f664591ca82eb92dba56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StorageFurniture
+  layout: {fileID: 7415090990296999209, guid: 051f8bc62ee50e641ad69d45f1105027, type: 3}
+  startingItems: []
+  extraParts:
+  - {fileID: 552079535}
+  - {fileID: 552079534}
+  - {fileID: 552079532}
+  - {fileID: 552079531}
 --- !u!1 &1939587698
 GameObject:
   m_ObjectHideFlags: 0

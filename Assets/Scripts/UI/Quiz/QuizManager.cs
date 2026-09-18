@@ -838,6 +838,15 @@ public class QuizManager : MonoBehaviour
         if (answerBox != null)
             answerBox.ShowResult(isCorrect);
 
+        // A right answer is used up and leaves the bag straight away; a wrong one stays
+        // packed. Waits one frame first: the item is still finishing its drag this frame, and
+        // the drag handler puts it back in its grid before letting go.
+        if (isCorrect && answerBox != null)
+        {
+            yield return null;
+            answerBox.ConsumeItem();
+        }
+
         if (SoundManager.Instance != null)
         {
             AudioClip clip = isCorrect ? correctSFX : wrongSFX;
@@ -871,10 +880,6 @@ public class QuizManager : MonoBehaviour
 
             yield return new WaitForSecondsRealtime(feedbackReadSeconds);
         }
-
-        // A right answer is used up and leaves the bag; a wrong one stays packed
-        if (isCorrect && answerBox != null)
-            answerBox.ConsumeItem();
 
         currentQuestionIndex++;
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -20,6 +21,13 @@ public class StorageFurniture : MonoBehaviour
     [FormerlySerializedAs("supplyItems")]
     [SerializeField] private SupplyItemStack[] startingItems;
 
+    [Tooltip("Other objects that belong to this furniture, like the rest of a pile of boxes. " +
+             "Tapping any of them opens this storage, and reach is measured to the nearest one.")]
+    [SerializeField] private Collider[] extraParts = new Collider[0];
+
+    // Furniture that can be tapped right now, for finding which one owns a tapped part
+    private static readonly List<StorageFurniture> enabledFurniture = new List<StorageFurniture>();
+
     private InventoryGrid[] compartments;
     private Collider cachedCollider;
     private bool colliderCached;
@@ -29,6 +37,33 @@ public class StorageFurniture : MonoBehaviour
 
     public StorageLayout Layout => layout;
     public SupplyItemStack[] StartingItems => startingItems;
+
+    void OnEnable() => enabledFurniture.Add(this);
+    void OnDisable() => enabledFurniture.Remove(this);
+
+    /// <summary>
+    /// The furniture a tapped collider belongs to: its own, or the one listing it as an
+    /// extra part. Null for anything that isn't storage.
+    /// </summary>
+    public static StorageFurniture FromCollider(Collider hit)
+    {
+        if (hit == null)
+            return null;
+
+        StorageFurniture own = hit.GetComponent<StorageFurniture>();
+        if (own != null)
+            return own;
+
+        foreach (StorageFurniture furniture in enabledFurniture)
+        {
+            if (furniture.extraParts == null)
+                continue;
+            foreach (Collider part in furniture.extraParts)
+                if (part == hit)
+                    return furniture;
+        }
+        return null;
+    }
 
     public int CompartmentCount
     {
@@ -114,16 +149,25 @@ public class StorageFurniture : MonoBehaviour
     /// </summary>
     public float GetPlanarDistanceTo(Vector3 worldPosition)
     {
-        Vector3 measureFrom = transform.position;
-
         Collider reachCollider = GetReachCollider();
-        if (reachCollider != null)
-            measureFrom = reachCollider.bounds.ClosestPoint(worldPosition);
+        float nearest = reachCollider != null
+            ? PlanarDistance(worldPosition, reachCollider.bounds.ClosestPoint(worldPosition))
+            : PlanarDistance(worldPosition, transform.position);
 
-        return Vector2.Distance(
-            new Vector2(worldPosition.x, worldPosition.z),
-            new Vector2(measureFrom.x, measureFrom.z)
-        );
+        // A pile of boxes counts as close when any box in it is
+        if (extraParts != null)
+        {
+            foreach (Collider part in extraParts)
+                if (part != null)
+                    nearest = Mathf.Min(nearest, PlanarDistance(worldPosition, part.bounds.ClosestPoint(worldPosition)));
+        }
+
+        return nearest;
+    }
+
+    private static float PlanarDistance(Vector3 a, Vector3 b)
+    {
+        return Vector2.Distance(new Vector2(a.x, a.z), new Vector2(b.x, b.z));
     }
 
     /// <summary>

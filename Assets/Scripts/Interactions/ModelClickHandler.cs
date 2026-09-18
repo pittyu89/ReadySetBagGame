@@ -106,7 +106,7 @@ public class ModelClickHandler : MonoBehaviour
             if (playerTransform == null)
                 return;
 
-            StorageFurniture furniture = hit.collider.GetComponent<StorageFurniture>();
+            StorageFurniture furniture = StorageFurniture.FromCollider(hit.collider);
             if (furniture != null)
             {
                 // Measured to the prop's collider surface, not its pivot. A wide cabinet's
