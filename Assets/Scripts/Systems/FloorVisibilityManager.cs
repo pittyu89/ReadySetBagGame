@@ -56,7 +56,7 @@ public class FloorVisibilityManager : MonoBehaviour
         }
 
         // Find the player
-        playerTransform = FindObjectOfType<PlayerMovement>()?.transform;
+        playerTransform = FindObjectOfType<PlayerController>()?.transform;
 
         if (playerTransform == null)
         {

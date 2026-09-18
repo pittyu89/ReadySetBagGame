@@ -185,7 +185,7 @@ public class BagPickupPose : MonoBehaviour
         // Size and centre on the bag's visible pixels, not its frame: the bag sheets pad each
         // frame with empty space. A tight sprite mesh's vertices wrap exactly those pixels.
         Vector2 min, max;
-        GoBagFloater.VisibleBounds(bagSprite, out min, out max);
+        GoBagPickup.VisibleBounds(bagSprite, out min, out max);
 
         Vector2 size = max - min;
         Vector2 center = (min + max) * 0.5f;

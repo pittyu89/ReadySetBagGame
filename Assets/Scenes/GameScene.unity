@@ -3320,7 +3320,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c93275b5db3dd04cb1e466a04b61ff7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GoBagFloater
+  m_EditorClassIdentifier: Assembly-CSharp::GoBagPickup
   floatSpeed: 2
   floatHeight: 0.5
   maleAnimatorController: {fileID: 9100000, guid: b2acc2efad732db47a33c0a2679bdf2a,
@@ -7287,7 +7287,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36fe5ca933004694cb2eb75cb9f1f986, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PausePanelHUDDisplay
+  m_EditorClassIdentifier: Assembly-CSharp::PauseStatsDisplay
   avatarImage: {fileID: 837856942}
   weightValue: {fileID: 1273496947}
   itemsValue: {fileID: 1683171873}
@@ -22178,7 +22178,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ea5d952f1907ca439817e61cfae0f30, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::QuizHandler
+  m_EditorClassIdentifier: Assembly-CSharp::QuizManager
   dialogueBox: {fileID: 678714488}
   questionText: {fileID: 1014956035}
   characterPortrait: {fileID: 1597654579}
@@ -26945,7 +26945,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
         m_MethodName: CloseCurrentPanel
         m_Mode: 1
         m_Arguments:
@@ -47663,7 +47663,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
         m_MethodName: CloseCurrentPanel
         m_Mode: 1
         m_Arguments:
@@ -63465,7 +63465,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
         m_MethodName: CloseCurrentPanel
         m_Mode: 1
         m_Arguments:
@@ -63997,7 +63997,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fcd7f905004806746baca5e7c5a5dc6f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventoryPanelHandler
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryPanel
   inventoryPanel: {fileID: 99663005}
   closeButton: {fileID: 732692690}
   closeButtonBack: {fileID: 1784620223}
@@ -73084,7 +73084,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7cd308d1b5fefe4e9cbd80ca7f63f8f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
+  m_EditorClassIdentifier: Assembly-CSharp::TutorialPanel
   tutorialPanel: {fileID: 2013683858}
   tutorialTitleText: {fileID: 230035377}
   tutorialTitle: {fileID: 1965523911}

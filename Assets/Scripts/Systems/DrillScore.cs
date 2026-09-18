@@ -16,7 +16,7 @@ using UnityEngine;
 /// paper for a fraction of the weight. Grading against the items the quiz actually teaches
 /// keeps the two halves of the game saying the same thing.
 ///
-/// The maths lives here rather than in QuizHandler so it can be checked on its own, without
+/// The maths lives here rather than in QuizManager so it can be checked on its own, without
 /// a scene, a bag or a running quiz.
 /// </summary>
 public static class DrillScore
