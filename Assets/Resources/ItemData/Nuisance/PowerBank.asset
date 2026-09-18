@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 0
   weightKg: 0.2
   description: Recharges a phone or radio when electricity is out
+  essentialRank: 0

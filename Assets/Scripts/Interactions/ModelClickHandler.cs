@@ -94,7 +94,7 @@ public class ModelClickHandler : MonoBehaviour
         // Create a layer mask that ignores the "Wall" and "Sphere" layers
         int layerMask = ~(LayerMask.GetMask("Wall") | LayerMask.GetMask("Sphere"));
 
-        // Raycast and check if hit object has ClickableModel component
+        // Raycast and check if the hit object is storage furniture
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))
         {
             // Find player if not already found (for dynamically spawned player)
@@ -106,19 +106,17 @@ public class ModelClickHandler : MonoBehaviour
             if (playerTransform == null)
                 return;
 
-            ClickableModel clickableModel = hit.collider.GetComponent<ClickableModel>();
-            if (clickableModel != null)
+            StorageFurniture furniture = StorageFurniture.FromCollider(hit.collider);
+            if (furniture != null)
             {
                 // Measured to the prop's collider surface, not its pivot. A wide cabinet's
                 // pivot can sit further than interactionDistance while the player is standing
                 // against its face, which made props look randomly unclickable.
-                if (!clickableModel.IsWithinReach(playerTransform.position, interactionDistance, verticalReach))
+                if (!furniture.IsWithinReach(playerTransform.position, interactionDistance, verticalReach))
                 {
                     return;
                 }
-                // Open the storage view instead of collecting the model.
-                Sprite modelSprite = clickableModel.GetModelSprite();
-                OpenInventoryWithStorage(modelSprite, clickableModel);
+                OpenInventoryWithStorage(furniture);
             }
         }
     }
@@ -149,11 +147,11 @@ public class ModelClickHandler : MonoBehaviour
         }
     }
 
-    private void OpenInventoryWithStorage(Sprite modelSprite, ClickableModel model)
+    private void OpenInventoryWithStorage(StorageFurniture furniture)
     {
         if (inventoryPanelHandler != null)
         {
-            inventoryPanelHandler.OpenInventoryWithStorage(modelSprite, model);
+            inventoryPanelHandler.OpenInventoryWithStorage(furniture);
         }
     }
 }

@@ -20,3 +20,4 @@ MonoBehaviour:
   weightKg: 0.02
   description: Signal rescuers without exhausting your voice. Sound travels farther
     than shouting.
+  essentialRank: 4

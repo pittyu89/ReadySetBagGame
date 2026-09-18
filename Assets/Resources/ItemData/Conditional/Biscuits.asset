@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 1
   weightKg: 0
   description: Can be used for more energy (makes you more thirsty because of sugar)
+  essentialRank: 0

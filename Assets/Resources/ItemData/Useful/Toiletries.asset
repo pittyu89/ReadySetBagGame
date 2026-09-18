@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 2
   weightKg: 0.15
   description: Stores essential cleaning and hygiene supplies.
+  essentialRank: 0

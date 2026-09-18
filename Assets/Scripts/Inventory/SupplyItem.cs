@@ -16,6 +16,13 @@ public class SupplyItem : ScriptableObject
     [SerializeField] private float weightKg = 0f;  // Weight in kilograms
     [SerializeField] private string description = "";  // Item description
 
+    [Tooltip("0 = not an essential. 1 and up = an essential the packing score counts, and its " +
+             "place in the Journal's order. Items sharing a rank are alternatives - packing " +
+             "either one covers it (e.g. the small and big flashlight). Keep this in step with " +
+             "the quiz: essentials are exactly the items the quiz teaches.")]
+    [Min(0)]
+    [SerializeField] private int essentialRank = 0;
+
     public string ItemName => itemName;
     public Sprite ItemImage => itemImage;
     public int GridWidth => gridWidth;
@@ -23,6 +30,8 @@ public class SupplyItem : ScriptableObject
     public ItemImportance Importance => importance;
     public float WeightKg => weightKg;
     public string Description => description;
+    public int EssentialRank => essentialRank;
+    public bool IsEssential => essentialRank > 0;
 }
 
 public enum ItemImportance

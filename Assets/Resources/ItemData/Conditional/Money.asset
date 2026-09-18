@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 1
   weightKg: 0.05
   description: Can be used to buy more supplies from others and currency
+  essentialRank: 0

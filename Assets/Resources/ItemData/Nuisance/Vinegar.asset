@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 0
   weightKg: 1
   description: Can be used as condiment and can make food last longer.
+  essentialRank: 0

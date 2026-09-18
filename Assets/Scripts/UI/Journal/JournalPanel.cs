@@ -120,7 +120,7 @@ public class JournalPanel : MonoBehaviour
             if (byImportance != 0)
                 return byImportance;
 
-            int byEssential = EssentialRank(a.ItemName).CompareTo(EssentialRank(b.ItemName));
+            int byEssential = SortRank(a).CompareTo(SortRank(b));
             if (byEssential != 0)
                 return byEssential;
 
@@ -128,19 +128,8 @@ public class JournalPanel : MonoBehaviour
         });
     }
 
-    private static int EssentialRank(string itemName)
-    {
-        string[][] essentials = DrillScore.DEFAULT_ESSENTIALS;
-        for (int rank = 0; rank < essentials.Length; rank++)
-        {
-            foreach (string essential in essentials[rank])
-            {
-                if (string.Equals(essential, itemName, System.StringComparison.OrdinalIgnoreCase))
-                    return rank;
-            }
-        }
-        return int.MaxValue;
-    }
+    // Essentials in their ranked order, then everything else
+    private static int SortRank(SupplyItem item) => item.IsEssential ? item.EssentialRank : int.MaxValue;
 
     public void Open()
     {

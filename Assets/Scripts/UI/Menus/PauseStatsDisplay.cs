@@ -172,41 +172,9 @@ public class PauseStatsDisplay : MonoBehaviour
             return;
         }
 
-        // Count total unique items in all GoBag sections (excluding storage)
-        int totalItems = 0;
-        System.Collections.Generic.HashSet<InventoryItem> allItems = new System.Collections.Generic.HashSet<InventoryItem>();
-
-        // Access the sections through reflection
-        var sectionsField = inventoryManager.GetType()
-            .GetField("sections", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        
-        if (sectionsField != null)
-        {
-            var sections = sectionsField.GetValue(inventoryManager) as InventoryManager.InventorySection[];
-            
-            if (sections != null)
-            {
-                foreach (var section in sections)
-                {
-                    // Skip storage and refrigerator compartments
-                    if (section.sectionName.Contains("Storage") || section.sectionName.Contains("Refrigerator"))
-                        continue;
-
-                    // Get all items from this section's grid
-                    if (section.grid != null)
-                    {
-                        var items = section.grid.GetAllItems();
-                        foreach (var item in items)
-                        {
-                            allItems.Add(item);
-                        }
-                    }
-                }
-            }
-        }
-
-        totalItems = allItems.Count;
-        itemsValue.text = totalItems.ToString();
+        // Each item once, however many cells it covers
+        var packed = new System.Collections.Generic.HashSet<InventoryItem>(inventoryManager.GetGoBagItems());
+        itemsValue.text = packed.Count.ToString();
     }
 
     private void UpdateTimeDisplay()

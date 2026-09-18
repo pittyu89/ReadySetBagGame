@@ -63,6 +63,29 @@ public class GameDifficultyApplier : MonoBehaviour
         ApplyToGameSystems();
     }
 
+    /// <summary>
+    /// Whether the part of the house <paramref name="target"/> is in can be reached on this
+    /// session's difficulty: the garage opens on Intermediate, upstairs on Advanced. Asked by
+    /// difficulty rather than by what is currently visible, because Advanced keeps the second
+    /// floor hidden until the player climbs the stairs.
+    /// </summary>
+    public bool IsAreaOpen(Transform target)
+    {
+        string difficulty = PlayerPrefs.GetString("SessionDifficulty", "beginner").ToLowerInvariant();
+        bool inGarage = garage != null && target.IsChildOf(garage.transform);
+        bool upstairs = secondFloor != null && target.IsChildOf(secondFloor.transform);
+
+        switch (difficulty)
+        {
+            case "advanced":
+                return true;
+            case "intermediate":
+                return !upstairs;
+            default:
+                return !inGarage && !upstairs;
+        }
+    }
+
     private void ApplyFloorVisibility(string difficulty)
     {
         switch (difficulty)

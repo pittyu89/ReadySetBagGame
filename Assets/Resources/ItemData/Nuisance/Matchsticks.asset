@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 0
   weightKg: 0.02
   description: Used to light a candle or start a small fire.
+  essentialRank: 0

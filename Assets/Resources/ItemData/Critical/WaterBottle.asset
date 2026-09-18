@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 4
   weightKg: 1.5
   description: Clean drinking water for 72-hour hydration.
+  essentialRank: 1
