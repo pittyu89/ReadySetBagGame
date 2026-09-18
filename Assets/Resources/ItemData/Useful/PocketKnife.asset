@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 2
   weightKg: 0.15
   description: Multi-use tool for cutting, opening cans, and minor repairs.
+  essentialRank: 13

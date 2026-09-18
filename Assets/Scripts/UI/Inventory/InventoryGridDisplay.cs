@@ -8,166 +8,80 @@ using System.Collections.Generic;
 /// </summary>
 public class InventoryGridDisplay : MonoBehaviour
 {
+    [Tooltip("Go bag displays only: the InventoryManager section this display shows.")]
     [SerializeField] private string sectionName;
     [SerializeField] private float cellSize = 9f;
     [SerializeField] private float spacing = 1f;
-    [SerializeField] private bool useStorageGrid = false;  // Set to true for model storage display
+    [Tooltip("On for furniture compartments, which are given their grid when the furniture is opened.")]
+    [SerializeField] private bool useStorageGrid = false;
 
-    private int gridWidth;   // Auto-populated from InventoryManager
-    private int gridHeight;  // Auto-populated from InventoryManager
+    private int gridWidth;
+    private int gridHeight;
 
     [SerializeField] private RectTransform gridContainer;
 
     private InventoryManager inventoryManager;
-    private InventoryGrid displayGrid;  // Can be either from InventoryManager or a storage grid
+    private InventoryGrid displayGrid;  // A go bag section, or the furniture compartment on show
     private InventoryGridSlotUI[,] slotUIs;
     private Dictionary<InventoryItem, InventoryGridItemUI> itemUIs;
-    private ClickableModel currentStorageModel;  // Reference to the model being looted
+
+    private void EnsureInitialized()
+    {
+        if (inventoryManager == null)
+            inventoryManager = InventoryManager.Instance;
+        if (itemUIs == null)
+            itemUIs = new Dictionary<InventoryItem, InventoryGridItemUI>();
+    }
 
     void Start()
     {
-        inventoryManager = InventoryManager.Instance;
-        itemUIs = new Dictionary<InventoryItem, InventoryGridItemUI>();
+        EnsureInitialized();
 
-        // Auto-populate grid dimensions from InventoryManager
-        if (!useStorageGrid && inventoryManager != null)
+        // Furniture compartments are built when their furniture is opened (and usually
+        // before this runs, since the layout is created and filled in the same frame)
+        if (useStorageGrid)
+            return;
+
+        InventoryGrid grid = inventoryManager != null ? inventoryManager.GetGrid(sectionName) : null;
+        if (grid != null)
         {
-            InventoryGrid grid = inventoryManager.GetGrid(sectionName);
-            if (grid != null)
-            {
-                gridWidth = grid.GetWidth();
-                gridHeight = grid.GetHeight();
-                displayGrid = grid;  // Initialize displayGrid for this section
-            }
+            gridWidth = grid.GetWidth();
+            gridHeight = grid.GetHeight();
+            displayGrid = grid;
         }
-
-        // GridLayoutGroup is no longer used; positioning is done manually
 
         CreateGridSlots();
         RefreshDisplay();
 
-        // Subscribe to inventory changes
-        if (inventoryManager != null && !useStorageGrid)
-        {
+        if (inventoryManager != null)
             inventoryManager.OnInventoryChanged += RefreshDisplay;
-        }
     }
 
     void OnDestroy()
     {
         if (inventoryManager != null && !useStorageGrid)
-        {
             inventoryManager.OnInventoryChanged -= RefreshDisplay;
-        }
     }
 
     /// <summary>
-    /// Sets this display to show a specific storage section from a model.
-    /// Uses gridLayout and gridContainer that are already configured in the Inspector.
+    /// Shows one furniture compartment. Called by the inventory panel for each compartment
+    /// of the furniture being opened.
     /// </summary>
-    public void SetStorageModelForSection(ClickableModel model, string storageSectionName)
+    public void ShowStorageCompartment(InventoryGrid grid)
     {
-        // Ensure inventoryManager is initialized
-        if (inventoryManager == null)
-        {
-            inventoryManager = InventoryManager.Instance;
-        }
-        
-        if (itemUIs == null)
-        {
-            itemUIs = new Dictionary<InventoryItem, InventoryGridItemUI>();
-        }
-
-        currentStorageModel = model;
+        EnsureInitialized();
         useStorageGrid = true;
 
-        if (model != null && !string.IsNullOrEmpty(storageSectionName))
-        {
-            displayGrid = model.GetStorageGrid(storageSectionName);
-            
-            if (displayGrid == null)
-            {
-                return;
-            }
-            
-            gridWidth = displayGrid.gridWidth;
-            gridHeight = displayGrid.gridHeight;
+        displayGrid = grid;
+        if (grid == null)
+            return;
 
-            // Clear existing slots
-            if (gridContainer != null)
-            {
-                foreach (Transform child in gridContainer)
-                {
-                    Destroy(child.gameObject);
-                }
-            }
-            
-            slotUIs = null;
-            itemUIs.Clear();
+        gridWidth = grid.gridWidth;
+        gridHeight = grid.gridHeight;
+        itemUIs.Clear();
 
-            CreateGridSlots();
-            RefreshDisplay();
-        }
-    }
-
-    /// <summary>
-    /// Sets this display to show a model's storage instead of the main inventory.
-    /// Optionally specify a storage section name. If not specified, uses the first section.
-    /// </summary>
-    public void SetStorageModel(ClickableModel model, string storageSectionName = null)
-    {
-        // Ensure inventoryManager is initialized
-        if (inventoryManager == null)
-        {
-            inventoryManager = InventoryManager.Instance;
-        }
-        
-        if (itemUIs == null)
-        {
-            itemUIs = new Dictionary<InventoryItem, InventoryGridItemUI>();
-        }
-
-        currentStorageModel = model;
-        useStorageGrid = true;
-
-        if (model != null)
-        {
-            // If no section name specified, use the first available section
-            if (string.IsNullOrEmpty(storageSectionName))
-            {
-                string[] sectionNames = model.GetAllStorageSectionNames();
-                
-                if (sectionNames.Length > 0)
-                {
-                    storageSectionName = sectionNames[0];
-                }
-                else
-                {
-                    return;
-                }
-            }
-            
-            displayGrid = model.GetStorageGrid(storageSectionName);
-            
-            if (displayGrid == null)
-            {
-                return;
-            }
-            
-            gridWidth = displayGrid.gridWidth;
-            gridHeight = displayGrid.gridHeight;
-
-            // Recreate slots for the storage grid
-            foreach (Transform child in gridContainer)
-            {
-                Destroy(child.gameObject);
-            }
-            slotUIs = null;
-            itemUIs.Clear();
-
-            CreateGridSlots();
-            RefreshDisplay();
-        }
+        CreateGridSlots();
+        RefreshDisplay();
     }
 
     /// <summary>
@@ -208,50 +122,6 @@ public class InventoryGridDisplay : MonoBehaviour
     public RectTransform GetGridContainer()
     {
         return gridContainer;
-    }
-
-    /// <summary>
-    /// Switches to a different storage section on the current model.
-    /// Reloads the grid display with the new section's contents.
-    /// </summary>
-    public void SwitchStorageSection(string newSectionName)
-    {
-        // Ensure inventoryManager is initialized
-        if (inventoryManager == null)
-        {
-            inventoryManager = InventoryManager.Instance;
-        }
-
-        if (currentStorageModel == null)
-        {
-            return;
-        }
-
-        if (string.IsNullOrEmpty(newSectionName))
-        {
-            return;
-        }
-
-        displayGrid = currentStorageModel.GetStorageGrid(newSectionName);
-
-        if (displayGrid == null)
-        {
-            return;
-        }
-
-        gridWidth = displayGrid.gridWidth;
-        gridHeight = displayGrid.gridHeight;
-
-        // Recreate slots for the new section
-        foreach (Transform child in gridContainer)
-        {
-            Destroy(child.gameObject);
-        }
-        slotUIs = null;
-        itemUIs.Clear();
-
-        CreateGridSlots();
-        RefreshDisplay();
     }
 
     private void CreateGridSlots()

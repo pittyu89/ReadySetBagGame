@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 3
   weightKg: 0.02
   description: Protects lungs from debris, dust, and smoke.
+  essentialRank: 6

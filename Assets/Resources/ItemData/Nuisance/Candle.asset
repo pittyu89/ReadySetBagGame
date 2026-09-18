@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 0
   weightKg: 0.1
   description: Backup light source when batteries fail.
+  essentialRank: 0

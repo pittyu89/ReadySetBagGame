@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 0
   weightKg: 0.05
   description: Helps with navigation if landmarks are destroyed.
+  essentialRank: 0

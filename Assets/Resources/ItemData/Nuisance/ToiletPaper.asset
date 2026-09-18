@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 0
   weightKg: 0.05
   description: Provides comfort and hygiene
+  essentialRank: 0

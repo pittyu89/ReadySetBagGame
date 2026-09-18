@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 4
   weightKg: 0.5
   description: Treats injuries and prevents infection.
+  essentialRank: 2

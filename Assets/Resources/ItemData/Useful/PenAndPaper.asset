@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 2
   weightKg: 0.05
   description: Can be used to communicate, document and give information.
+  essentialRank: 0

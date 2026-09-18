@@ -53,7 +53,7 @@ public class ClickableHighlightManager : MonoBehaviour
              "refreshed periodically rather than only once at startup.")]
     [SerializeField] private float rescanInterval = 2f;
 
-    private ClickableModel[] models;
+    private StorageFurniture[] models;
     private ClickableIndicator[] indicators;
     private Transform playerTransform;
     private float nextRescanTime;
@@ -75,7 +75,7 @@ public class ClickableHighlightManager : MonoBehaviour
     {
         // Include inactive props: upper floors start hidden and are revealed later, so an
         // active-only scan would miss them permanently.
-        models = FindObjectsOfType<ClickableModel>(true);
+        models = FindObjectsOfType<StorageFurniture>(true);
         indicators = new ClickableIndicator[models.Length];
 
         for (int i = 0; i < models.Length; i++)
@@ -128,7 +128,7 @@ public class ClickableHighlightManager : MonoBehaviour
 
         for (int i = 0; i < models.Length; i++)
         {
-            ClickableModel model = models[i];
+            StorageFurniture model = models[i];
             ClickableIndicator indicator = indicators[i];
 
             if (model == null || indicator == null)

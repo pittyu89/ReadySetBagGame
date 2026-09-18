@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 0
   weightKg: 0.2
   description: Receives emergency alerts and contacts rescuers.
+  essentialRank: 0

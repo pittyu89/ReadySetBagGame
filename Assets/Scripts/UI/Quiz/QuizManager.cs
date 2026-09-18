@@ -293,6 +293,7 @@ public class QuizManager : MonoBehaviour
     // run scored 2 of 13 essentials.
     private List<DrillScore.PackedItem> packedAtOpen = new List<DrillScore.PackedItem>();
     private float weightLimitAtOpen = 0f;
+    private int essentialTargetAtOpen = 0;
 
     // True from the moment an item lands until the next question is ready for input.
     private bool isResolvingAnswer = false;
@@ -1099,35 +1100,23 @@ public class QuizManager : MonoBehaviour
     /// </summary>
     private DrillScore.Result BuildDrillScore(int correct, float remainingTime, float totalTime)
     {
-        return DrillScore.Compute(packedAtOpen, weightLimitAtOpen,
+        return DrillScore.Compute(packedAtOpen, essentialTargetAtOpen, weightLimitAtOpen,
                                   TotalQuestions, correct, tasksCompleted,
                                   remainingTime, totalTime, timeParFraction);
     }
 
     /// <summary>
     /// Records what the player packed, before the quiz begins consuming correct answers out
-    /// of the bag. Importance and weight live on the SupplyItem assets rather than on the
-    /// runtime items, so each one is matched back by name.
+    /// of the bag. Importance, weight and essentials come from each item's own SupplyItem.
     /// </summary>
     private void CaptureBagSnapshot()
     {
         packedAtOpen.Clear();
         weightLimitAtOpen = 0f;
+        essentialTargetAtOpen = DrillScore.CountEssentialTarget(Resources.LoadAll<SupplyItem>("ItemData"));
 
         if (InventoryManager.Instance == null)
             return;
-
-        Dictionary<string, DrillScore.PackedItem> byName =
-            new Dictionary<string, DrillScore.PackedItem>(System.StringComparer.OrdinalIgnoreCase);
-
-        foreach (SupplyItem supply in Resources.LoadAll<SupplyItem>("ItemData"))
-        {
-            if (supply == null || string.IsNullOrEmpty(supply.ItemName))
-                continue;
-
-            byName[supply.ItemName] =
-                new DrillScore.PackedItem(supply.ItemName, supply.Importance, supply.WeightKg);
-        }
 
         weightLimitAtOpen = InventoryManager.Instance.GetGoBagWeightLimit();
 
@@ -1136,10 +1125,10 @@ public class QuizManager : MonoBehaviour
             if (item == null || string.IsNullOrEmpty(item.itemName))
                 continue;
 
-            DrillScore.PackedItem known;
-            if (byName.TryGetValue(item.itemName, out known))
+            if (item.source != null)
             {
                 // Stackables count once per unit carried
+                DrillScore.PackedItem known = new DrillScore.PackedItem(item.source);
                 int units = Mathf.Max(1, item.quantity);
                 for (int i = 0; i < units; i++)
                     packedAtOpen.Add(known);

@@ -55,32 +55,14 @@ public static class DrillScore
     public const int BADGE_MASTER_MIN = 88;
     public const int BADGE_PROFICIENT_MIN = 70;
 
-    /// <summary>
-    /// E_target. Each entry is one requirement, satisfied by any one of its listed items —
-    /// so either torch counts, and either tin counts, without demanding both.
-    ///
-    /// This is deliberately the set the quiz teaches. Every correct answer in the question
-    /// pool appears here, and nothing else does, so a student who learns the lessons packs
-    /// a perfect bag — and is never asked to carry something the game never taught.
-    ///
-    /// Keep the two in step: dropping a question means dropping its item from here too.
-    /// </summary>
-    public static readonly string[][] DEFAULT_ESSENTIALS =
-    {
-        new[] { "Water Bottle" },
-        new[] { "First Aid Kit" },
-        new[] { "Small Flashlight", "Big Flashlight" },
-        new[] { "Whistle" },
-        new[] { "Canned Corned Beef", "Canned Fish" },
-        new[] { "Dust Mask" },
-        new[] { "Thermal Blanket" },
-        new[] { "Medication" },
-        new[] { "Spare Clothes" },
-        new[] { "Rope" },
-        new[] { "Ziplock Bag" },
-        new[] { "Glow Sticks" },
-        new[] { "Pocket Knife" }
-    };
+    // E_target is set on the item data, as each SupplyItem's Essential Rank: every rank is
+    // one requirement, satisfied by any one of the items that share it - so either torch
+    // counts, and either tin counts, without demanding both.
+    //
+    // This is deliberately the set the quiz teaches. Every correct answer in the question
+    // pool is an essential, and nothing else is, so a student who learns the lessons packs a
+    // perfect bag - and is never asked to carry something the game never taught. Keep the two
+    // in step: dropping a question means clearing its item's Essential Rank too.
 
     public struct Result
     {
@@ -110,55 +92,53 @@ public static class DrillScore
         public string Name;
         public ItemImportance Importance;
         public float WeightKg;
+        public int EssentialRank;  // 0 = not an essential
 
-        public PackedItem(string name, ItemImportance importance, float weightKg)
+        public PackedItem(string name, ItemImportance importance, float weightKg, int essentialRank = 0)
         {
             Name = name;
             Importance = importance;
             WeightKg = weightKg;
+            EssentialRank = essentialRank;
+        }
+
+        public PackedItem(SupplyItem supply)
+            : this(supply.ItemName, supply.Importance, supply.WeightKg, supply.EssentialRank)
+        {
         }
     }
 
-    /// <summary>
-    /// How many of the required groups the bag satisfies, and how many there were.
-    /// </summary>
-    public static void CountEssentials(IList<PackedItem> packed, string[][] essentials,
-                                       out int found, out int target)
+    /// <summary>E_target: how many essential requirements the item data defines.</summary>
+    public static int CountEssentialTarget(IEnumerable<SupplyItem> allItems)
     {
-        if (essentials == null)
-            essentials = DEFAULT_ESSENTIALS;
+        HashSet<int> ranks = new HashSet<int>();
+        if (allItems != null)
+        {
+            foreach (SupplyItem item in allItems)
+                if (item != null && item.IsEssential)
+                    ranks.Add(item.EssentialRank);
+        }
+        return ranks.Count;
+    }
 
-        target = essentials.Length;
-        found = 0;
-
-        HashSet<string> have = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
+    /// <summary>E_packed: how many different essential requirements the bag covers.</summary>
+    public static int CountEssentialsPacked(IList<PackedItem> packed)
+    {
+        HashSet<int> covered = new HashSet<int>();
         if (packed != null)
         {
             foreach (PackedItem item in packed)
-                if (!string.IsNullOrEmpty(item.Name))
-                    have.Add(item.Name);
+                if (item.EssentialRank > 0)
+                    covered.Add(item.EssentialRank);  // any one of the alternates covers it
         }
-
-        foreach (string[] group in essentials)
-        {
-            if (group == null)
-                continue;
-
-            foreach (string option in group)
-            {
-                if (have.Contains(option))
-                {
-                    found++;
-                    break; // any one of the alternates satisfies the requirement
-                }
-            }
-        }
+        return covered.Count;
     }
 
     /// <summary>
     /// Scores a finished drill.
     /// </summary>
     /// <param name="packed">What ended up in the go bag.</param>
+    /// <param name="essentialTarget">E_target, from <see cref="CountEssentialTarget"/>.</param>
     /// <param name="weightLimitKg">The difficulty's limit. 0 means unlimited.</param>
     /// <param name="questionsAsked">N_quiz — length of the round.</param>
     /// <param name="correctAnswers">Sum of C_match.</param>
@@ -168,20 +148,20 @@ public static class DrillScore
     /// </param>
     public static Result Compute(
         IList<PackedItem> packed,
+        int essentialTarget,
         float weightLimitKg,
         int questionsAsked,
         int correctAnswers,
         int tasksCompleted,
         float timeRemaining,
         float timeTotal,
-        float timeParFraction = DEFAULT_TIME_PAR,
-        string[][] essentials = null)
+        float timeParFraction = DEFAULT_TIME_PAR)
     {
         Result r = new Result();
 
         // ---- 1. S_pack ----
-        int found, target;
-        CountEssentials(packed, essentials, out found, out target);
+        int target = essentialTarget;
+        int found = Mathf.Min(CountEssentialsPacked(packed), target);
         r.EssentialsPacked = found;
         r.EssentialsTarget = target;
 

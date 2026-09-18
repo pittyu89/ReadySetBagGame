@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 4
   weightKg: 0.4
   description: Non-perishable energy source. 3-day food supply.
+  essentialRank: 5

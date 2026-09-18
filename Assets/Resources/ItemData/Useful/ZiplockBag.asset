@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 2
   weightKg: 0.03
   description: Can be used to package and wrap non-waterproof items.
+  essentialRank: 11

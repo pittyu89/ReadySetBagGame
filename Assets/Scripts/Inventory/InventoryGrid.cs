@@ -9,13 +9,21 @@ public class InventoryGrid
     public int gridWidth;
     public int gridHeight;
     public float maxWeightKg;  // Weight limit for this grid (0 = unlimited)
+
+    /// <summary>
+    /// True for the go bag's compartments, false for furniture storage. The bag's weight limit
+    /// only applies to moves into a go bag grid.
+    /// </summary>
+    public readonly bool isGoBag;
+
     private InventorySlot[,] slots;
 
-    public InventoryGrid(int width, int height, float weightLimit = 0f)
+    public InventoryGrid(int width, int height, float weightLimit = 0f, bool goBag = false)
     {
         gridWidth = width;
         gridHeight = height;
         maxWeightKg = weightLimit;
+        isGoBag = goBag;
         slots = new InventorySlot[width, height];
 
         // Initialize all slots

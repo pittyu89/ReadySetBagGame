@@ -12,6 +12,9 @@ public class InventoryPanel : MonoBehaviour
     [SerializeField] private Button bagButton;
     [SerializeField] private GameObject bagButtonGroup;
     [SerializeField] private Image modelDisplayImage;
+
+    // The compartments of the furniture currently open, laid over modelDisplayImage
+    private StorageLayout openLayout;
     [SerializeField] private RectTransform goBagSide;
     [SerializeField] private RectTransform storageSide;
     [SerializeField] private GameObject quizPanel;
@@ -246,8 +249,10 @@ public class InventoryPanel : MonoBehaviour
         currentOpenPanel = null;
     }
 
-    public void OpenInventoryWithStorage(Sprite modelSprite, ClickableModel model)
+    public void OpenInventoryWithStorage(StorageFurniture furniture)
     {
+        StorageLayout layout = furniture != null ? furniture.Layout : null;
+
         // Hide quiz panel when opening inventory
         if (quizPanel != null)
             quizPanel.SetActive(false);
@@ -259,72 +264,12 @@ public class InventoryPanel : MonoBehaviour
         ShowCloseButton();
 
         // Set up split screen mode with storage
-        SetSplitScreenMode(modelSprite);
+        SetSplitScreenMode(layout != null ? layout.FurnitureSprite : null);
 
         // Every storage opened reshuffles the Small / Medium Bag's slots
         NotifyBagsStorageOpened();
 
-        // Set model display size from ClickableModel
-        if (model != null && modelDisplayImage != null)
-        {
-            RectTransform imageRect = modelDisplayImage.GetComponent<RectTransform>();
-            if (imageRect != null)
-            {
-                imageRect.sizeDelta = new Vector2(model.GetModelDisplayWidth(), model.GetModelDisplayHeight());
-
-            }
-        }
-
-        // Display ALL storage sections at once
-        if (model != null && storageSide != null)
-        {
-            string[] sectionNames = model.GetAllStorageSectionNames();
-
-            
-            // First, hide all storage grid displays to clear previous model's display
-            InventoryGridDisplay[] allDisplays = storageSide.GetComponentsInChildren<InventoryGridDisplay>(true);
-            foreach (InventoryGridDisplay display in allDisplays)
-            {
-                if (display.gameObject != null)
-                {
-                    display.gameObject.SetActive(false);
-                }
-            }
-            
-            // For each section, find matching container (search all children, not just direct)
-            foreach (string sectionName in sectionNames)
-            {
-
-                
-                // Get all children recursively
-                Transform[] allChildren = storageSide.GetComponentsInChildren<Transform>(true);
-                
-                foreach (Transform child in allChildren)
-                {
-                    string childName = child.gameObject.name;
-                    
-                    // Check if this transform matches the section name
-                    if (childName.Contains(sectionName))
-                    {
-
-                        
-                        // Get InventoryGridDisplay from this container
-                        InventoryGridDisplay gridDisplay = child.GetComponent<InventoryGridDisplay>();
-                        if (gridDisplay != null)
-                        {
-
-                            child.gameObject.SetActive(true); // Make sure it's visible
-                            gridDisplay.SetStorageModelForSection(model, sectionName);
-                        }
-                        else
-                        {
-
-                        }
-                        break; // Found match for this section, move to next section
-                    }
-                }
-            }
-        }
+        ShowFurnitureCompartments(furniture, layout);
 
         // Rebind animator and reset to idle state
         // Skipped when the Small Bag is in use and the standard bag is hidden
@@ -414,6 +359,34 @@ public class InventoryPanel : MonoBehaviour
         if (modelDisplayImage != null)
         {
             modelDisplayImage.gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// Lays the furniture's compartments over its picture: the layout for its furniture type
+    /// is created on top of the picture, and each compartment display is handed that piece of
+    /// furniture's own grid. The previous furniture's layout is thrown away first.
+    /// </summary>
+    private void ShowFurnitureCompartments(StorageFurniture furniture, StorageLayout layout)
+    {
+        if (openLayout != null)
+        {
+            Destroy(openLayout.gameObject);
+            openLayout = null;
+        }
+
+        if (furniture == null || layout == null || modelDisplayImage == null)
+            return;
+
+        RectTransform imageRect = modelDisplayImage.rectTransform;
+        imageRect.sizeDelta = layout.DisplaySize;
+
+        openLayout = Instantiate(layout, imageRect, false);
+        var compartments = openLayout.Compartments;
+        for (int i = 0; i < compartments.Count; i++)
+        {
+            if (compartments[i].display != null)
+                compartments[i].display.ShowStorageCompartment(furniture.GetCompartment(i));
         }
     }
 

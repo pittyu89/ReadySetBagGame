@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 0
   weightKg: 0.15
   description: Provides comfort during extended shelter stays.
+  essentialRank: 0

@@ -58,7 +58,8 @@ public class InventoryManager : MonoBehaviour
         {
             foreach (var section in sections)
             {
-                section.grid = new InventoryGrid(section.gridWidth, section.gridHeight, section.maxWeightKg);
+                // Every section here is part of a go bag; furniture storage keeps its own grids
+                section.grid = new InventoryGrid(section.gridWidth, section.gridHeight, section.maxWeightKg, goBag: true);
                 gridMap[section.sectionName] = section.grid;
             }
         }
@@ -273,36 +274,33 @@ public class InventoryManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets the total weight of all items in GoBag sections (excludes storage compartments).
+    /// Gets the total weight of everything in the go bag. Every section of this manager is a
+    /// go bag compartment; furniture storage keeps its own grids and never counts.
     /// </summary>
     public float GetGoBagTotalWeight()
     {
         float totalWeight = 0f;
-        foreach (var kvp in gridMap)
+        foreach (InventoryGrid grid in gridMap.Values)
         {
-            // Only count GoBag sections, not storage (Refrigerator, etc.)
-            if (!kvp.Key.Contains("Refrigerator") && !kvp.Key.Contains("Storage"))
-            {
-                totalWeight += kvp.Value.GetTotalWeight();
-            }
+            if (grid.isGoBag)
+                totalWeight += grid.GetTotalWeight();
         }
         return totalWeight;
     }
 
     /// <summary>
-    /// Every item currently in the go bag, ignoring storage compartments — the same sections
-    /// <see cref="GetGoBagTotalWeight"/> counts. Scoring uses this to work out what was
-    /// actually packed when the drill ends.
+    /// Every item currently in the go bag - the same compartments <see cref="GetGoBagTotalWeight"/>
+    /// counts. Scoring uses this to work out what was actually packed when the drill ends.
     /// </summary>
     public List<InventoryItem> GetGoBagItems()
     {
         List<InventoryItem> packed = new List<InventoryItem>();
-        foreach (var kvp in gridMap)
+        foreach (InventoryGrid grid in gridMap.Values)
         {
-            if (kvp.Key.Contains("Refrigerator") || kvp.Key.Contains("Storage"))
+            if (!grid.isGoBag)
                 continue;
 
-            InventoryItem[] items = kvp.Value.GetAllItems();
+            InventoryItem[] items = grid.GetAllItems();
             if (items != null)
                 packed.AddRange(items);
         }

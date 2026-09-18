@@ -19,3 +19,4 @@ MonoBehaviour:
   importance: 3
   weightKg: 0.5
   description: Maintains hygiene and warmth after evacuation.
+  essentialRank: 9

@@ -1077,16 +1077,14 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         if (item == null || gridDisplay == null)
             return false;
 
-        string sectionName = gridDisplay.GetSectionName();
-
-        // Check if this is a GoBag section (not a storage compartment)
-        if (sectionName.Contains("Refrigerator") || sectionName.Contains("Storage"))
-        {
-            // Storage sections don't have global weight limits
+        // Only the go bag has a weight limit. Moves into furniture - including rearranging a
+        // shelf while the bag is nearly full - are always allowed.
+        InventoryGrid target = gridDisplay.GetCurrentGrid();
+        if (target == null || !target.isGoBag)
             return true;
-        }
 
-        // This is a GoBag section - check global weight limit
+        // The item has already been lifted out of wherever it came from, so the bag's weight
+        // here is what it would be without it
         InventoryManager manager = InventoryManager.Instance;
         if (manager == null)
             return true;
