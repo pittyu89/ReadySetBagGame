@@ -32,6 +32,8 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
     private static TextMeshProUGUI sharedItemNameText;
     private static TextMeshProUGUI sharedDescriptionText;
     private static TextMeshProUGUI sharedWeightText;
+    // The item shown standing in the display case at the top of the popup
+    private static Image sharedItemImage;
 
     // Root canvas the panel lives under, used to keep the popup on screen.
     private static RectTransform sharedCanvasRect;
@@ -84,6 +86,7 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         sharedItemNameText = null;
         sharedDescriptionText = null;
         sharedWeightText = null;
+        sharedItemImage = null;
         sharedCanvasRect = null;
 
         if (staticDescriptionPanel == null)
@@ -109,6 +112,8 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         foreach (var t in allTexts)
         {
             string n = t.gameObject.name.ToLowerInvariant();
+            // Fixed captions such as the "Weight" label next to the value
+            if (n.Contains("label")) continue;
             if (n.Contains("name")) sharedItemNameText = t;
             else if (n.Contains("weight")) sharedWeightText = t;
             else if (n.Contains("desc")) sharedDescriptionText = t;
@@ -119,6 +124,9 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         if (sharedDescriptionText == null && allTexts.Length > 0) sharedDescriptionText = allTexts[0];
         if (sharedItemNameText == null && allTexts.Length > 2) sharedItemNameText = allTexts[2];
         if (sharedWeightText == null && allTexts.Length > 1) sharedWeightText = allTexts[1];
+
+        Transform itemImage = staticDescriptionPanel.transform.Find("ItemImage");
+        sharedItemImage = itemImage != null ? itemImage.GetComponent<Image>() : null;
 
         staticDescriptionPanel.SetActive(false);
     }
@@ -184,8 +192,8 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
     private Coroutine descriptionAnimationCoroutine;
     
     [Header("Description Popup")]
-    [Tooltip("Gap in UI units between the item and the popup.")]
-    [SerializeField] private float panelGap = 15f;
+    [Tooltip("Gap in UI units between the item and the popup while the item is being dragged.")]
+    [SerializeField] private float panelGap = 2f;
 
     // True between this item opening its description and asking for it to close, so a second
     // tap closes it even while the pop-in is still animating.
@@ -320,6 +328,11 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         if (isItemCurrentlyBeingDragged)
             return;
 
+        // The popup sits over the item while its description is open; the item stays put until
+        // it is closed (a tap on the item, or anywhere else)
+        if (panelOwner == this && descriptionOpen)
+            return;
+
         // Mark that we're now dragging an item, and that THIS handler is the owner of that drag
         isItemCurrentlyBeingDragged = true;
         didBeginDrag = true;
@@ -415,35 +428,10 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         if (grid == null)
             return;
 
-        // Calculate which grid position the item is over
-        Vector3 itemWorldPos = rectTransform.parent.TransformPoint(rectTransform.localPosition);
-        RectTransform gridContainer = targetGrid.GetGridContainer();
-        Vector3 itemLocalPos = gridContainer.parent.InverseTransformPoint(itemWorldPos);
-
-        float cellSize = targetGrid.GetCellSize();
-        float spacing = targetGrid.GetSpacing();
-        float cellWithSpacing = cellSize + spacing;
-        
-        float totalGridWidth = grid.GetWidth() * cellSize + (grid.GetWidth() - 1) * spacing;
-        float totalGridHeight = grid.GetHeight() * cellSize + (grid.GetHeight() - 1) * spacing;
-        
-        float centerOffsetX = -(totalGridWidth / 2f);
-        float centerOffsetY = totalGridHeight / 2f;
-
         InventoryItem item = itemUI.GetItem();
-        float itemWidth = cellSize * item.width;
-        float itemHeight = cellSize * item.height;
-
-        // Convert to grid coordinates
-        float relativeX = itemLocalPos.x - centerOffsetX - itemWidth / 2f;
-        float relativeY = centerOffsetY - itemLocalPos.y - itemHeight / 2f;
-
-        int gridX = Mathf.RoundToInt(relativeX / cellWithSpacing);
-        int gridY = Mathf.RoundToInt(relativeY / cellWithSpacing);
-
-        // Clamp to valid range
-        gridX = Mathf.Max(0, Mathf.Min(gridX, grid.GetWidth() - 1));
-        gridY = Mathf.Max(0, Mathf.Min(gridY, grid.GetHeight() - 1));
+        Vector2Int cell = GetCellUnderItem(targetGrid, grid, item);
+        int gridX = cell.x;
+        int gridY = cell.y;
 
         // Check if item actually fits at this position
         bool itemFits = (gridX + item.width <= grid.GetWidth()) && (gridY + item.height <= grid.GetHeight());
@@ -458,6 +446,34 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
             // Item doesn't fit - restore grid to show actual contents only
             targetGrid.RestoreSlotVisuals();
         }
+    }
+
+    /// <summary>
+    /// The grid cell the dragged item's top-left corner is nearest, clamped onto the grid.
+    /// Items are laid out as posX = centerOffsetX + gridX * (cell + spacing) + itemWidth / 2
+    /// (see InventoryGridDisplay), so this runs that backwards from where the item is now.
+    /// </summary>
+    private Vector2Int GetCellUnderItem(InventoryGridDisplay gridDisplay, InventoryGrid grid, InventoryItem item)
+    {
+        // The item may be parented to the root canvas mid-drag, so go through world space
+        Vector3 itemWorldPos = rectTransform.parent.TransformPoint(rectTransform.localPosition);
+        Vector3 itemLocalPos = gridDisplay.GetGridContainer().parent.InverseTransformPoint(itemWorldPos);
+
+        float cellSize = gridDisplay.GetCellSize();
+        float spacing = gridDisplay.GetSpacing();
+        float cellWithSpacing = cellSize + spacing;
+
+        float totalGridWidth = grid.GetWidth() * cellSize + (grid.GetWidth() - 1) * spacing;
+        float totalGridHeight = grid.GetHeight() * cellSize + (grid.GetHeight() - 1) * spacing;
+        float centerOffsetX = -(totalGridWidth / 2f);
+        float centerOffsetY = totalGridHeight / 2f;
+
+        float relativeX = itemLocalPos.x - centerOffsetX - cellSize * item.width / 2f;
+        float relativeY = centerOffsetY - itemLocalPos.y - cellSize * item.height / 2f;
+
+        int gridX = Mathf.Clamp(Mathf.RoundToInt(relativeX / cellWithSpacing), 0, grid.GetWidth() - 1);
+        int gridY = Mathf.Clamp(Mathf.RoundToInt(relativeY / cellWithSpacing), 0, grid.GetHeight() - 1);
+        return new Vector2Int(gridX, gridY);
     }
 
     private void HighlightSlotsForItem(InventoryGridDisplay targetGrid, int startX, int startY, InventoryItem item)
@@ -494,7 +510,13 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         // always the single-item weight. The format string is what stops raw float
         // interpolation printing values like "0.30000001kg".
         if (weightText != null)
-            weightText.text = $"{item.weightKg:0.##} kg";
+            weightText.text = $"{item.weightKg:0.##} Kg";
+
+        if (sharedItemImage != null)
+        {
+            sharedItemImage.sprite = item.itemSprite;
+            sharedItemImage.enabled = item.itemSprite != null;
+        }
 
         // Tapping one item while another's description is still fading out: that fade would
         // switch the shared panel off underneath this one when it finished, so stop it first.
@@ -518,40 +540,29 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
             return;
 
         RectTransform canvasRect = ResolveCanvasRect();
+        Vector2 extents = GetPanelWorldExtents();
 
-        // Preferred spot: above the item, clear of it by a small gap.
-        float gap = panelGap * Mathf.Abs(rectTransform.lossyScale.y);
-        Vector3 itemWorldPos = rectTransform.position;
-        float itemHalfHeight = (rectTransform.rect.height * rectTransform.lossyScale.y) * 0.5f;
-        float panelHalfHeight = GetPanelWorldExtents().y * 0.5f;
-
-        Vector3 target = new Vector3(
-            itemWorldPos.x,
-            itemWorldPos.y + itemHalfHeight + panelHalfHeight + gap,
-            itemWorldPos.z);
+        // A tapped item gets the popup centred on it. While dragging, it sits just above the
+        // item instead, so it doesn't hide what is being dragged.
+        Vector3 target = rectTransform.TransformPoint(rectTransform.rect.center);
+        if (didBeginDrag)
+        {
+            float gap = panelGap * Mathf.Abs(rectTransform.lossyScale.y);
+            GetDrawnItemWorldY(out float itemTop, out _);
+            target.y = itemTop + extents.y * 0.5f + gap;
+        }
 
         descriptionPanelRect.position = target;
 
         if (canvasRect == null)
             return;
 
-        // If the panel would run off the top, flip it under the item instead of letting it
-        // slide off screen - items near the top row of the bag were pushing it out of view.
-        Vector2 extents = GetPanelWorldExtents();
         Vector3[] canvasCorners = new Vector3[4];
         canvasRect.GetWorldCorners(canvasCorners);
         float canvasTop = canvasCorners[2].y;
         float canvasBottom = canvasCorners[0].y;
         float canvasLeft = canvasCorners[0].x;
         float canvasRight = canvasCorners[2].x;
-
-        if (target.y + extents.y * 0.5f > canvasTop)
-        {
-            float flipped = itemWorldPos.y - itemHalfHeight - extents.y * 0.5f - gap;
-            // Only flip if below actually fits; otherwise keep above and let the clamp handle it.
-            if (flipped - extents.y * 0.5f >= canvasBottom)
-                target.y = flipped;
-        }
 
         // Keep the whole panel inside the canvas on both axes.
         float halfW = extents.x * 0.5f;
@@ -560,6 +571,34 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         target.y = Mathf.Clamp(target.y, canvasBottom + halfH, canvasTop - halfH);
 
         descriptionPanelRect.position = target;
+    }
+
+    /// <summary>
+    /// World-space top and bottom of the item's picture as drawn. Items keep their proportions
+    /// inside their grid box, so a wide item leaves empty bands above and below it - measuring
+    /// the box put the popup visibly far from the picture. Falls back to the box itself when
+    /// there is no sprite to measure.
+    /// </summary>
+    private void GetDrawnItemWorldY(out float top, out float bottom)
+    {
+        Rect box = rectTransform.rect;
+        float drawnHeight = box.height;
+
+        if (itemImage != null && itemImage.sprite != null && itemImage.preserveAspect)
+        {
+            Vector2 spriteSize = itemImage.sprite.rect.size;
+            if (spriteSize.x > 0f && spriteSize.y > 0f)
+            {
+                // Fit inside the box: whichever side runs out first sets the scale
+                float fit = Mathf.Min(box.width / spriteSize.x, box.height / spriteSize.y);
+                drawnHeight = spriteSize.y * fit;
+            }
+        }
+
+        // The picture is centred in the box
+        float centreY = box.center.y;
+        top = rectTransform.TransformPoint(new Vector3(0f, centreY + drawnHeight * 0.5f, 0f)).y;
+        bottom = rectTransform.TransformPoint(new Vector3(0f, centreY - drawnHeight * 0.5f, 0f)).y;
     }
 
     /// <summary>
@@ -924,399 +963,110 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
 
     private bool TryMoveItemWithinGridSnapped(InventoryItem item, InventoryGridDisplay gridDisplay)
     {
-        if (item == null || gridDisplay == null)
+        InventoryGrid grid = gridDisplay != null ? gridDisplay.GetCurrentGrid() : null;
+        if (item == null || grid == null || !TryFindItemOrigin(grid, item, out Vector2Int old))
+            return false;
+
+        // Lift the item out first so CanPlaceItem doesn't see it occupying its own cells
+        grid.RemoveItem(old.x, old.y);
+
+        if (!TryFindPlacement(grid, item, GetCellUnderItem(gridDisplay, grid, item), out Vector2Int target)
+            || !CanPlaceItemWithGlobalWeightCheck(item, gridDisplay))
         {
-    
+            grid.PlaceItem(old.x, old.y, item);
             return false;
         }
 
-        InventoryGrid grid = gridDisplay.GetCurrentGrid();
-        
-        if (grid == null)
-        {
-
-            return false;
-        }
-
-        // Find current item position
-        int oldX = -1, oldY = -1;
-        for (int y = 0; y < grid.GetHeight(); y++)
-        {
-            for (int x = 0; x < grid.GetWidth(); x++)
-            {
-                InventoryItem itemAtPos = grid.GetItemAt(x, y);
-                if (itemAtPos == item)
-                {
-                    InventorySlot slot = grid.GetSlotAt(x, y);
-                    if (slot != null && slot.itemGridX == 0 && slot.itemGridY == 0)
-                    {
-                        oldX = x;
-                        oldY = y;
-                        break;
-                    }
-                }
-            }
-            if (oldX != -1) break;
-        }
-
-        if (oldX == -1)
-        {
-
-            return false;
-        }
-
-
-
-        // Verify item is actually at this position (prevent stale state)
-        InventoryItem verifyItem = grid.GetItemAt(oldX, oldY);
-        if (verifyItem != item)
-        {
-
-            return false;
-        }
-
-        // Remove item from old position FIRST so CanPlaceItem doesn't see it as occupying a slot
-        grid.RemoveItem(oldX, oldY);
-
-        // Get grid settings from display
-        float cellSize = gridDisplay.GetCellSize();
-        float spacing = gridDisplay.GetSpacing();
-
-        // Get the item's position and convert it to the grid container's local space
-        // The item might be in root canvas space during drag, so we need to convert it properly
-        Vector3 itemWorldPos = rectTransform.parent.TransformPoint(rectTransform.localPosition);
-        RectTransform gridContainer = gridDisplay.GetGridContainer();
-        Vector3 itemLocalPos = gridContainer.parent.InverseTransformPoint(itemWorldPos);
-        
-        // Calculate grid cell size including spacing
-        float cellWithSpacing = cellSize + spacing;
-        
-        // Calculate the grid's layout parameters
-        float totalGridWidth = grid.GetWidth() * cellSize + (grid.GetWidth() - 1) * spacing;
-        float totalGridHeight = grid.GetHeight() * cellSize + (grid.GetHeight() - 1) * spacing;
-        
-        float centerOffsetX = -(totalGridWidth / 2f);
-        float centerOffsetY = totalGridHeight / 2f;
-
-        // Account for item size when converting position back to grid coordinates
-        float itemWidth = cellSize * item.width;
-        float itemHeight = cellSize * item.height;
-
-        // Convert item position to grid coordinates
-        // Items are positioned such that: posX = centerOffsetX + gridX * cellWithSpacing + itemWidth / 2f
-        // So to reverse: gridX = (itemLocalPos.x - centerOffsetX - itemWidth / 2f) / cellWithSpacing
-        float relativeX = itemLocalPos.x - centerOffsetX - itemWidth / 2f;
-        float relativeY = centerOffsetY - itemLocalPos.y - itemHeight / 2f;
-
-        int gridX = Mathf.RoundToInt(relativeX / cellWithSpacing);
-        int gridY = Mathf.RoundToInt(relativeY / cellWithSpacing);
-
-        // Clamp to valid range
-        gridX = Mathf.Max(0, Mathf.Min(gridX, grid.GetWidth() - 1));
-        gridY = Mathf.Max(0, Mathf.Min(gridY, grid.GetHeight() - 1));
-
-
-
-        int targetX = gridX;
-        int targetY = gridY;
-
-        // Check if we can place the item at this grid position
-        if (!grid.CanPlaceItem(targetX, targetY, item))
-        {
-
-            
-            // Fallback: find nearest valid slot
-            int nearestX = -1, nearestY = -1;
-            float nearestDistance = float.MaxValue;
-
-            for (int y = 0; y < grid.GetHeight(); y++)
-            {
-                for (int x = 0; x < grid.GetWidth(); x++)
-                {
-                    if (!grid.CanPlaceItem(x, y, item))
-                        continue;
-
-                    float distance = Vector2.Distance(new Vector2(gridX, gridY), new Vector2(x, y));
-                    if (distance < nearestDistance)
-                    {
-                        nearestDistance = distance;
-                        nearestX = x;
-                        nearestY = y;
-                    }
-                }
-            }
-
-            if (nearestX == -1)
-            {
-
-                // Last fallback: find any valid empty slot
-                for (int y = 0; y < grid.GetHeight() && nearestX == -1; y++)
-                {
-                    for (int x = 0; x < grid.GetWidth(); x++)
-                    {
-                        if (grid.CanPlaceItem(x, y, item))
-                        {
-                            nearestX = x;
-                            nearestY = y;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (nearestX == -1)
-            {
-
-                grid.PlaceItem(oldX, oldY, item);
-                return false;
-            }
-
-            targetX = nearestX;
-            targetY = nearestY;
-        }
-
-        // Check global GoBag weight limit if moving within a GoBag section
-        if (!CanPlaceItemWithGlobalWeightCheck(item, gridDisplay))
-        {
-
-            grid.PlaceItem(oldX, oldY, item);
-            return false;
-        }
-
-        // Place at target position
-        grid.PlaceItem(targetX, targetY, item);
-        
-        PlayItemPlacedSFX();
-
-        // Invoke inventory changed event for UI updates (like progress bars)
-        if (InventoryManager.Instance != null)
-        {
-            InventoryManager.Instance.InvokeInventoryChanged();
-        }
-        
-        if (targetX == oldX && targetY == oldY)
-        {
-
-        }
-        else
-        {
-
-        }
-        
+        grid.PlaceItem(target.x, target.y, item);
+        OnItemPlaced();
         return true;
     }
 
     private bool TryMoveItemBetweenGridsSnapped(InventoryItem item, InventoryGridDisplay sourceGridDisplay, InventoryGridDisplay targetGridDisplay)
     {
-        if (item == null || sourceGridDisplay == null || targetGridDisplay == null)
-        {
+        InventoryGrid sourceGrid = sourceGridDisplay != null ? sourceGridDisplay.GetCurrentGrid() : null;
+        InventoryGrid targetGrid = targetGridDisplay != null ? targetGridDisplay.GetCurrentGrid() : null;
+        if (item == null || sourceGrid == null || targetGrid == null || !TryFindItemOrigin(sourceGrid, item, out Vector2Int old))
+            return false;
 
+        // Lift the item out of the source first so the target grid's checks aren't confused by it
+        sourceGrid.RemoveItem(old.x, old.y);
+
+        if (!TryFindPlacement(targetGrid, item, GetCellUnderItem(targetGridDisplay, targetGrid, item), out Vector2Int target)
+            || !CanPlaceItemWithGlobalWeightCheck(item, targetGridDisplay))
+        {
+            sourceGrid.PlaceItem(old.x, old.y, item);
             return false;
         }
 
-        InventoryGrid sourceGrid = sourceGridDisplay.GetCurrentGrid();
-        InventoryGrid targetGrid = targetGridDisplay.GetCurrentGrid();
-
-        if (sourceGrid == null || targetGrid == null)
-        {
-
-            return false;
-        }
-
-        // Find current item position in source grid
-        int oldX = -1, oldY = -1;
-        for (int y = 0; y < sourceGrid.GetHeight(); y++)
-        {
-            for (int x = 0; x < sourceGrid.GetWidth(); x++)
-            {
-                InventoryItem itemAtPos = sourceGrid.GetItemAt(x, y);
-                if (itemAtPos == item)
-                {
-                    InventorySlot slot = sourceGrid.GetSlotAt(x, y);
-                    if (slot.itemGridX == 0 && slot.itemGridY == 0)
-                    {
-                        oldX = x;
-                        oldY = y;
-                        break;
-                    }
-                }
-            }
-            if (oldX != -1) break;
-        }
-
-        if (oldX == -1)
-        {
-
-            return false;
-        }
-
-        // Verify item is actually at this position (prevent stale state)
-        InventoryItem verifyItem = sourceGrid.GetItemAt(oldX, oldY);
-        if (verifyItem != item)
-        {
-
-            return false;
-        }
-
-        // Remove item from source grid FIRST so CanPlaceItem in target grid doesn't get confused
-        sourceGrid.RemoveItem(oldX, oldY);
-
-        // Find nearest grid slot in target to item's current position
-        int nearestX = -1, nearestY = -1;
-        float cellSize = targetGridDisplay.GetCellSize();
-        float spacing = targetGridDisplay.GetSpacing();
-
-        // Get item dimensions for proper coordinate conversion
-        float itemWidth = cellSize * item.width;
-        float itemHeight = cellSize * item.height;
-        float cellWithSpacing = cellSize + spacing;
-
-        // Get item's local position relative to target grid container
-        Vector3 itemLocalPos = rectTransform.localPosition;
-        RectTransform targetGridContainer = targetGridDisplay.GetGridContainer();
-        
-        // Convert to target grid's local space
-        Vector3 itemPosInTargetGrid = targetGridContainer.parent.InverseTransformPoint(
-            rectTransform.parent.TransformPoint(itemLocalPos));
-        
-        // Calculate target grid's layout parameters
-        float totalGridWidth = targetGrid.GetWidth() * cellSize + (targetGrid.GetWidth() - 1) * spacing;
-        float totalGridHeight = targetGrid.GetHeight() * cellSize + (targetGrid.GetHeight() - 1) * spacing;
-        
-        float centerOffsetX = -(totalGridWidth / 2f);
-        float centerOffsetY = totalGridHeight / 2f;
-
-        // Convert item position to grid coordinates, accounting for item size
-        // Items are positioned such that: posX = centerOffsetX + gridX * cellWithSpacing + itemWidth / 2f
-        // So to reverse: gridX = (itemPosInTargetGrid.x - centerOffsetX - itemWidth / 2f) / cellWithSpacing
-        float relativeX = itemPosInTargetGrid.x - centerOffsetX - itemWidth / 2f;
-        float relativeY = centerOffsetY - itemPosInTargetGrid.y - itemHeight / 2f;
-
-        int targetGridX = Mathf.RoundToInt(relativeX / cellWithSpacing);
-        int targetGridY = Mathf.RoundToInt(relativeY / cellWithSpacing);
-
-        // Clamp to valid range
-        targetGridX = Mathf.Max(0, Mathf.Min(targetGridX, targetGrid.GetWidth() - 1));
-        targetGridY = Mathf.Max(0, Mathf.Min(targetGridY, targetGrid.GetHeight() - 1));
-
-
-
-        // First try the calculated position
-        if (targetGrid.CanPlaceItem(targetGridX, targetGridY, item))
-        {
-            nearestX = targetGridX;
-            nearestY = targetGridY;
-        }
-        else
-        {
-            // Fallback: find nearest valid slot
-            float nearestDistance = float.MaxValue;
-
-            for (int y = 0; y < targetGrid.GetHeight(); y++)
-            {
-                for (int x = 0; x < targetGrid.GetWidth(); x++)
-                {
-                    // Only consider slots that can fit the item
-                    if (!targetGrid.CanPlaceItem(x, y, item))
-                        continue;
-
-                    float distance = Vector2.Distance(new Vector2(targetGridX, targetGridY), new Vector2(x, y));
-
-                    if (distance < nearestDistance)
-                    {
-                        nearestDistance = distance;
-                        nearestX = x;
-                        nearestY = y;
-                    }
-                }
-            }
-        }
-
-        if (nearestX == -1)
-        {
-
-            // Fallback: find any valid empty slot
-            for (int y = 0; y < targetGrid.GetHeight() && nearestX == -1; y++)
-            {
-                for (int x = 0; x < targetGrid.GetWidth(); x++)
-                {
-                    if (targetGrid.CanPlaceItem(x, y, item))
-                    {
-                        nearestX = x;
-                        nearestY = y;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (nearestX == -1)
-        {
-
-            // Restore item to source grid since we can't place it in target
-            sourceGrid.PlaceItem(oldX, oldY, item);
-            return false;
-        }
-
-        // Check global GoBag weight limit if moving to a GoBag section
-        if (!CanPlaceItemWithGlobalWeightCheck(item, targetGridDisplay))
-        {
-
-            sourceGrid.PlaceItem(oldX, oldY, item);
-            return false;
-        }
-
-
-
-        // Place in target grid
-        targetGrid.PlaceItem(nearestX, nearestY, item);
-        
-        PlayItemPlacedSFX();
-
-        // Invoke inventory changed event for UI updates (like progress bars)
-        if (InventoryManager.Instance != null)
-        {
-            InventoryManager.Instance.InvokeInventoryChanged();
-        }
-
+        targetGrid.PlaceItem(target.x, target.y, item);
+        OnItemPlaced();
         return true;
     }
 
-    private bool TryMoveItemToGrid(InventoryItem item, InventoryGridDisplay targetGridDisplay)
+    /// <summary>The cell holding the item's top-left corner, where the grid stores it.</summary>
+    private static bool TryFindItemOrigin(InventoryGrid grid, InventoryItem item, out Vector2Int origin)
     {
-        if (item == null || targetGridDisplay == null)
-            return false;
-
-        // Get source and target inventory managers
-        InventoryManager sourceInventoryManager = InventoryManager.Instance;
-        if (sourceInventoryManager == null)
-            return false;
-
-        // Find the item's current location
-        if (!sourceInventoryManager.FindItem(item, out string sourceSectionName, out int sourceX, out int sourceY))
-            return false;
-
-        // Get target grid
-        string targetSectionName = targetGridDisplay.GetSectionName();
-        InventoryGrid targetGrid = sourceInventoryManager.GetGrid(targetSectionName);
-        if (targetGrid == null)
-            return false;
-
-        // Try to find space and place in target grid
-        if (targetGrid.FindSpaceForItem(item, out int targetX, out int targetY))
+        for (int y = 0; y < grid.GetHeight(); y++)
         {
-            // Remove from source
-            sourceInventoryManager.GetGrid(sourceSectionName).RemoveItem(sourceX, sourceY);
+            for (int x = 0; x < grid.GetWidth(); x++)
+            {
+                if (grid.GetItemAt(x, y) != item)
+                    continue;
 
-            // Add to target
-            targetGrid.PlaceItem(targetX, targetY, item);
-            
-            PlayItemPlacedSFX();
-
-            return true;
+                InventorySlot slot = grid.GetSlotAt(x, y);
+                if (slot != null && slot.itemGridX == 0 && slot.itemGridY == 0)
+                {
+                    origin = new Vector2Int(x, y);
+                    return true;
+                }
+            }
         }
 
+        origin = default;
         return false;
+    }
+
+    /// <summary>
+    /// Where the item goes: the cell it was dropped on if it fits there, otherwise the nearest
+    /// cell that fits. False when it fits nowhere in the grid.
+    /// </summary>
+    private static bool TryFindPlacement(InventoryGrid grid, InventoryItem item, Vector2Int dropped, out Vector2Int placement)
+    {
+        placement = dropped;
+        if (grid.CanPlaceItem(dropped.x, dropped.y, item))
+            return true;
+
+        float nearestDistance = float.MaxValue;
+        bool found = false;
+
+        for (int y = 0; y < grid.GetHeight(); y++)
+        {
+            for (int x = 0; x < grid.GetWidth(); x++)
+            {
+                if (!grid.CanPlaceItem(x, y, item))
+                    continue;
+
+                float distance = Vector2.Distance(dropped, new Vector2(x, y));
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    placement = new Vector2Int(x, y);
+                    found = true;
+                }
+            }
+        }
+
+        return found;
+    }
+
+    private void OnItemPlaced()
+    {
+        PlayItemPlacedSFX();
+
+        // Progress bars and the like listen for this
+        if (InventoryManager.Instance != null)
+            InventoryManager.Instance.InvokeInventoryChanged();
     }
 
     /// <summary>

@@ -553,9 +553,9 @@ TextureImporter:
       name: FemaleWithMediumBag_21
       rect:
         serializedVersion: 2
-        x: 39
+        x: 40
         y: 201
-        width: 31
+        width: 33
         height: 34
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -577,7 +577,7 @@ TextureImporter:
         serializedVersion: 2
         x: 88
         y: 201
-        width: 30
+        width: 34
         height: 35
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -599,7 +599,7 @@ TextureImporter:
         serializedVersion: 2
         x: 136
         y: 201
-        width: 30
+        width: 35
         height: 34
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -621,7 +621,7 @@ TextureImporter:
         serializedVersion: 2
         x: 184
         y: 200
-        width: 30
+        width: 36
         height: 34
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -643,7 +643,7 @@ TextureImporter:
         serializedVersion: 2
         x: 232
         y: 200
-        width: 30
+        width: 34
         height: 35
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -663,9 +663,9 @@ TextureImporter:
       name: FemaleWithMediumBag_26
       rect:
         serializedVersion: 2
-        x: 279
+        x: 280
         y: 200
-        width: 31
+        width: 33
         height: 34
       alignment: 0
       pivot: {x: 0.5, y: 0.5}

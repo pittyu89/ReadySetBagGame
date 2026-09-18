@@ -2,24 +2,27 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Leaves little pixel dust puffs at the character's feet while they walk. A puff is dropped
-/// every <see cref="spacing"/> world units travelled, plays its frames while drifting up and
-/// fading, then goes back to a small pool. Puffs face the camera like the character does.
+/// Leaves a short trail of little cloud puffs behind the character while they walk: a puff is
+/// dropped every <see cref="spawnInterval"/> seconds and sits on the floor where it was left,
+/// shrinking and fading until the next <see cref="maxPuffs"/> drops have replaced it. So there
+/// is always a solid, full-sized puff at the heels, then smaller fainter ones behind it, and
+/// never more than <see cref="maxPuffs"/> at once. Puffs face the camera like the character
+/// does and go back to a small pool when gone.
 /// </summary>
 public class DustTrail : MonoBehaviour
 {
-    [Tooltip("The puff animation, in order.")]
-    [SerializeField] private Sprite[] frames = new Sprite[] { };
-    [Tooltip("Distance walked between puffs.")]
-    [SerializeField] private float spacing = 0.6f;
+    [Tooltip("The cloud every puff is drawn with.")]
+    [SerializeField] private Sprite puffSprite;
+    [Tooltip("Seconds between puffs while walking. Higher is a slower, calmer trail.")]
+    [SerializeField] private float spawnInterval = 0.15f;
+    [Tooltip("Most puffs on screen at once. Each one shrinks away over this many drops.")]
+    [SerializeField] private int maxPuffs = 3;
     [Tooltip("Slower than this (units/second) counts as standing still.")]
     [SerializeField] private float minSpeed = 0.5f;
-    [SerializeField] private float lifetime = 0.4f;
-    [SerializeField] private float puffScale = 1.5f;
-    [Tooltip("How far a puff rises over its life.")]
-    [SerializeField] private float rise = 0.12f;
+    [Tooltip("Scale of a puff when it is dropped.")]
+    [SerializeField] private float puffScale = 0.7f;
     [Tooltip("Puffs appear this far behind the feet, against the direction of travel.")]
-    [SerializeField] private float behindOffset = 0.15f;
+    [SerializeField] private float behindOffset = 0.2f;
     [Tooltip("Tiny lift so puffs don't clip into the floor.")]
     [SerializeField] private float floorLift = 0.04f;
 
@@ -27,7 +30,6 @@ public class DustTrail : MonoBehaviour
     {
         public Transform transform;
         public SpriteRenderer renderer;
-        public Vector3 start;
         public float age;
     }
 
@@ -36,8 +38,11 @@ public class DustTrail : MonoBehaviour
     private CharacterController controller;
     private Camera mainCamera;
     private Vector3 lastPosition;
-    private float travelled;
+    private float sinceLastPuff;
     private Transform puffParent;
+
+    // Each puff lasts exactly as long as it takes the next few to be dropped
+    private float Lifetime => spawnInterval * Mathf.Max(1, maxPuffs);
 
     void Start()
     {
@@ -64,19 +69,19 @@ public class DustTrail : MonoBehaviour
         float speed = Time.deltaTime > 0f ? step.magnitude / Time.deltaTime : 0f;
         bool grounded = controller == null || controller.isGrounded;
 
-        if (frames.Length > 0 && grounded && speed >= minSpeed)
+        if (puffSprite != null && grounded && speed >= minSpeed)
         {
-            travelled += step.magnitude;
-            if (travelled >= spacing)
+            sinceLastPuff += Time.deltaTime;
+            if (sinceLastPuff >= spawnInterval)
             {
-                travelled = 0f;
+                sinceLastPuff = 0f;
                 Spawn(FeetPosition() - step.normalized * behindOffset);
             }
         }
         else
         {
-            // The first step after stopping kicks up a puff straight away
-            travelled = spacing;
+            // The first step after stopping leaves a puff straight away
+            sinceLastPuff = spawnInterval;
         }
 
         Animate();
@@ -93,15 +98,29 @@ public class DustTrail : MonoBehaviour
 
     private void Spawn(Vector3 position)
     {
+        // A long frame can drop the next puff a moment before the oldest has shrunk away;
+        // clear it out so there are never more than maxPuffs on screen
+        while (active.Count >= Mathf.Max(1, maxPuffs))
+            Recycle(0);
+
         Puff puff = pool.Count > 0 ? pool.Pop() : CreatePuff();
-        puff.start = position;
         puff.age = 0f;
         puff.transform.position = position;
         puff.transform.localScale = Vector3.one * puffScale;
-        puff.renderer.sprite = frames[0];
+        puff.renderer.sprite = puffSprite;
         puff.renderer.color = Color.white;
+        // Mirroring every other puff stops the trail looking stamped
+        puff.renderer.flipX = !puff.renderer.flipX;
         puff.transform.gameObject.SetActive(true);
         active.Add(puff);
+    }
+
+    private void Recycle(int index)
+    {
+        Puff puff = active[index];
+        puff.transform.gameObject.SetActive(false);
+        active.RemoveAt(index);
+        pool.Push(puff);
     }
 
     private Puff CreatePuff()
@@ -128,6 +147,8 @@ public class DustTrail : MonoBehaviour
                 facing = Quaternion.LookRotation(camForward.normalized, Vector3.up);
         }
 
+        float lifetime = Lifetime;
+
         for (int i = active.Count - 1; i >= 0; i--)
         {
             Puff puff = active[i];
@@ -136,19 +157,17 @@ public class DustTrail : MonoBehaviour
 
             if (t >= 1f)
             {
-                puff.transform.gameObject.SetActive(false);
-                active.RemoveAt(i);
-                pool.Push(puff);
+                Recycle(i);
                 continue;
             }
 
-            puff.renderer.sprite = frames[Mathf.Min(frames.Length - 1, Mathf.FloorToInt(t * frames.Length))];
-            puff.transform.position = puff.start + Vector3.up * rise * t;
+            // Shrinks toward its base, so it stays sitting on the floor. The fade starts gently
+            // so the puff at the heels stays solid and only the tail of the trail goes faint.
+            puff.transform.localScale = Vector3.one * puffScale * (1f - t);
             puff.transform.rotation = facing;
 
-            // Solid for the first half, then fade out
             Color c = puff.renderer.color;
-            c.a = t < 0.5f ? 1f : 1f - (t - 0.5f) * 2f;
+            c.a = 1f - t * t;
             puff.renderer.color = c;
         }
     }

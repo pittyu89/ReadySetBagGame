@@ -255,15 +255,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a60c08ef7ab6ac448b03cd5dad8f8fcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DustTrail
-  frames:
-  - {fileID: -5294026334478247828, guid: 6ad4d1b72cbdf0b408630882e2d2d3b2, type: 3}
-  - {fileID: -6622841083217622238, guid: 6ad4d1b72cbdf0b408630882e2d2d3b2, type: 3}
-  - {fileID: -6464215946706206362, guid: 6ad4d1b72cbdf0b408630882e2d2d3b2, type: 3}
-  - {fileID: 7705883810510091988, guid: 6ad4d1b72cbdf0b408630882e2d2d3b2, type: 3}
-  spacing: 0.6
+  puffSprite: {fileID: 21300000, guid: e5d7e1ba7c845474792e6fadc9216cbb, type: 3}
+  spawnInterval: 0.15
+  maxPuffs: 3
   minSpeed: 0.5
-  lifetime: 0.4
-  puffScale: 1.5
-  rise: 0.12
-  behindOffset: 0.15
+  puffScale: 0.7
+  behindOffset: 0.2
   floorLift: 0.04

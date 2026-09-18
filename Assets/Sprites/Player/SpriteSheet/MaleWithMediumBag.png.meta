@@ -553,7 +553,7 @@ TextureImporter:
       name: MaleWithMediumBag_22
       rect:
         serializedVersion: 2
-        x: 39
+        x: 42
         y: 201
         width: 31
         height: 34
@@ -575,9 +575,9 @@ TextureImporter:
       name: MaleWithMediumBag_23
       rect:
         serializedVersion: 2
-        x: 88
+        x: 90
         y: 201
-        width: 30
+        width: 32
         height: 35
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -597,9 +597,9 @@ TextureImporter:
       name: MaleWithMediumBag_24
       rect:
         serializedVersion: 2
-        x: 137
+        x: 138
         y: 201
-        width: 29
+        width: 33
         height: 35
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -621,7 +621,7 @@ TextureImporter:
         serializedVersion: 2
         x: 186
         y: 200
-        width: 28
+        width: 34
         height: 34
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -641,9 +641,9 @@ TextureImporter:
       name: MaleWithMediumBag_26
       rect:
         serializedVersion: 2
-        x: 232
+        x: 234
         y: 200
-        width: 30
+        width: 32
         height: 35
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -663,7 +663,7 @@ TextureImporter:
       name: MaleWithMediumBag_27
       rect:
         serializedVersion: 2
-        x: 279
+        x: 282
         y: 200
         width: 31
         height: 34

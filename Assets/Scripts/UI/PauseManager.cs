@@ -183,51 +183,16 @@ public class PauseManager : MonoBehaviour
         return !string.IsNullOrEmpty(sessionCode);
     }
 
+    // The pause buttons stay on screen behind a sub-panel. Its full-screen dimmed backdrop
+    // catches taps, so they can't be pressed until the sub-panel is closed.
     private void ShowSubPanel(GameObject subPanel)
     {
-        // Hide all main pause buttons
-        HideMainPauseButtons();
-
-        // Show the sub-panel
         PopupPanelTransition.Show(subPanel);
     }
 
     private void HideSubPanel(GameObject subPanel)
     {
-        // Show main pause buttons again once the sub-panel has slid away
-        PopupPanelTransition.Hide(subPanel, ShowMainPauseButtons);
-    }
-
-    private void HideMainPauseButtons()
-    {
-        if (continueButton != null)
-            continueButton.gameObject.SetActive(false);
-        if (restartButton != null)
-            restartButton.gameObject.SetActive(false);
-        if (exitButton != null)
-            exitButton.gameObject.SetActive(false);
-        if (optionButton != null)
-            optionButton.gameObject.SetActive(false);
-        if (htpButton != null)
-            htpButton.gameObject.SetActive(false);
-        if (aboutButton != null)
-            aboutButton.gameObject.SetActive(false);
-    }
-
-    private void ShowMainPauseButtons()
-    {
-        if (continueButton != null)
-            continueButton.gameObject.SetActive(true);
-        if (restartButton != null)
-            restartButton.gameObject.SetActive(!IsTeacherSession());
-        if (exitButton != null)
-            exitButton.gameObject.SetActive(true);
-        if (optionButton != null)
-            optionButton.gameObject.SetActive(true);
-        if (htpButton != null)
-            htpButton.gameObject.SetActive(true);
-        if (aboutButton != null)
-            aboutButton.gameObject.SetActive(true);
+        PopupPanelTransition.Hide(subPanel);
     }
 
     private void OnDestroy()
