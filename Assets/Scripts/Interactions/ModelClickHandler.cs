@@ -11,7 +11,7 @@ public class ModelClickHandler : MonoBehaviour
     [Tooltip("How far the pointer may move, as a fraction of screen height, and still count " +
              "as a tap rather than a camera drag.")]
     [SerializeField] private float tapMaxMovement = 0.02f;
-    private InventoryPanelHandler inventoryPanelHandler;
+    private InventoryPanel inventoryPanelHandler;
     private Transform playerTransform;
     private Vector2 pressPosition;
     private bool pressStartedOverUI;
@@ -26,8 +26,8 @@ public class ModelClickHandler : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
 
-        // Find the InventoryPanelHandler in the scene
-        inventoryPanelHandler = FindObjectOfType<InventoryPanelHandler>();
+        // Find the InventoryPanel in the scene
+        inventoryPanelHandler = FindObjectOfType<InventoryPanel>();
 
         // Players could not tell which props were clickable, so props advertise themselves.
         // Created here rather than required in the scene, so GameScene needs no extra setup;
@@ -85,7 +85,7 @@ public class ModelClickHandler : MonoBehaviour
     private void HandleTouchClick(Vector2 clickPosition)
     {
         // Can't click models until gobag is picked up
-        if (!GoBagFloater.IsBagPickedUp())
+        if (!GoBagPickup.IsBagPickedUp())
             return;
 
         Ray ray = mainCamera.ScreenPointToRay(clickPosition);
@@ -133,8 +133,8 @@ public class ModelClickHandler : MonoBehaviour
             return;
         }
 
-        // Try to find by PlayerMovement component
-        PlayerMovement playerMovement = FindObjectOfType<PlayerMovement>();
+        // Try to find by PlayerController component
+        PlayerController playerMovement = FindObjectOfType<PlayerController>();
         if (playerMovement != null)
         {
             playerTransform = playerMovement.transform;

@@ -11,13 +11,13 @@ using System.Collections.Generic;
 /// (garage and second floor are toggled by GameDifficultyApplier).
 ///
 /// Execution order matters: this runs after GameDifficultyApplier (so the right rooms are
-/// active) and before CharacterSpawner and GoBagFloater (so they pick up the new positions).
+/// active) and before PlayerSpawner and GoBagPickup (so they pick up the new positions).
 /// </summary>
 public class HouseSpawnRandomizer : MonoBehaviour
 {
     [Header("Scene References")]
     [SerializeField] private Transform house;
-    [SerializeField] private GameObject player;   // in-scene player that CharacterSpawner replaces
+    [SerializeField] private GameObject player;   // in-scene player that PlayerSpawner replaces
     [SerializeField] private GameObject goBag;
 
     [Tooltip("The floor meshes that count as spawnable ground. A surface being flat is not " +

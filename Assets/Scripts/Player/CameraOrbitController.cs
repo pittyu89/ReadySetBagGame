@@ -59,6 +59,16 @@ public class CameraOrbitController : MonoBehaviour
 
     void Update()
     {
+        // The view holds still while the character shows off the go-bag. Any drag in progress
+        // is dropped, so the camera doesn't jump when the pose ends mid-drag.
+        if (BagPickupPose.IsPlaying)
+        {
+            orbitFingerId = -1;
+            mouseOrbiting = false;
+            ApplyOffset();
+            return;
+        }
+
         Vector2 delta = Input.touchCount > 0 ? ReadTouchDelta() : ReadMouseDelta();
 
         if (delta != Vector2.zero)

@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6957323183673538843
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4690950015077758698}
+  - component: {fileID: 5787342065864463426}
+  m_Layer: 0
+  m_Name: LoadingScreen
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &4690950015077758698
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6957323183673538843}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &5787342065864463426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6957323183673538843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fe11dbb4f51e8e4dad2cba9def488cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoadingScreen
+  bagIcon: {fileID: 21300000, guid: 328da4fdece461549b21f32718d9f90f, type: 3}
+  font: {fileID: 11400000, guid: cb9e1039b0a3b8246bd89a8ec45dc46c, type: 2}
+  backgroundColor: {r: 0.18431373, g: 0.18431373, b: 0.18431373, a: 1}
+  fillColor: {r: 1, g: 0.5686275, b: 0.3019608, a: 1}
+  wipeColor: {r: 0.85490197, g: 0.85490197, b: 0.85490197, a: 1}
+  wipeStripeColor: {r: 0.7529412, g: 0.7529412, b: 0.7529412, a: 1}
+  iconSize: 192
+  fillAreaMin: {x: 0.21875, y: 0.09375}
+  fillAreaMax: {x: 0.78125, y: 0.71875}
+  loadingText: Loading
+  fontSize: 44
+  wipeDuration: 1.5
+  wipeSlant: 420
+  wipeStripeWidth: 44
+  minFillDuration: 1.2
+  holdWhenFull: 0.25
+  slideUpDuration: 0.6

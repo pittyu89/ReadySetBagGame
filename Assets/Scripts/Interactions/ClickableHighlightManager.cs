@@ -104,7 +104,7 @@ public class ClickableHighlightManager : MonoBehaviour
         // Nothing is clickable until the bag is picked up, so nothing should be advertised as
         // clickable either. This also gives picking the bag up a visible payoff: the room
         // fills with markers for everything the player can now search.
-        if (!GoBagFloater.IsBagPickedUp())
+        if (!GoBagPickup.IsBagPickedUp())
         {
             HideAll();
             return;
@@ -200,7 +200,7 @@ public class ClickableHighlightManager : MonoBehaviour
             return;
         }
 
-        PlayerMovement playerMovement = FindObjectOfType<PlayerMovement>();
+        PlayerController playerMovement = FindObjectOfType<PlayerController>();
         if (playerMovement != null)
             playerTransform = playerMovement.transform;
     }

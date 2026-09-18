@@ -59,7 +59,7 @@ public class GameSessionMonitor : MonoBehaviour
                                 PlayerPrefs.Save();
                                 
                                 // Redirect to MainScene
-                                SceneNavigator.Instance.GoToMainScene();
+                                SceneNavigationManager.Instance.GoToMainScene();
                             }
                         }
                     }
