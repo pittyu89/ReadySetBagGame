@@ -23,6 +23,13 @@ public class JoinSessionPanel : MonoBehaviour
     [SerializeField] private string joinLabel = "JOIN";
     [SerializeField] private string joinedLabel = "JOINED";
 
+    [Header("Waiting Character")]
+    [Tooltip("Idle chibis above the Waiting For Teacher title; only the selected character is shown.")]
+    [SerializeField] private GameObject femaleWaitingCharacter;
+    [SerializeField] private GameObject maleWaitingCharacter;
+
+    private const string SELECTED_CHARACTER_SUFFIX = "_SelectedCharacter";
+
     private FirebaseFirestore db;
     private string studentId;
     private string studentUsername;
@@ -161,6 +168,22 @@ public class JoinSessionPanel : MonoBehaviour
 
         if (joined && waitingForTeacherText != null)
             waitingForTeacherText.gameObject.SetActive(false);
+
+        if (joined)
+            ShowSelectedWaitingCharacter();
+    }
+
+    private void ShowSelectedWaitingCharacter()
+    {
+        bool isGuest = PlayerPrefs.GetString("IsGuest", "false") == "true";
+        string userName = isGuest ? "Guest" : PlayerPrefs.GetString("StudentName", "User");
+        bool isMale = PlayerPrefs.GetString(userName + SELECTED_CHARACTER_SUFFIX, "Female") == "Male";
+
+        if (femaleWaitingCharacter != null)
+            femaleWaitingCharacter.SetActive(!isMale);
+
+        if (maleWaitingCharacter != null)
+            maleWaitingCharacter.SetActive(isMale);
     }
 
     private void SetStatusText(string message)
