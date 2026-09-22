@@ -3,28 +3,39 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Menu pop-up animation (Options, About): the window picks up speed as it slides in from off
-/// the left edge and hits its resting place like a wall - rebounding to the left in a few
-/// shrinking bounces that never pass it - while the backdrop dims. Closing slides it back out
-/// to the left before the panel is disabled. Runs on unscaled time so it also works while the
-/// game is paused.
+/// Menu pop-up animation (Options, About, Terms and Conditions): the window picks up speed as it
+/// slides in from off one edge of the screen and hits its resting place like a wall - rebounding
+/// back towards that edge in a few shrinking bounces that never pass it - while the backdrop dims.
+/// Closing slides it back out the same way before the panel is disabled. Runs on unscaled time so
+/// it also works while the game is paused.
+/// <see cref="slideFrom"/> picks the edge: menu panels come in from the left, the terms panel
+/// rises from the bottom.
 /// Open with <see cref="Show"/> and close with <see cref="Hide"/>; both fall back to plain
 /// SetActive for panels without this component.
 /// </summary>
 public class PopupPanelTransition : MonoBehaviour
 {
+    /// <summary>Screen edge the window travels in from (and back out to).</summary>
+    public enum SlideEdge
+    {
+        Left,
+        Bottom,
+    }
+
     [SerializeField] private RectTransform window;
     [Tooltip("Full-screen backdrop that fades in behind the window.")]
     [SerializeField] private CanvasGroup dim;
 
     [Header("Slide")]
+    [Tooltip("Screen edge the window slides in from.")]
+    [SerializeField] private SlideEdge slideFrom = SlideEdge.Left;
     [SerializeField] private float slideInDuration = 0.35f;
     [SerializeField] private float slideOutDuration = 0.28f;
-    [Tooltip("Extra distance past the left edge the window starts from.")]
+    [Tooltip("Extra distance past the edge the window starts from.")]
     [SerializeField] private float offscreenMargin = 60f;
 
     [Header("Impact Bounce")]
-    [Tooltip("How far the window rebounds to the left on the first bounce.")]
+    [Tooltip("How far the window rebounds back towards its entry edge on the first bounce.")]
     [SerializeField] private float bounceDistance = 14f;
     [Tooltip("Total time of all the bounces.")]
     [SerializeField] private float bounceDuration = 0.4f;
@@ -139,7 +150,10 @@ public class PopupPanelTransition : MonoBehaviour
         running = StartCoroutine(routine);
     }
 
-    /// <summary>X offset that puts the window's right edge just past the left of the screen.</summary>
+    /// <summary>
+    /// How far along the slide axis the window has to sit for its trailing edge to clear the
+    /// screen. Always negative: offsets run from the entry edge towards the resting place.
+    /// </summary>
     private float OffscreenOffset()
     {
         RectTransform canvasRect = transform as RectTransform;
@@ -147,8 +161,13 @@ public class PopupPanelTransition : MonoBehaviour
         if (canvas != null)
             canvasRect = canvas.rootCanvas.transform as RectTransform;
 
-        float canvasWidth = canvasRect != null ? canvasRect.rect.width : 1280f;
-        return -(canvasWidth * 0.5f + window.rect.width * 0.5f + offscreenMargin);
+        bool horizontal = slideFrom == SlideEdge.Left;
+        float canvasSize = canvasRect != null
+            ? (horizontal ? canvasRect.rect.width : canvasRect.rect.height)
+            : (horizontal ? 1280f : 720f);
+        float windowSize = horizontal ? window.rect.width : window.rect.height;
+
+        return -(canvasSize * 0.5f + windowSize * 0.5f + offscreenMargin);
     }
 
     private IEnumerator SlideIn()
@@ -161,7 +180,7 @@ public class PopupPanelTransition : MonoBehaviour
 
         // A fresh open rests at home (see OnDisable) and starts off-screen; reopening mid-close
         // carries on from wherever the window got to
-        float startOffset = window.anchoredPosition.x - home.x;
+        float startOffset = CurrentOffset();
         float startDim = dim != null ? dim.alpha : 0f;
         if (Mathf.Approximately(startOffset, 0f))
         {
@@ -178,8 +197,8 @@ public class PopupPanelTransition : MonoBehaviour
             yield return null;
         }
 
-        // Impact: the resting place is a wall. Each bounce is an arc back to the left and into
-        // the wall again; every bounce keeps a share of the speed, so it is lower and shorter
+        // Impact: the resting place is a wall. Each bounce is an arc back towards the entry edge
+        // and into the wall again; every bounce keeps a share of the speed, so it is lower and shorter
         // than the last - the way a real rebound dies out.
         int count = Mathf.Max(1, bounceCount);
         float r = Mathf.Clamp(bounceRestitution, 0.05f, 0.95f);
@@ -211,7 +230,7 @@ public class PopupPanelTransition : MonoBehaviour
         if (window != null)
         {
             float offscreen = OffscreenOffset();
-            float startOffset = window.anchoredPosition.x - home.x;
+            float startOffset = CurrentOffset();
             float startDim = dim != null ? dim.alpha : 1f;
 
             for (float t = 0f; t < 1f;)
@@ -228,9 +247,18 @@ public class PopupPanelTransition : MonoBehaviour
         onHidden?.Invoke();
     }
 
-    private void SetOffset(float x)
+    private void SetOffset(float distance)
     {
-        window.anchoredPosition = home + new Vector2(x, 0f);
+        window.anchoredPosition = home + (slideFrom == SlideEdge.Left
+            ? new Vector2(distance, 0f)
+            : new Vector2(0f, distance));
+    }
+
+    /// <summary>Where the window currently sits along the slide axis, relative to home.</summary>
+    private float CurrentOffset()
+    {
+        Vector2 delta = window.anchoredPosition - home;
+        return slideFrom == SlideEdge.Left ? delta.x : delta.y;
     }
 
     private void SetDim(float alpha)
