@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 2
   importance: 0
   weightKg: 0.05
-  description: Provides comfort and hygiene
+  description: Provides comfort and hygiene.
   essentialRank: 0

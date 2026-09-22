@@ -70,6 +70,15 @@ public class WhistleTapMinigame : MonoBehaviour
     [Tooltip("Pause once the bar is full, before the minigame closes.")]
     [SerializeField] private float finishDelay = 0.9f;
 
+    [Header("Sound")]
+    [Tooltip("A short blast per tap, alternated so a mash doesn't sound like one sample.")]
+    [SerializeField] private AudioClip[] whistleSFX = new AudioClip[0];
+    [Tooltip("Shortest gap between blasts, in seconds. Mashing faster than this still " +
+             "fills the bar, it just doesn't stack more whistles on top of each other.")]
+    [SerializeField] private float whistleMinInterval = 0.12f;
+
+    private float lastWhistleTime = float.NegativeInfinity;
+
     [Header("Finish")]
     [Tooltip("Optional. Flashed once the bar is full.")]
     [SerializeField] private GameObject completedBanner;
@@ -191,6 +200,12 @@ public class WhistleTapMinigame : MonoBehaviour
         float gain = (1f / requiredTaps) * Mathf.Lerp(1f, lateTapStrength, progress);
 
         progress = Mathf.Clamp01(progress + gain);
+
+        if (Time.unscaledTime - lastWhistleTime >= whistleMinInterval)
+        {
+            lastWhistleTime = Time.unscaledTime;
+            SoundManager.Sfx(whistleSFX);
+        }
     }
 
     /// <summary>

@@ -9,7 +9,6 @@ public class GameDifficultyApplier : MonoBehaviour
     // only punished students for packing the very items the quiz had just taught them.
     private static readonly float[] WEIGHT_LIMITS = { 5f, 5f, 5f }; // beginner, intermediate, advanced
     private static readonly string[] DIFFICULTY_NAMES = { "beginner", "intermediate", "advanced" };
-    private static readonly float[] TIME_LIMITS = { 600f, 480f, 360f }; // 10min, 8min, 6min in seconds
 
     [SerializeField] private GameObject garage;
     [SerializeField] private GameObject secondFloor;
@@ -160,17 +159,5 @@ public class GameDifficultyApplier : MonoBehaviour
             }
         }
         return 5f; // Default to beginner
-    }
-
-    public static float GetTimeLimitForDifficulty(string difficulty)
-    {
-        for (int i = 0; i < DIFFICULTY_NAMES.Length; i++)
-        {
-            if (DIFFICULTY_NAMES[i] == difficulty.ToLower())
-            {
-                return TIME_LIMITS[i];
-            }
-        }
-        return 180f; // Default to beginner
     }
 }

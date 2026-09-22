@@ -133,8 +133,7 @@ public class JoinSessionPanel : MonoBehaviour
             await AddPlayerToSession(currentSessionId);
 
             // Play join session audio
-            if (joinSessionAudio != null && SoundManager.Instance != null)
-                SoundManager.Instance.PlaySFX(joinSessionAudio);
+            SoundManager.Sfx(joinSessionAudio);
 
             // Listen for session changes (difficulty, status)
             ListenToSession(currentSessionId);

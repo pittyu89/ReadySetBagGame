@@ -444,7 +444,6 @@ public class JournalPanel : MonoBehaviour
 
     private void PlaySFX(AudioClip clip)
     {
-        if (clip != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFX(clip);
+        SoundManager.Sfx(clip);
     }
 }

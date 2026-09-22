@@ -19,4 +19,4 @@ MonoBehaviour:
   importance: 3
   weightKg: 0.01
   description: Used to identify and contact in case of being lost.
-  essentialRank: 0
+  essentialRank: 18

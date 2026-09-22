@@ -97,6 +97,12 @@ public class CannedFoodMinigame : MonoBehaviour
     [Tooltip("Pause once the tin is empty, before the minigame closes.")]
     [SerializeField] private float finishDelay = 0.9f;
 
+    [Header("Sound")]
+    [Tooltip("As the lid is pulled back.")]
+    [SerializeField] private AudioClip peelSFX;
+    [Tooltip("One of these on every tap, never the same twice running.")]
+    [SerializeField] private AudioClip[] tapSFX = new AudioClip[0];
+
     [Header("Finish")]
     [Tooltip("Optional. Flashed once the tin is empty.")]
     [SerializeField] private GameObject completedBanner;
@@ -205,6 +211,9 @@ public class CannedFoodMinigame : MonoBehaviour
 
     private void OnSwiped()
     {
+        if (!peeled)
+            SoundManager.Sfx(peelSFX);
+
         peeled = true;
     }
 
@@ -235,6 +244,7 @@ public class CannedFoodMinigame : MonoBehaviour
             return;
 
         tapsTaken++;
+        SoundManager.Sfx(tapSFX);
 
         // Every tap rocks the tin, whether or not it shook a portion loose, so a tap always
         // lands on something.

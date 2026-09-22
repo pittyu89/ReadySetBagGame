@@ -99,6 +99,15 @@ public class MedicationMinigame : MonoBehaviour
     [Tooltip("Pause once the last pill is sorted, before the minigame closes.")]
     [SerializeField] private float finishDelay = 0.9f;
 
+    [Header("Sound")]
+    [Tooltip("As a falling pill hits the floor of a container or the shelf.")]
+    [SerializeField] private AudioClip pillLandSFX;
+    [Tooltip("Slowest landing that still clinks, in canvas units a second. Keeps the pile " +
+             "from chattering as it settles.")]
+    [SerializeField] private float pillLandMinSpeed = 350f;
+    [Tooltip("Landing speed that plays the clink at full volume.")]
+    [SerializeField] private float pillLandFullSpeed = 1400f;
+
     [Header("Finish")]
     [Tooltip("Optional. Flashed once every pill is sorted.")]
     [SerializeField] private GameObject completedBanner;
@@ -450,7 +459,10 @@ public class MedicationMinigame : MonoBehaviour
                 // bouncing that back is a jitter that never dies out. Below that threshold
                 // the pill is lying on the tray, not landing on it.
                 if (-b.Velocity.y > gravity * dt * 2f)
+                {
+                    PlayPillLand(-b.Velocity.y);
                     b.Velocity.y = -b.Velocity.y * bounce;
+                }
                 else
                     b.Velocity.y = 0f;
 
@@ -484,6 +496,19 @@ public class MedicationMinigame : MonoBehaviour
 
         ResolvePillContacts(dt);
         UpdateSleep(dt);
+    }
+
+    /// <summary>
+    /// Clinks for a pill hitting the floor, louder the harder it lands. The small bounces
+    /// after the first stay quiet, so fifteen pills settling don't turn into a rattle.
+    /// </summary>
+    private void PlayPillLand(float speed)
+    {
+        if (pillLandSFX == null || speed < pillLandMinSpeed || SoundManager.Instance == null)
+            return;
+
+        float loudness = Mathf.InverseLerp(pillLandMinSpeed, pillLandFullSpeed, speed);
+        SoundManager.Instance.PlaySFX(pillLandSFX, Mathf.Lerp(0.35f, 1f, loudness));
     }
 
     /// <summary>

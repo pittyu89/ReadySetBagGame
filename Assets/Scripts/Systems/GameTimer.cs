@@ -181,6 +181,13 @@ public class GameTimer : MonoBehaviour
         {
             screenPulseEffect.StopRedPulse();
         }
+
+        // The last-5-seconds tick loops on its own source, so it has to be held here
+        // or it keeps ticking behind the pause menu
+        if (tickingStarted && tickingAudioSource != null)
+        {
+            tickingAudioSource.Pause();
+        }
     }
 
     public void ResumeTimer()
@@ -189,6 +196,11 @@ public class GameTimer : MonoBehaviour
         if (screenPulseEffect != null && red90PercentPulsed)
         {
             screenPulseEffect.StartRedPulse();
+        }
+
+        if (tickingStarted && tickingAudioSource != null)
+        {
+            tickingAudioSource.UnPause();
         }
     }
 

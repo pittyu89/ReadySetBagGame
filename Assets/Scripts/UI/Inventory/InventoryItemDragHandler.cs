@@ -211,8 +211,8 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
 
     private void PlayItemPlacedSFX()
     {
-        if (InventoryManager.Instance != null && InventoryManager.Instance.itemPlacedInBagAudio != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFX(InventoryManager.Instance.itemPlacedInBagAudio);
+        if (InventoryManager.Instance != null)
+            SoundManager.Sfx(InventoryManager.Instance.itemPlacedInBagAudio);
     }
 
     void Start()

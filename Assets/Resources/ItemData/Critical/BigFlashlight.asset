@@ -17,6 +17,6 @@ MonoBehaviour:
   gridWidth: 2
   gridHeight: 3
   importance: 4
-  weightKg: 0.2
+  weightKg: 0.4
   description: Illumination and light during power outages.
   essentialRank: 3

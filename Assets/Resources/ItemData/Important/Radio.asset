@@ -19,4 +19,4 @@ MonoBehaviour:
   importance: 3
   weightKg: 0.22
   description: Can be used to gather information and news.
-  essentialRank: 0
+  essentialRank: 15

@@ -78,6 +78,10 @@ public class FlashlightMinigame : MonoBehaviour
     [Tooltip("Optional. Flashed once everyone has been found.")]
     [SerializeField] private GameObject completedBanner;
 
+    [Header("Sound")]
+    [Tooltip("As each person comes fully into the light.")]
+    [SerializeField] private AudioClip foundSFX;
+
     private bool isPlaying = false;
     private bool torchOpened = false;
     private int foundCount = 0;
@@ -239,6 +243,7 @@ public class FlashlightMinigame : MonoBehaviour
     {
         foundCount++;
         UpdateCounter();
+        SoundManager.Sfx(foundSFX);
 
         // Out from under the dark sheet, so the beam moving on no longer covers them back
         // up. World position is kept so they do not jump on the way across.

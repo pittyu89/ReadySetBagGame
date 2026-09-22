@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 1
   importance: 2
   weightKg: 0.1
-  description: Can be used to prevent and treat sickness, or to help others
+  description: Can be used to prevent and treat sickness, or to help others.
   essentialRank: 8

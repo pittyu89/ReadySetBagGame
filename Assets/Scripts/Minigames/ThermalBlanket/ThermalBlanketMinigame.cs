@@ -108,6 +108,13 @@ public class ThermalBlanketMinigame : MonoBehaviour
     [Tooltip("Optional. Flashed once she is wrapped up.")]
     [SerializeField] private GameObject completedBanner;
 
+    [Header("Sound")]
+    [Tooltip("One per fold, played in order as each swipe shakes the blanket out. A short " +
+             "list reuses its last entry.")]
+    [SerializeField] private AudioClip[] foldSFX = new AudioClip[0];
+    [Tooltip("As the blanket goes round her.")]
+    [SerializeField] private AudioClip wrapSFX;
+
     private bool isPlaying = false;
 
     // Bumped by the swipe area; read by the unfold loop.
@@ -212,6 +219,9 @@ public class ThermalBlanketMinigame : MonoBehaviour
 
         foldsDone++;
         blanketImage.sprite = foldStages[Mathf.Min(foldsDone, foldStages.Length - 1)];
+
+        if (foldSFX != null && foldSFX.Length > 0)
+            SoundManager.Sfx(foldSFX[Mathf.Min(foldsDone - 1, foldSFX.Length - 1)]);
 
         if (foldsDone < foldsNeeded)
             ArmFold(foldsDone);
@@ -350,6 +360,7 @@ public class ThermalBlanketMinigame : MonoBehaviour
     private IEnumerator SlideBlanketOntoBody()
     {
         blanketTool.SetAvailable(false);
+        SoundManager.Sfx(wrapSFX);
 
         // The tool's own spring pulls it home every frame it is not held, so it has to be
         // switched off for the blanket to go anywhere else.

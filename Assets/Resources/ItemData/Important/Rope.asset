@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 1
   importance: 3
   weightKg: 0.2
-  description: Can be used to wrap tie and hold items.
+  description: Can be used to wrap, tie and hold items.
   essentialRank: 10

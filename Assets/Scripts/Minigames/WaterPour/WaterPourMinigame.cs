@@ -51,6 +51,12 @@ public class WaterPourMinigame : MonoBehaviour
     [Tooltip("Pause after the last glass, before the minigame closes.")]
     [SerializeField] private float finishDelay = 0.9f;
 
+    [Header("Sound")]
+    [Tooltip("Loops while water is running into a glass.")]
+    [SerializeField] private AudioClip pourLoopSFX;
+
+    private SfxLoop pourLoop;
+
     [Header("Finish")]
     [Tooltip("Optional. Flashed once every glass is full.")]
     [SerializeField] private GameObject completedBanner;
@@ -63,6 +69,8 @@ public class WaterPourMinigame : MonoBehaviour
     {
         if (panelGroup == null && panelRoot != null)
             panelGroup = panelRoot.GetComponent<CanvasGroup>();
+
+        pourLoop = SfxLoop.Create(gameObject, pourLoopSFX);
 
         if (instructionLabel != null && !string.IsNullOrEmpty(instructionText))
             instructionLabel.text = instructionText;
@@ -157,6 +165,9 @@ public class WaterPourMinigame : MonoBehaviour
                 }
 
                 cup.AddMilliliters(fillRateMlPerSecond * Time.unscaledDeltaTime);
+
+                if (pourLoop != null)
+                    pourLoop.Hold();
 
                 if (pourStream != null)
                     pourStream.UpdateStream(bottle.Spout, cup);

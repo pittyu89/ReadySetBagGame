@@ -57,15 +57,13 @@ public class DoorToggle : MonoBehaviour
         if (isOpen)
         {
             // Open the door (rotate Z to 80 degrees)
-            if (openDoorSFX != null && SoundManager.Instance != null)
-                SoundManager.Instance.PlaySFX(openDoorSFX);
+            SoundManager.Sfx(openDoorSFX);
             rotationCoroutine = StartCoroutine(RotateDoorTo(80f));
         }
         else
         {
             // Close the door (rotate Z to 0 degrees)
-            if (openDoorSFX != null && SoundManager.Instance != null)
-                SoundManager.Instance.PlaySFX(openDoorSFX);
+            SoundManager.Sfx(openDoorSFX);
             rotationCoroutine = StartCoroutine(RotateDoorTo(0f));
         }
     }

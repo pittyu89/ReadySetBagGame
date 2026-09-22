@@ -182,8 +182,7 @@ public class DoorProximityHandler : MonoBehaviour
     {
         if (nearestDoor == null) return;
 
-        if (buttonClickAudio != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFX(buttonClickAudio);
+        SoundManager.Sfx(buttonClickAudio);
 
         nearestDoor.ToggleDoor();
     }

@@ -57,7 +57,7 @@ public class QuizManager : MonoBehaviour
     [Tooltip("Seconds the player gets to answer each question before it is marked wrong. " +
              "Counted from when the question has finished typing, not from when it starts, " +
              "so every question gets the same window whatever its length.")]
-    [SerializeField] private float questionTimeLimit = 20f;
+    [SerializeField] private float questionTimeLimit = 30f;
     [Tooltip("Countdown readout for the current question. Optional - the limit still " +
              "applies if nothing is assigned.")]
     [SerializeField] private TextMeshProUGUI questionTimerText;
@@ -84,6 +84,18 @@ public class QuizManager : MonoBehaviour
              "Its look and its colours belong to the CountdownBar itself, so the quiz's bar " +
              "and this one cannot drift apart.")]
     [SerializeField] private CountdownBar minigameTimerBar;
+    [Tooltip("The COMPLETE! / TIMES UP! banner shown when a minigame ends, shared by every " +
+             "minigame. Optional.")]
+    [SerializeField] private MinigameResultBanner minigameResultBanner;
+    [Tooltip("Looping tick for the minigame's last seconds — the same clip as the round " +
+             "timer's, so the two warnings sound alike. Optional.")]
+    [SerializeField] private AudioClip minigameTickingSFX;
+    [Tooltip("Seconds left on the minigame clock when the tick starts.")]
+    [SerializeField] private float minigameTickingFrom = 5f;
+    [Tooltip("Music for while a minigame is up. The house music comes back afterwards from " +
+             "where it left off, and this track does the same the next time. Optional.")]
+    [SerializeField] private AudioClip minigameMusic;
+    [SerializeField] private float minigameMusicCrossfade = 0.8f;
 
     [Header("Timing")]
     [Tooltip("Seconds between characters while the question, and any feedback, types in. " +
@@ -330,6 +342,9 @@ public class QuizManager : MonoBehaviour
     // True if any minigame for the question just answered was cut off by its timer
     private bool minigameTimedOut = false;
 
+    // Plays minigameTickingSFX. Made on first use and handed to the SFX bus.
+    private AudioSource minigameTickingSource;
+
     // The earthquake preparedness questions - arranged from easiest to hardest beginner
     // difficulty. Add to this list and the round grows to match: the length drives how many
     // questions are asked, the score denominator, and the debug picker's dropdown.
@@ -445,7 +460,7 @@ public class QuizManager : MonoBehaviour
         {
             questionText = "Anong alternatibong gamit ang maari mong gamitin upang makagawa ng mapa papunta sa evacuation center kung sakaling hindi mo magamit ang iyong telepono at walang signal?",
             correctAnswerItemNames = new string[] { "Pen & Paper" },
-            correctFeedback = "Tama! Ang permanent marker at notebook ay ang bagay na pwede mong gamitin upang makagawa ng mapa na maari niyong gawing gabay sakaling kayo ay maligaw.",
+            correctFeedback = "Tama! Ang panulat at papel ay ang bagay na pwede mong gamitin upang makagawa ng mapa na maari niyong gawing gabay sakaling kayo ay maligaw.",
             incorrectFeedback = "Isama ito sa go-bag! Kapag walang kuryente at cellphone, maari mo ito gamiting gabay at pang komunikasyon."
         },
         new QuestionData
@@ -471,10 +486,10 @@ public class QuizManager : MonoBehaviour
         },
         new QuestionData
         {
-            questionText = "Nagkalat ang basag na salamin at matutulis na bakal sa sahig matapos ang lindol, at kailangan mong alisin ang mga ito sa daanan. Anong gamit ang dapat mong isuot upang hindi masugatan ang iyong mga kamay?",
+            questionText = "Tumigil na ang pagyanig, ngunit may basag na salamin na humaharang sa iyong daraanan. Kailangan mong maingat na alisin ang mga basag na salamin. Ano ang unang-unang dapat mong isuot sa iyong mga kamay?",
             correctAnswerItemNames = new string[] { "Gloves" },
-            correctFeedback = "Tama! Pinoprotektahan ng makapal na gloves ang iyong mga kamay laban sa hiwa mula sa basag na salamin at matutulis na bagay habang nagliligpit ng debris.",
-            incorrectFeedback = "Magbaon ng gloves! Madaling mahiwa ang kamay sa basag na salamin at bakal pagkatapos ng lindol, at ang sugat ay maaaring ma-impeksyon habang sarado pa ang mga ospital."
+            correctFeedback = "Tama! Napakatibay ng mga heavy-duty gloves! Nagsisilbi itong pangbalot sa iyong mga kamay para hindi ka masugatan ng mga matutulis na salamin, kalawanging pako, o magagaspang na semento habang nililinis mo ang iyong daraanan.",
+            incorrectFeedback = "Huwag na huwag mong hahawakan ang mga kalat mula sa lindol gamit ang iyong mga kamay nang walang proteksyon! Kahit mag-ingat ka pa, ang mga nakatagong bubog o kalawanging bakal ay maaaring magdulot ng malubhang sugat. Laging protektahan muna ang iyong mga kamay!"
         }
     };
 
@@ -787,6 +802,8 @@ public class QuizManager : MonoBehaviour
         if (!minigameRunning)
             yield break;
 
+        AudioClip musicBefore = StartMinigameMusic();
+
         // Every minigame panel carries the objective card, and the card knows when its
         // minigame has been seen through, so no minigame had to learn about the clock
         MinigameObjective objective = minigame != null
@@ -808,32 +825,54 @@ public class QuizManager : MonoBehaviour
             minigameTimerBar.SetTime(remaining, minigameTimeLimit);
         }
 
+        bool completed = false;
+
         while (minigameRunning)
         {
             yield return null;
 
-            if (!timed || !minigameRunning)
-                continue;
+            if (!minigameRunning)
+                break;
 
-            // Done. Take the clock down and let the rest of the minigame play out in peace.
-            if (objective != null && objective.IsComplete)
+            // Done. Take the clock down, raise COMPLETE!, and let the rest of the minigame
+            // play out in peace. The banner fades out with the minigame's own panel.
+            if (!completed && objective != null && objective.IsComplete)
             {
+                completed = true;
                 timed = false;
                 HideMinigameClock();
+
+                if (minigameResultBanner != null)
+                {
+                    GameObject ownBanner = objective.CompletedBanner;
+                    minigameResultBanner.ShowComplete(ownBanner != null
+                        ? ownBanner.GetComponentInParent<CanvasGroup>(true)
+                        : null);
+                }
                 continue;
             }
 
+            if (!timed)
+                continue;
+
             remaining -= Time.deltaTime;
             UpdateTimerLabel(minigameTimerText, remaining);
+            UpdateMinigameTicking(remaining);
 
             if (minigameTimerBar != null)
                 minigameTimerBar.SetTime(remaining, minigameTimeLimit);
 
             if (remaining <= 0f)
             {
+                // Freeze the minigame where it stands and play TIMES UP! over it before
+                // tearing it down, so the player sees what ended it
                 StopCoroutine(routine);
                 minigameRunning = false;
                 minigameTimedOut = true;
+                HideMinigameClock();
+
+                if (minigameResultBanner != null)
+                    yield return StartCoroutine(minigameResultBanner.PlayTimesUp());
 
                 if (forceClose != null)
                     forceClose();
@@ -841,6 +880,38 @@ public class QuizManager : MonoBehaviour
         }
 
         HideMinigameClock();
+
+        if (minigameResultBanner != null)
+            minigameResultBanner.Hide();
+
+        EndMinigameMusic(musicBefore);
+    }
+
+    /// <summary>
+    /// Swaps to the minigame's track. Returns what was playing, for
+    /// <see cref="EndMinigameMusic"/> to bring back.
+    /// </summary>
+    private AudioClip StartMinigameMusic()
+    {
+        SoundManager sound = SoundManager.Instance;
+        if (minigameMusic == null || sound == null)
+            return null;
+
+        AudioClip before = sound.GetCurrentMusic();
+        sound.PlayMusic(minigameMusic, true, minigameMusicCrossfade, true);
+        return before;
+    }
+
+    private void EndMinigameMusic(AudioClip musicBefore)
+    {
+        SoundManager sound = SoundManager.Instance;
+        if (minigameMusic == null || sound == null)
+            return;
+
+        if (musicBefore != null && musicBefore != minigameMusic)
+            sound.PlayMusic(musicBefore, true, minigameMusicCrossfade, true);
+        else if (musicBefore == null)
+            sound.StopMusic();
     }
 
     /// <summary>
@@ -854,6 +925,46 @@ public class QuizManager : MonoBehaviour
 
         if (minigameTimerBar != null)
             minigameTimerBar.Hide();
+
+        if (minigameTickingSource != null)
+            minigameTickingSource.Stop();
+    }
+
+    /// <summary>
+    /// Runs the tick through the minigame's last seconds. Held while the game is paused:
+    /// the clock stops with timeScale, and a tick carrying on behind the pause menu
+    /// would promise a countdown that isn't happening.
+    /// </summary>
+    private void UpdateMinigameTicking(float remaining)
+    {
+        if (minigameTickingSFX == null || remaining > minigameTickingFrom)
+            return;
+
+        if (minigameTickingSource == null)
+        {
+            minigameTickingSource = gameObject.AddComponent<AudioSource>();
+            minigameTickingSource.clip = minigameTickingSFX;
+            minigameTickingSource.loop = true;
+            minigameTickingSource.playOnAwake = false;
+            minigameTickingSource.spatialBlend = 0f;
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.RegisterSFXSource(minigameTickingSource);
+        }
+
+        if (Time.timeScale == 0f)
+        {
+            minigameTickingSource.Pause();
+            return;
+        }
+
+        if (!minigameTickingSource.isPlaying)
+        {
+            // UnPause picks up a tick held by the pause menu; Play starts a fresh one
+            minigameTickingSource.UnPause();
+            if (!minigameTickingSource.isPlaying)
+                minigameTickingSource.Play();
+        }
     }
 
     private IEnumerator WatchMinigame(IEnumerator play)
@@ -948,12 +1059,7 @@ public class QuizManager : MonoBehaviour
             answerBox.ConsumeItem();
         }
 
-        if (SoundManager.Instance != null)
-        {
-            AudioClip clip = isCorrect ? correctSFX : wrongSFX;
-            if (clip != null)
-                SoundManager.Instance.PlaySFX(clip);
-        }
+        SoundManager.Sfx(isCorrect ? correctSFX : wrongSFX);
 
         yield return new WaitForSecondsRealtime(preFeedbackDelay);
 
@@ -1191,19 +1297,7 @@ public class QuizManager : MonoBehaviour
 
         // The cheer now follows the drill grade rather than the raw answer count, so it
         // matches the badge the player is being shown.
-        if (SoundManager.Instance != null)
-        {
-            if (drill.FinalScore >= DrillScore.BADGE_PROFICIENT_MIN)
-            {
-                if (highScoreSFX != null)
-                    SoundManager.Instance.PlaySFX(highScoreSFX);
-            }
-            else
-            {
-                if (lowScoreSFX != null)
-                    SoundManager.Instance.PlaySFX(lowScoreSFX);
-            }
-        }
+        SoundManager.Sfx(drill.FinalScore >= DrillScore.BADGE_PROFICIENT_MIN ? highScoreSFX : lowScoreSFX);
 
         isResolvingAnswer = false;
     }

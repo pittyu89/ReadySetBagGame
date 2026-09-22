@@ -77,6 +77,12 @@ public class ZiplockMinigame : MonoBehaviour
     [Tooltip("Pause once the last thing is in, before the minigame closes.")]
     [SerializeField] private float finishDelay = 0.9f;
 
+    [Header("Sound")]
+    [Tooltip("As the zipper starts across.")]
+    [SerializeField] private AudioClip zipSFX;
+    [Tooltip("As an item drops into the bag.")]
+    [SerializeField] private AudioClip packSFX;
+
     [Header("Finish")]
     [Tooltip("Optional. Flashed once everything is in the bag.")]
     [SerializeField] private GameObject completedBanner;
@@ -168,8 +174,22 @@ public class ZiplockMinigame : MonoBehaviour
         // so the items stay inert until it has been pulled across.
         zipper.SetArmed(true);
 
+        // The zip plays as the pull gets going, so it runs alongside the gesture rather
+        // than arriving after it
+        bool zipPlayed = false;
         while (!zipper.IsOpen)
+        {
+            if (!zipPlayed && zipper.Progress > 0.05f)
+            {
+                zipPlayed = true;
+                SoundManager.Sfx(zipSFX);
+            }
+
             yield return null;
+        }
+
+        if (!zipPlayed)
+            SoundManager.Sfx(zipSFX);
 
         foreach (ZiplockItem item in items)
             item.SetArmed(true);
@@ -242,6 +262,7 @@ public class ZiplockMinigame : MonoBehaviour
 
         slots[slot] = item;
         item.Slot = slot;
+        SoundManager.Sfx(packSFX);
 
         item.Rect.SetParent(insideLayer, false);
         StartSettling(item, PackInto(item, slot));

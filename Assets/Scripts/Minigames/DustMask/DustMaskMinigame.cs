@@ -66,6 +66,10 @@ public class DustMaskMinigame : MonoBehaviour
     [Tooltip("Optional. Flashed once the mask is on.")]
     [SerializeField] private GameObject completedBanner;
 
+    [Header("Sound")]
+    [Tooltip("As the mask goes onto her face.")]
+    [SerializeField] private AudioClip maskOnSFX;
+
     private bool isPlaying = false;
 
     // Carried between frames so the drop can be judged on where the mask was while it was
@@ -207,6 +211,7 @@ public class DustMaskMinigame : MonoBehaviour
     private IEnumerator SlideMaskOntoFace()
     {
         maskTool.SetAvailable(false);
+        SoundManager.Sfx(maskOnSFX);
 
         // The tool's own spring pulls it home every frame it is not held, so it has to be
         // switched off for the mask to go anywhere else.

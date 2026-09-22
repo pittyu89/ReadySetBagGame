@@ -96,6 +96,10 @@ public class PocketKnifeMinigame : MonoBehaviour
     [Tooltip("How long a missed cut's message stays up before the rope is handed back.")]
     [SerializeField] private float retryMessageSeconds = 1.3f;
 
+    [Header("Sound")]
+    [Tooltip("As the rope is cut through. A miss leaves the rope whole, so it is silent.")]
+    [SerializeField] private AudioClip cutSFX;
+
     [Header("Finish")]
     [Tooltip("Optional. Flashed once the rope has been cut to length.")]
     [SerializeField] private GameObject completedBanner;
@@ -195,6 +199,7 @@ public class PocketKnifeMinigame : MonoBehaviour
 
             if (onTarget)
             {
+                SoundManager.Sfx(cutSFX);
                 yield return StartCoroutine(DropOffcut());
                 done = true;
             }

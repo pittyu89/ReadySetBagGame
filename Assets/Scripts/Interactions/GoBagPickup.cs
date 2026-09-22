@@ -176,10 +176,7 @@ public class GoBagPickup : MonoBehaviour
             picked = true;
 
             // Play pickup audio
-            if (pickupAudio != null && SoundManager.Instance != null)
-            {
-                SoundManager.Instance.PlaySFX(pickupAudio);
-            }
+            SoundManager.Sfx(pickupAudio);
             
             bool isMale = GetPlayerGender() == "Male";
             Animator playerAnimator = collision.GetComponentInChildren<Animator>();

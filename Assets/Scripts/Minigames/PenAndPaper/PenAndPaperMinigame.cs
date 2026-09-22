@@ -101,6 +101,12 @@ public class PenAndPaperMinigame : MonoBehaviour
     [Tooltip("Pause once the field is reached, before the minigame closes.")]
     [SerializeField] private float finishDelay = 0.9f;
 
+    [Header("Sound")]
+    [Tooltip("Loops while the pen is moving along the map.")]
+    [SerializeField] private AudioClip drawLoopSFX;
+
+    private SfxLoop drawLoop;
+
     [Header("Finish")]
     [Tooltip("Optional. Flashed once the route reaches the field.")]
     [SerializeField] private GameObject completedBanner;
@@ -149,6 +155,8 @@ public class PenAndPaperMinigame : MonoBehaviour
     {
         if (panelGroup == null && panelRoot != null)
             panelGroup = panelRoot.GetComponent<CanvasGroup>();
+
+        drawLoop = SfxLoop.Create(gameObject, drawLoopSFX);
 
         if (instructionLabel != null && !string.IsNullOrEmpty(instructionText))
             instructionLabel.text = instructionText;
@@ -276,6 +284,9 @@ public class PenAndPaperMinigame : MonoBehaviour
         stroke.Add(p);
         routeLine.AddPoint(p);
         CarryPen(p);
+
+        if (drawLoop != null)
+            drawLoop.Hold();
 
         if (IsOnField(p, goalReach))
             Arrive();

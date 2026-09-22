@@ -69,6 +69,14 @@ public class RopeKnotMinigame : MonoBehaviour
     [Tooltip("Pause once the knot cinches, before the minigame closes.")]
     [SerializeField] private float finishDelay = 0.9f;
 
+    [Header("Sound")]
+    [Tooltip("Loops while the finger is tracing the knot.")]
+    [SerializeField] private AudioClip traceLoopSFX;
+    [Tooltip("As the knot is pulled tight.")]
+    [SerializeField] private AudioClip cinchSFX;
+
+    private SfxLoop traceLoop;
+
     [Header("Finish")]
     [Tooltip("Optional. Flashed once the knot is tied.")]
     [SerializeField] private GameObject completedBanner;
@@ -106,6 +114,8 @@ public class RopeKnotMinigame : MonoBehaviour
     {
         if (panelGroup == null && panelRoot != null)
             panelGroup = panelRoot.GetComponent<CanvasGroup>();
+
+        traceLoop = SfxLoop.Create(gameObject, traceLoopSFX);
 
         if (instructionLabel != null && !string.IsNullOrEmpty(instructionText))
             instructionLabel.text = instructionText;
@@ -228,6 +238,9 @@ public class RopeKnotMinigame : MonoBehaviour
         stroke.Add(p);
         traceLine.AddPoint(p);
 
+        if (traceLoop != null)
+            traceLoop.Hold();
+
         if (nextCheckpoint < checkpoints.Count &&
             Vector2.Distance(p, checkpoints[nextCheckpoint]) <= checkpointRadius)
         {
@@ -249,6 +262,7 @@ public class RopeKnotMinigame : MonoBehaviour
     private void Cinch()
     {
         knotTied = true;
+        SoundManager.Sfx(cinchSFX);
 
         // Close the loop so the finished knot reads as one continuous line
         if (checkpoints.Count > 0)

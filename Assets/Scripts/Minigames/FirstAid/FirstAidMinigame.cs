@@ -72,6 +72,16 @@ public class FirstAidMinigame : MonoBehaviour
     [Tooltip("Optional. Flashed once the arm is patched up.")]
     [SerializeField] private GameObject completedBanner;
 
+    [Header("Sound")]
+    [Tooltip("As the alcohol wets a fresh swab.")]
+    [SerializeField] private AudioClip alcoholSFX;
+    [Tooltip("Loops while the swab is actually rubbing the arm.")]
+    [SerializeField] private AudioClip swabWipeLoopSFX;
+    [Tooltip("As the gauze goes on.")]
+    [SerializeField] private AudioClip gauzeSFX;
+
+    private SfxLoop swabWipeLoop;
+
     private bool isPlaying = false;
     private bool isBandaged = false;
     private bool swabOut = false;
@@ -85,6 +95,8 @@ public class FirstAidMinigame : MonoBehaviour
 
         if (instructionLabel != null && !string.IsNullOrEmpty(instructionText))
             instructionLabel.text = instructionText;
+
+        swabWipeLoop = SfxLoop.Create(gameObject, swabWipeLoopSFX);
 
         // Reset the contents but leave the panel's active state alone. Awake first runs
         // during the SetActive in Open, so deactivating here would switch the panel back
@@ -189,6 +201,10 @@ public class FirstAidMinigame : MonoBehaviour
     private void OnAlcoholUsed()
     {
         SetSwabOut(!swabOut);
+
+        // Only wetting makes a sound; tapping again just puts the swab away
+        if (swabOut)
+            SoundManager.Sfx(alcoholSFX);
     }
 
     /// <summary>
@@ -243,6 +259,9 @@ public class FirstAidMinigame : MonoBehaviour
             return;
 
         painter.PaintAt(uv, Time.unscaledDeltaTime);
+
+        if (swabWipeLoop != null)
+            swabWipeLoop.Hold();
     }
 
     /// <summary>
@@ -260,6 +279,7 @@ public class FirstAidMinigame : MonoBehaviour
             return;
 
         isBandaged = true;
+        SoundManager.Sfx(gauzeSFX);
 
         // The gauze is its own band around the arm, so it just switches on — the arm
         // underneath stays exactly as the player left it.

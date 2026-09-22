@@ -19,4 +19,4 @@ MonoBehaviour:
   importance: 3
   weightKg: 0.1
   description: Stores essential documents and important files.
-  essentialRank: 0
+  essentialRank: 17

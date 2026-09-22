@@ -565,8 +565,7 @@ public class MainMenuManager : MonoBehaviour
 
     private void PlayButtonAudio()
     {
-        if (buttonClickAudio != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFX(buttonClickAudio);
+        SoundManager.Sfx(buttonClickAudio);
     }
 
     /// <summary>

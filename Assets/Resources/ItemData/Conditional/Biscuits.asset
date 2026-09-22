@@ -17,6 +17,6 @@ MonoBehaviour:
   gridWidth: 1
   gridHeight: 1
   importance: 1
-  weightKg: 0
+  weightKg: 0.2
   description: Can be used for more energy (makes you more thirsty because of sugar)
   essentialRank: 0

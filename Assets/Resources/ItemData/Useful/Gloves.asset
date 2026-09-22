@@ -18,6 +18,6 @@ MonoBehaviour:
   gridHeight: 2
   importance: 2
   weightKg: 0.1
-  description: Standard safety work gloves or heavy-duty utility gloves used for
-    protection during emergency situations or debris clearing
+  description: Heavy-duty work gloves that protect your hands while clearing debris
+    and broken glass.
   essentialRank: 14

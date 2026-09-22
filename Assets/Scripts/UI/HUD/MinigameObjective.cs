@@ -52,6 +52,16 @@ public class MinigameObjective : MonoBehaviour
         get { return isChecked; }
     }
 
+    /// <summary>
+    /// The minigame's own COMPLETED banner. It no longer draws anything — the shared
+    /// <see cref="MinigameResultBanner"/> is shown in its place — but it still marks the
+    /// moment of finishing, and its panel is what the shared banner fades out with.
+    /// </summary>
+    public GameObject CompletedBanner
+    {
+        get { return completedBanner; }
+    }
+
     private void OnEnable()
     {
         SetChecked(false);

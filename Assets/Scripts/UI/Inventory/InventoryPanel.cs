@@ -68,14 +68,12 @@ public class InventoryPanel : MonoBehaviour
 
     private void PlayZipBagSFX()
     {
-        if (openZipBagAudio != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFX(openZipBagAudio);
+        SoundManager.Sfx(openZipBagAudio);
     }
 
     private void PlayTopBagSFX()
     {
-        if (openTopBagAudio != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFX(openTopBagAudio);
+        SoundManager.Sfx(openTopBagAudio);
     }
 
     void Start()

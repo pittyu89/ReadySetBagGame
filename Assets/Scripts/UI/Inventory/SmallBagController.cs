@@ -144,7 +144,6 @@ public class SmallBagController : MonoBehaviour
 
     private static void PlaySFX(AudioClip clip)
     {
-        if (clip != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFX(clip);
+        SoundManager.Sfx(clip);
     }
 }

@@ -19,10 +19,67 @@ using UnityEngine.UI;
 /// If a mixer is assigned, buses own the volume and every AudioSource stays at
 /// amplitude 1 (fades aside). Without a mixer the same amplitude is written to
 /// each source directly, so the system behaves identically either way.
+///
+/// The manager lives in a prefab under Resources and creates itself before the first
+/// scene loads, so every scene has sound - including one opened straight in the Editor.
 /// </summary>
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance { get; private set; }
+
+    // Resources path of the prefab the manager is created from
+    private const string PREFAB_PATH = "SoundManager";
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void Bootstrap()
+    {
+        if (Instance != null)
+            return;
+
+        SoundManager prefab = Resources.Load<SoundManager>(PREFAB_PATH);
+        if (prefab == null)
+        {
+            Debug.LogWarning("[SoundManager] No SoundManager prefab in Resources - the game will be silent.");
+            return;
+        }
+
+        Instantiate(prefab).name = prefab.name;
+    }
+
+    /// <summary>
+    /// Plays a one-shot SFX with its settings from the <see cref="SoundLibrary"/>.
+    /// Safe to call with a null clip or before the manager exists, so callers need no checks.
+    /// </summary>
+    public static void Sfx(AudioClip clip)
+    {
+        if (clip != null && Instance != null)
+            Instance.PlaySFX(clip);
+    }
+
+    /// <summary>
+    /// Plays one of several takes of the same sound, never the same one twice running when
+    /// there is a choice, so a repeated action doesn't sound like a stuck recording.
+    /// </summary>
+    public static void Sfx(AudioClip[] clips)
+    {
+        if (clips == null || clips.Length == 0 || Instance == null)
+            return;
+
+        int pick = Random.Range(0, clips.Length);
+        if (clips.Length > 1 && clips[pick] == Instance.lastVariantPlayed)
+            pick = (pick + 1 + Random.Range(0, clips.Length - 1)) % clips.Length;
+
+        Instance.lastVariantPlayed = clips[pick];
+        Instance.PlaySFX(clips[pick]);
+    }
+
+    // The take Sfx(AudioClip[]) played last, so the next call can pick a different one
+    private AudioClip lastVariantPlayed;
+
+    [Header("Sound Library")]
+    [Tooltip("Per-sound volume, pitch variation and protection. Clips not listed play at " +
+             "full volume and their real pitch.")]
+    [SerializeField] private SoundLibrary library;
 
     [Header("Audio Mixer (optional)")]
     [Tooltip("Assign to route audio through mixer buses. Leave empty to fall back to per-AudioSource volume.")]
@@ -38,13 +95,16 @@ public class SoundManager : MonoBehaviour
     [Tooltip("Pooled voices so overlapping SFX can each carry their own pitch.")]
     [SerializeField] private int sfxVoiceCount = 8;
 
-    [Tooltip("Random pitch spread applied per SFX so repeats don't machine-gun. 0 disables it.")]
+    [Tooltip("Random pitch spread for sounds the library marks Vary Pitch, so repeats don't " +
+             "machine-gun. 0 disables it.")]
     [Range(0f, 0.5f)]
     [SerializeField] private float sfxPitchVariation = 0.08f;
 
     [Header("Music")]
     [Tooltip("Seconds to crossfade when switching tracks. 0 is a hard cut.")]
     [SerializeField] private float defaultCrossfadeDuration = 1f;
+    [Tooltip("Seconds StopMusic() fades out over when no length is given. 0 is a hard cut.")]
+    [SerializeField] private float defaultStopFadeDuration = 0.6f;
 
     [Header("Volume Ranges")]
     [SerializeField] private float minVolume = 0f;
@@ -84,6 +144,8 @@ public class SoundManager : MonoBehaviour
     private Coroutine musicFadeRoutine;
 
     private readonly List<AudioSource> sfxVoices = new List<AudioSource>();
+    // Parallel to sfxVoices: true while that voice plays a sound that must not be cut off
+    private readonly List<bool> voiceProtected = new List<bool>();
     private int nextVoiceIndex;
 
     // AudioSources owned by other scripts (looping footsteps, the timer tick)
@@ -162,6 +224,10 @@ public class SoundManager : MonoBehaviour
             voice.outputAudioMixerGroup = sfxGroup;
             sfxVoices.Add(voice);
         }
+
+        voiceProtected.Clear();
+        for (int i = 0; i < sfxVoices.Count; i++)
+            voiceProtected.Add(false);
     }
 
     private AudioSource CreateChildSource(string sourceName)
@@ -338,10 +404,15 @@ public class SoundManager : MonoBehaviour
     {
         float amp = sfxGroup != null ? 1f : SFXAmplitude;
 
-        for (int i = 0; i < sfxVoices.Count; i++)
+        // With a bus the pooled voices only carry their per-clip trim, set when they
+        // start, so leave them be rather than flattening a playing sound's trim to 1
+        if (sfxGroup == null)
         {
-            if (sfxVoices[i] != null)
-                sfxVoices[i].volume = amp;
+            for (int i = 0; i < sfxVoices.Count; i++)
+            {
+                if (sfxVoices[i] != null)
+                    sfxVoices[i].volume = amp;
+            }
         }
 
         // Externally owned sources are pushed to here, on change only.
@@ -393,6 +464,19 @@ public class SoundManager : MonoBehaviour
         registeredSfxSources.Remove(source);
     }
 
+    /// <summary>
+    /// The volume an SFX source of its own should sit at to play <paramref name="clip"/>:
+    /// its library volume, times the user's SFX level when there is no mixer bus to carry it.
+    /// For sources that also fade themselves, such as <see cref="SfxLoop"/>, and so can't
+    /// be handed to <see cref="RegisterSFXSource"/>.
+    /// </summary>
+    public float GetSfxSourceVolume(AudioClip clip)
+    {
+        SoundLibrary.Entry entry = library != null ? library.Find(clip) : null;
+        float clipVolume = entry != null ? entry.volume : 1f;
+        return (sfxGroup != null ? 1f : SFXAmplitude) * clipVolume;
+    }
+
     #endregion
 
     #region Music
@@ -413,6 +497,16 @@ public class SoundManager : MonoBehaviour
     /// </summary>
     public void PlayMusic(AudioClip musicClip, bool loop, float fadeDuration)
     {
+        PlayMusic(musicClip, loop, fadeDuration, false);
+    }
+
+    /// <summary>
+    /// Play background music. With <paramref name="resume"/> set, a track that was playing
+    /// earlier picks up where it was left rather than from the top — for swapping to a
+    /// minigame's track and back without the house music restarting its intro every time.
+    /// </summary>
+    public void PlayMusic(AudioClip musicClip, bool loop, float fadeDuration, bool resume)
+    {
         if (musicClip == null || activeMusic == null)
             return;
 
@@ -432,11 +526,17 @@ public class SoundManager : MonoBehaviour
             musicFadeRoutine = null;
         }
 
+        RememberPosition(previous);
+
         next.clip = musicClip;
         next.loop = loop;
         SetFade(next, 0f);
         ApplyMusicVolumes();
         next.Play();
+
+        if (resume && resumePositions.TryGetValue(musicClip, out float position)
+            && position < musicClip.length)
+            next.time = position;
 
         activeMusic = next;
 
@@ -454,11 +554,13 @@ public class SoundManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Stop music immediately.
+    /// Stop music with the default short fade, so it never cuts off mid-note.
+    /// The manager outlives scene loads, so the fade finishes even if the caller
+    /// changes scene straight after.
     /// </summary>
     public void StopMusic()
     {
-        StopMusic(0f);
+        StopMusic(defaultStopFadeDuration);
     }
 
     /// <summary>
@@ -472,7 +574,9 @@ public class SoundManager : MonoBehaviour
             musicFadeRoutine = null;
         }
 
-        if (fadeDuration <= 0f)
+        // A fade needs a coroutine, which can't start while the manager itself is
+        // being torn down (quitting, or a caller's OnDestroy on the way out)
+        if (fadeDuration <= 0f || !isActiveAndEnabled)
         {
             StopSourceImmediate(musicA, ref fadeA);
             StopSourceImmediate(musicB, ref fadeB);
@@ -493,6 +597,21 @@ public class SoundManager : MonoBehaviour
     public AudioClip GetCurrentMusic()
     {
         return activeMusic != null ? activeMusic.clip : null;
+    }
+
+    // Where each track was when it was last faded out, for PlayMusic's resume
+    private readonly Dictionary<AudioClip, float> resumePositions = new Dictionary<AudioClip, float>();
+
+    /// <summary>
+    /// Notes where a track is as it is being replaced. Taken at the start of the crossfade,
+    /// so a resumed track comes back on the phrase the player last heard rather than one
+    /// that played out under the fade.
+    /// </summary>
+    private void RememberPosition(AudioSource source)
+    {
+        // A stopped deck has had its clip cleared, so any clip still on one is a live track
+        if (source != null && source.clip != null)
+            resumePositions[source.clip] = source.time;
     }
 
     private void StopSourceImmediate(AudioSource source, ref float fade)
@@ -583,67 +702,96 @@ public class SoundManager : MonoBehaviour
     #region SFX
 
     /// <summary>
-    /// Play a one-shot SFX sound effect.
+    /// Play a one-shot SFX with its settings from the <see cref="SoundLibrary"/>.
     /// </summary>
     public void PlaySFX(AudioClip sfxClip)
     {
-        PlaySFX(sfxClip, 1f, true);
+        PlaySFX(sfxClip, 1f);
     }
 
     /// <summary>
-    /// Play a one-shot SFX at a relative volume.
+    /// Play a one-shot SFX at a relative volume, on top of its library volume.
     /// </summary>
     public void PlaySFX(AudioClip sfxClip, float volumeScale)
     {
-        PlaySFX(sfxClip, volumeScale, true);
+        SoundLibrary.Entry entry = library != null ? library.Find(sfxClip) : null;
+        PlaySFX(sfxClip, volumeScale, entry != null && entry.varyPitch);
     }
 
     /// <summary>
-    /// Play a one-shot SFX.
+    /// Play a one-shot SFX, choosing explicitly whether its pitch is varied.
     /// Each shot takes its own pooled voice, so overlapping sounds can carry
-    /// their own pitch. Set <paramref name="varyPitch"/> false for sounds that
-    /// should always be identical, such as UI clicks.
+    /// their own pitch. Volume and protection still come from the library.
     /// </summary>
     public void PlaySFX(AudioClip sfxClip, float volumeScale, bool varyPitch)
     {
         if (sfxClip == null)
             return;
 
-        AudioSource voice = GetFreeVoice();
-        if (voice == null)
+        SoundLibrary.Entry entry = library != null ? library.Find(sfxClip) : null;
+
+        int index = GetFreeVoice();
+        if (index < 0)
             return;
 
+        AudioSource voice = sfxVoices[index];
+
         // The bus (or ApplySFXVolumes) already carries the user's SFX level;
-        // volumeScale is purely a per-clip trim on top of it.
+        // the library volume and volumeScale are per-clip trims on top of it.
         float baseAmp = sfxGroup != null ? 1f : SFXAmplitude;
+        float clipVolume = entry != null ? entry.volume : 1f;
 
         voice.clip = sfxClip;
-        voice.volume = baseAmp * Mathf.Clamp01(volumeScale);
+        voice.volume = baseAmp * clipVolume * Mathf.Clamp01(volumeScale);
         voice.pitch = varyPitch && sfxPitchVariation > 0f
             ? 1f + Random.Range(-sfxPitchVariation, sfxPitchVariation)
             : 1f;
         voice.Play();
+
+        voiceProtected[index] = entry != null && entry.protect;
     }
 
-    private AudioSource GetFreeVoice()
+    /// <summary>
+    /// Index of the voice the next SFX should use: a silent one if there is one,
+    /// otherwise the unprotected voice nearest the end of its sound, so what gets cut
+    /// is the tail of something nearly over rather than a fanfare. -1 if every voice
+    /// is playing a protected sound.
+    /// </summary>
+    private int GetFreeVoice()
     {
         if (sfxVoices.Count == 0)
-            return null;
+            return -1;
 
         for (int i = 0; i < sfxVoices.Count; i++)
         {
-            AudioSource voice = sfxVoices[(nextVoiceIndex + i) % sfxVoices.Count];
+            int index = (nextVoiceIndex + i) % sfxVoices.Count;
+            AudioSource voice = sfxVoices[index];
             if (voice != null && !voice.isPlaying)
             {
-                nextVoiceIndex = (nextVoiceIndex + i + 1) % sfxVoices.Count;
-                return voice;
+                nextVoiceIndex = (index + 1) % sfxVoices.Count;
+                return index;
             }
         }
 
-        // Every voice is busy: steal the oldest slot in the rotation.
-        AudioSource stolen = sfxVoices[nextVoiceIndex];
-        nextVoiceIndex = (nextVoiceIndex + 1) % sfxVoices.Count;
-        return stolen;
+        int best = -1;
+        float bestProgress = -1f;
+        for (int i = 0; i < sfxVoices.Count; i++)
+        {
+            AudioSource voice = sfxVoices[i];
+            if (voice == null || voiceProtected[i])
+                continue;
+
+            float progress = voice.clip != null && voice.clip.length > 0f
+                ? voice.time / voice.clip.length
+                : 1f;
+            if (progress > bestProgress)
+            {
+                bestProgress = progress;
+                best = i;
+            }
+        }
+
+        return best;
     }
 
     #endregion

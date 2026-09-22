@@ -86,6 +86,12 @@ public class ContactCardSmudges : MonoBehaviour,
     /// <summary>True while the player has a finger on the card.</summary>
     public bool IsWiping { get; private set; }
 
+    /// <summary>
+    /// Unscaled time the finger last moved across the card, so a finger resting still can
+    /// be told apart from one rubbing.
+    /// </summary>
+    public float LastRubTime { get; private set; } = float.NegativeInfinity;
+
     private RectTransform Self
     {
         get
@@ -234,6 +240,7 @@ public class ContactCardSmudges : MonoBehaviour,
 
         lastPoint = point;
         hasLastPoint = true;
+        LastRubTime = Time.unscaledTime;
 
         Upload();
     }

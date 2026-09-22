@@ -57,6 +57,12 @@ public class ContactCardMinigame : MonoBehaviour
     [Tooltip("Optional. Flashed once the card is clean.")]
     [SerializeField] private GameObject completedBanner;
 
+    [Header("Sound")]
+    [Tooltip("Loops while a finger is rubbing the mud.")]
+    [SerializeField] private AudioClip rubLoopSFX;
+
+    private SfxLoop rubLoop;
+
     private bool isPlaying = false;
 
     public bool IsPlaying { get { return isPlaying; } }
@@ -65,6 +71,8 @@ public class ContactCardMinigame : MonoBehaviour
     {
         if (panelGroup == null && panelRoot != null)
             panelGroup = panelRoot.GetComponent<CanvasGroup>();
+
+        rubLoop = SfxLoop.Create(gameObject, rubLoopSFX);
 
         if (instructionLabel != null && !string.IsNullOrEmpty(instructionText))
             instructionLabel.text = instructionText;
@@ -105,7 +113,13 @@ public class ContactCardMinigame : MonoBehaviour
         smudges.SetArmed(true);
 
         while (smudges.Cleanliness < cleanThreshold)
+        {
+            // Only while the finger is moving: a finger resting on the card makes no sound
+            if (rubLoop != null && smudges.IsWiping && Time.unscaledTime - smudges.LastRubTime < 0.1f)
+                rubLoop.Hold();
+
             yield return null;
+        }
 
         smudges.SetArmed(false);
 
