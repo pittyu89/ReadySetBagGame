@@ -1,46 +1,72 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
 /// The OBJECTIVE card every minigame shows in its top corner.
 ///
-/// It only owns the marking off: the line of text is set by the minigame itself, the way it
-/// always was. The diamond sits plain and turns the done colour the moment the minigame is
-/// finished — which is to say the moment its COMPLETED banner goes up, so a minigame cut
-/// short by the timer never gets marked.
-///
-/// The done state is a colour on the authored diamond rather than a second sprite, so the
-/// card needs nothing beyond the art it was given.
+/// It owns the marking off and the card's entrance: the line of text is set by the minigame
+/// itself, the way it always was. The diamond stays as authored; a green check lands on it the
+/// moment the minigame is finished — which is to say the moment its COMPLETED banner goes up —
+/// and a red X if the quiz reports the minigame ran out of time instead.
 ///
 /// Watching the banner rather than being told keeps this out of all twenty minigames: they
 /// already raise that banner on their own, and none of them had to learn about this card.
+/// The entrance works the same way: every minigame fades this card's CanvasGroup up from
+/// nothing when it starts, and the card slides in from the left whenever it sees that happen.
 /// </summary>
 public class MinigameObjective : MonoBehaviour
 {
     [Header("Diamond")]
     [SerializeField] private Image diamond;
-    [Tooltip("The diamond's colour while the objective is still open.")]
-    [SerializeField] private Color openColor = Color.white;
-    [Tooltip("What it turns once the minigame is finished.")]
-    [SerializeField] private Color doneColor = new Color(150f / 255f, 176f / 255f, 0f, 1f);
+
+    [Header("Result Mark")]
+    [Tooltip("Drawn over the diamond once the minigame is finished. Loaded from " +
+             "Resources/MinigameHUD/ObjectiveCheck when left empty.")]
+    [SerializeField] private Sprite checkSprite;
+    [Tooltip("Drawn over the diamond when the minigame runs out of time. Loaded from " +
+             "Resources/MinigameHUD/ObjectiveCross when left empty.")]
+    [SerializeField] private Sprite crossSprite;
+    [Tooltip("Size of the mark relative to the diamond. 1 = the diamond's own size.")]
+    [SerializeField] private float markSize = 1f;
 
     [Header("Completion")]
     [Tooltip("The minigame's COMPLETED banner. The diamond is checked while this is on, " +
              "so it follows whatever the minigame already counts as finishing.")]
     [SerializeField] private GameObject completedBanner;
 
-    [Header("Tick")]
-    [Tooltip("How far the diamond swells when it is checked, before settling back.")]
-    [SerializeField] private float popScale = 1.35f;
+    [Header("Mark Pop")]
+    [Tooltip("How far the mark swells when it lands, before settling back.")]
+    [SerializeField] private float popScale = 1.25f;
     [SerializeField] private float popDuration = 0.35f;
 
-    private bool isChecked = false;
+    [Header("Entrance")]
+    [Tooltip("How far left of its place the card starts, as a fraction of its width. Kept " +
+             "short: the card sits at the screen's left edge, so a long slide keeps it off " +
+             "screen for most of its fade and the fade can't be seen.")]
+    [SerializeField] private float slideDistance = 0.2f;
+    [Tooltip("Seconds the card takes to slide and fade in. Both finish together, so the card " +
+             "is fully visible the moment it settles. The card owns this fade: the minigame's " +
+             "own quick fade-in is overridden while it runs.")]
+    [FormerlySerializedAs("slideDuration")]
+    [SerializeField] private float entranceDuration = 0.5f;
+
+    private enum Mark { None, Check, Cross }
+
+    private Mark mark = Mark.None;
+    private Image markImage;
     private Coroutine popRoutine;
 
+    private RectTransform rectTransform;
+    private CanvasGroup group;
+    private Vector2 restPosition;
+    private float lastGroupAlpha;
+    private float entranceTime = -1f;
+
     /// <summary>
-    /// True once the minigame has been seen through — the same moment the diamond is ticked,
-    /// which is the moment its COMPLETED banner goes up.
+    /// True once the minigame has been seen through — the same moment the check lands, which
+    /// is the moment its COMPLETED banner goes up.
     ///
     /// The quiz reads this to know the player is finished, which is not the same as the
     /// minigame being over: a minigame keeps running for a few seconds after the last piece
@@ -49,7 +75,7 @@ public class MinigameObjective : MonoBehaviour
     /// </summary>
     public bool IsComplete
     {
-        get { return isChecked; }
+        get { return mark == Mark.Check; }
     }
 
     /// <summary>
@@ -62,33 +88,97 @@ public class MinigameObjective : MonoBehaviour
         get { return completedBanner; }
     }
 
+    private void Awake()
+    {
+        rectTransform = (RectTransform)transform;
+        group = GetComponent<CanvasGroup>();
+        restPosition = rectTransform.anchoredPosition;
+
+        if (checkSprite == null)
+            checkSprite = Resources.Load<Sprite>("MinigameHUD/ObjectiveCheck");
+        if (crossSprite == null)
+            crossSprite = Resources.Load<Sprite>("MinigameHUD/ObjectiveCross");
+    }
+
     private void OnEnable()
     {
-        SetChecked(false);
+        SetMark(Mark.None);
+        entranceTime = -1f;
+        rectTransform.anchoredPosition = restPosition;
+        lastGroupAlpha = group != null ? group.alpha : 1f;
     }
 
     private void Update()
     {
-        if (completedBanner == null || isChecked)
+        if (completedBanner == null || mark != Mark.None)
             return;
 
         if (completedBanner.activeInHierarchy)
-            SetChecked(true);
+            SetMark(Mark.Check);
+    }
+
+    private void LateUpdate()
+    {
+        if (group == null)
+            return;
+
+        // The minigame fading the card up from nothing is the start of a new run
+        float alpha = group.alpha;
+        if (lastGroupAlpha <= 0f && alpha > 0f)
+        {
+            entranceTime = 0f;
+            SetMark(Mark.None);
+        }
+        lastGroupAlpha = alpha;
+
+        if (entranceTime < 0f)
+            return;
+
+        // Capped so a hitch as the minigame opens can't jump most of the entrance in one frame
+        entranceTime += Mathf.Min(Time.unscaledDeltaTime, 0.05f);
+
+        float k = entranceDuration > 0f ? Mathf.Clamp01(entranceTime / entranceDuration) : 1f;
+
+        // One motion: the slide and the fade share a clock and both ease out, so the card
+        // glides to a stop in its place just as it becomes fully solid. The slide eases a
+        // little harder than the fade, which keeps the fade visible through the whole move.
+        float slideEased = 1f - Mathf.Pow(1f - k, 3f);
+        float fadeEased = 1f - (1f - k) * (1f - k);
+
+        float width = rectTransform.rect.width;
+        rectTransform.anchoredPosition = restPosition + Vector2.left * (width * slideDistance * (1f - slideEased));
+
+        // The fade is the card's own, not the dimmer of it and the minigame's: every minigame
+        // fades the card up in 0.3s, straight after its panel fades in, which read as the card
+        // simply appearing
+        group.alpha = fadeEased;
+
+        if (k >= 1f)
+        {
+            rectTransform.anchoredPosition = restPosition;
+            group.alpha = 1f;
+            entranceTime = -1f;
+        }
     }
 
     /// <summary>
-    /// Ticks or clears the diamond. Public so a minigame can call it directly if it ever
+    /// Ticks or clears the objective. Public so a minigame can call it directly if it ever
     /// wants to, rather than waiting on its banner.
     /// </summary>
     public void SetChecked(bool value)
     {
-        isChecked = value;
+        SetMark(value ? Mark.Check : Mark.None);
+    }
 
-        if (diamond != null)
-        {
-            diamond.color = value ? doneColor : openColor;
-            diamond.rectTransform.localScale = Vector3.one;
-        }
+    /// <summary>Marks the objective with a red X: the minigame ran out of time.</summary>
+    public void SetFailed()
+    {
+        SetMark(Mark.Cross);
+    }
+
+    private void SetMark(Mark value)
+    {
+        mark = value;
 
         if (popRoutine != null)
         {
@@ -96,22 +186,57 @@ public class MinigameObjective : MonoBehaviour
             popRoutine = null;
         }
 
-        // Only the tick is worth a flourish; clearing happens off screen between runs
-        if (value && isActiveAndEnabled && diamond != null && popDuration > 0f)
-            popRoutine = StartCoroutine(Pop());
+        if (value == Mark.None)
+        {
+            if (markImage != null)
+                markImage.enabled = false;
+            return;
+        }
+
+        Image image = EnsureMarkImage();
+        if (image == null)
+            return;
+
+        image.sprite = value == Mark.Check ? checkSprite : crossSprite;
+        image.enabled = image.sprite != null;
+        image.rectTransform.localScale = Vector3.one;
+
+        if (isActiveAndEnabled && popDuration > 0f)
+            popRoutine = StartCoroutine(Pop(image.rectTransform));
     }
 
-    private IEnumerator Pop()
+    /// <summary>The mark sits centred on the diamond, drawn just above it.</summary>
+    private Image EnsureMarkImage()
     {
-        RectTransform rt = diamond.rectTransform;
+        if (markImage != null || diamond == null)
+            return markImage;
 
+        GameObject go = new GameObject("ResultMark", typeof(RectTransform));
+        go.layer = diamond.gameObject.layer;
+
+        RectTransform rt = (RectTransform)go.transform;
+        rt.SetParent(diamond.transform, false);
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = Vector2.zero;
+        rt.sizeDelta = diamond.rectTransform.rect.size * markSize;
+
+        markImage = go.AddComponent<Image>();
+        markImage.preserveAspect = true;
+        markImage.raycastTarget = false;
+        markImage.enabled = false;
+        return markImage;
+    }
+
+    private IEnumerator Pop(RectTransform rt)
+    {
         for (float t = 0f; t < popDuration; t += Time.unscaledDeltaTime)
         {
             float k = Mathf.Clamp01(t / popDuration);
 
-            // Out fast, back slowly, so the check lands rather than wobbles
+            // Out fast, back slowly, so the mark lands rather than wobbles
             float s = k < 0.35f
-                ? Mathf.Lerp(1f, popScale, k / 0.35f)
+                ? Mathf.Lerp(0.4f, popScale, k / 0.35f)
                 : Mathf.Lerp(popScale, 1f, (k - 0.35f) / 0.65f);
 
             rt.localScale = new Vector3(s, s, 1f);

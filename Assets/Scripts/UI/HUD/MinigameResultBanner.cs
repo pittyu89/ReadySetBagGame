@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// The banner across the middle of the screen when a minigame ends: the chibi over a dark
-/// strip, with COMPLETE! or TIMES UP! beneath her.
+/// grey strip (the same #2A2A2A as the objective tab), with COMPLETE! or TIMES UP! beneath her.
 ///
 /// One banner serves all twenty minigames. The quiz drives it, since the quiz is what
 /// already knows both endings: the objective card tells it when the player is done, and its

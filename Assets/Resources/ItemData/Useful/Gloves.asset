@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SupplyItem
   itemName: Gloves
   itemImage: {fileID: 21300000, guid: 08584e09394073f44a6babc69541be2c, type: 3}
-  gridWidth: 2
+  gridWidth: 1
   gridHeight: 2
   importance: 2
   weightKg: 0.1

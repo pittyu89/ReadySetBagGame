@@ -92,10 +92,6 @@ public class QuizManager : MonoBehaviour
     [SerializeField] private AudioClip minigameTickingSFX;
     [Tooltip("Seconds left on the minigame clock when the tick starts.")]
     [SerializeField] private float minigameTickingFrom = 5f;
-    [Tooltip("Music for while a minigame is up. The house music comes back afterwards from " +
-             "where it left off, and this track does the same the next time. Optional.")]
-    [SerializeField] private AudioClip minigameMusic;
-    [SerializeField] private float minigameMusicCrossfade = 0.8f;
 
     [Header("Timing")]
     [Tooltip("Seconds between characters while the question, and any feedback, types in. " +
@@ -802,8 +798,6 @@ public class QuizManager : MonoBehaviour
         if (!minigameRunning)
             yield break;
 
-        AudioClip musicBefore = StartMinigameMusic();
-
         // Every minigame panel carries the objective card, and the card knows when its
         // minigame has been seen through, so no minigame had to learn about the clock
         MinigameObjective objective = minigame != null
@@ -871,6 +865,9 @@ public class QuizManager : MonoBehaviour
                 minigameTimedOut = true;
                 HideMinigameClock();
 
+                if (objective != null)
+                    objective.SetFailed();
+
                 if (minigameResultBanner != null)
                     yield return StartCoroutine(minigameResultBanner.PlayTimesUp());
 
@@ -883,35 +880,6 @@ public class QuizManager : MonoBehaviour
 
         if (minigameResultBanner != null)
             minigameResultBanner.Hide();
-
-        EndMinigameMusic(musicBefore);
-    }
-
-    /// <summary>
-    /// Swaps to the minigame's track. Returns what was playing, for
-    /// <see cref="EndMinigameMusic"/> to bring back.
-    /// </summary>
-    private AudioClip StartMinigameMusic()
-    {
-        SoundManager sound = SoundManager.Instance;
-        if (minigameMusic == null || sound == null)
-            return null;
-
-        AudioClip before = sound.GetCurrentMusic();
-        sound.PlayMusic(minigameMusic, true, minigameMusicCrossfade, true);
-        return before;
-    }
-
-    private void EndMinigameMusic(AudioClip musicBefore)
-    {
-        SoundManager sound = SoundManager.Instance;
-        if (minigameMusic == null || sound == null)
-            return;
-
-        if (musicBefore != null && musicBefore != minigameMusic)
-            sound.PlayMusic(musicBefore, true, minigameMusicCrossfade, true);
-        else if (musicBefore == null)
-            sound.StopMusic();
     }
 
     /// <summary>
@@ -1059,8 +1027,6 @@ public class QuizManager : MonoBehaviour
             answerBox.ConsumeItem();
         }
 
-        SoundManager.Sfx(isCorrect ? correctSFX : wrongSFX);
-
         yield return new WaitForSecondsRealtime(preFeedbackDelay);
 
         // Freeze the quiz into a blurred still so the verdict is the only thing in focus.
@@ -1068,6 +1034,10 @@ public class QuizManager : MonoBehaviour
         // snapshot shows the answer the player just gave.
         if (feedbackScrim != null)
             yield return StartCoroutine(feedbackScrim.CaptureIncludingUIRoutine());
+
+        // The chime goes off as the verdict word pops onto the screen, not when the item is
+        // dropped: the scrim capture and pre-feedback pause sit between the two
+        SoundManager.Sfx(isCorrect ? correctSFX : wrongSFX);
 
         if (feedbackBanner != null)
             yield return StartCoroutine(feedbackBanner.Play(isCorrect));

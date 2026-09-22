@@ -3279,7 +3279,7 @@ MonoBehaviour:
     type: 2}
   mediumBagSprite: {fileID: 8078079355289906419, guid: 4ebf0f4cddb295444b9c26df2a88212a,
     type: 3}
-  bagWorldSize: 1
+  bagWorldSize: 1.2
   pickupAudio: {fileID: 8300000, guid: 42ac0ee4bce909941bdf32fb8a1ec36a, type: 3}
   femalePickupSprite: {fileID: 21300000, guid: a4830ca7c4b37904da800f9938dfa2bc, type: 3}
   malePickupSprite: {fileID: 21300000, guid: 257fbf7be8467c3458bf2fd25b85a052, type: 3}
@@ -4838,7 +4838,7 @@ MonoBehaviour:
   spawnPoint: {fileID: 238152795}
   existingPlayer: {fileID: 8832247729343632439}
   cinemachineCamera: {fileID: 275292616}
-  backgroundMusic: {fileID: 8300000, guid: 105d13f02ccab2f41a46ac0116829d8f, type: 3}
+  backgroundMusic: {fileID: 8300000, guid: b806e3f0c1762ed4e9ee46aabf3172f6, type: 3}
 --- !u!4 &178981105
 Transform:
   m_ObjectHideFlags: 0
@@ -7942,11 +7942,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 60612172794549368, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 105803340320038234, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_LocalRotation.w
@@ -8033,11 +8028,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 285048025614549769, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 291310699532795929, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
       value: 2
@@ -8182,11 +8172,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 630466034222235367, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 637720523994548365, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
@@ -8202,17 +8187,7 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 691550971414464625, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 691848592367239458, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 697040645921516012, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
@@ -8232,17 +8207,7 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 711005672534173440, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 713744869265375171, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 715044456238249167, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
       value: 2
@@ -8452,11 +8417,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1371719418372053253, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1389524497960471622, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -8557,11 +8517,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1588120925822081365, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 1599274258153101826, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
@@ -8622,11 +8577,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1733774723388572421, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1760700560097255662, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
@@ -8662,11 +8612,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 1819549972661909270, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1821161531708855878, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -8676,11 +8621,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1849809004895874497, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1866213956808650904, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
@@ -8728,11 +8668,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2051887311676115730, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2069682863388122193, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
@@ -8987,11 +8922,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 2642719761170811448, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2642926146868181878, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -9026,11 +8956,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2774265720470949387, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2784376469080708859, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
@@ -9247,11 +9172,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 3337515193165774030, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3341188084551798855, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -9286,16 +9206,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3437037921091385869, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3443284116620118485, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3459380030411168888, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
@@ -9492,11 +9402,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 3904948319899223633, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 3919754580017049268, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
@@ -9518,11 +9423,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3979739695631780695, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3983529138867250549, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
@@ -9568,11 +9468,6 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4105025080580505012, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4114262867829466913, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
@@ -9947,11 +9842,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 4919214170111288680, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4940062795969871327, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -10087,11 +9977,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 5193776237467617486, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5201193511041499900, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -10197,11 +10082,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 5486631822084683086, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 5494251929829022254, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
@@ -10247,11 +10127,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 5558722254357360523, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 5583181863783740913, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -10293,11 +10168,6 @@ PrefabInstance:
       value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 5658872924681795323, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5658885526157426305, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
@@ -10357,11 +10227,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 5799303692596419675, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 5799417093850851361, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -10382,22 +10247,12 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 5844823089457792236, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5865439385808295481, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5868485550182389535, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5895190636136284984, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
@@ -10522,11 +10377,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6131542402271443066, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6140980059614014292, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
@@ -10538,16 +10388,6 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6154841743175633389, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6156594047343988464, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6160656303155274206, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
       value: 2
@@ -10627,11 +10467,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 6364447669644055173, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 6377709704253921230, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -10678,11 +10513,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6474815228556396182, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6482874419837293113, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
@@ -10782,17 +10612,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6653468751924471368, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 6665391566250565053, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6711563899742050366, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
       value: 2
@@ -11027,11 +10847,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 7326999973070658172, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 7330217352873241068, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
@@ -11078,11 +10893,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7429243902317313507, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7432825690131280774, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
       value: 2
@@ -11297,11 +11107,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 7863101058805756058, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7869891194427015198, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -11323,11 +11128,6 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7905165008798236117, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7923982922819543919, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
       value: 2
@@ -11422,11 +11222,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 8127740796188330379, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8129468623342661296, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
@@ -11487,11 +11282,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 8245220470563160779, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 8267015862771323249, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -11538,11 +11328,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8421569775686950064, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_ReceiveGI
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8447126312900213742, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
       value: 2
@@ -11807,11 +11592,6 @@ PrefabInstance:
       propertyPath: m_ReceiveGI
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 9124511479398644341, guid: 3abad698c646a9a4aad77f5ee9a434bd,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 9131090483617779397, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_ReceiveGI
@@ -11866,7 +11646,7 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[2]'
       value: 
-      objectReference: {fileID: 2100000, guid: bdd2a8b4b5defca468629a27edbf8442, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 9178754501695220629, guid: 3abad698c646a9a4aad77f5ee9a434bd,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -13012,8 +12792,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa8e1bca3b75da04c933c796ffbbaf3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraOrbitController
-  pivotHeight: 1.1
-  distance: 4
+  pivotHeight: 1.375
+  distance: 4.6
   startYaw: 0
   startPitch: 14
   minPitch: -5
@@ -14803,11 +14583,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 1945516228}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 1437522159}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &328989762 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8464214984001809511, guid: 3abad698c646a9a4aad77f5ee9a434bd,
@@ -23978,8 +23761,6 @@ MonoBehaviour:
   minigameResultBanner: {fileID: 1975731949}
   minigameTickingSFX: {fileID: 8300000, guid: 30e9acd80be64a446af5a0b7dd6f3a98, type: 3}
   minigameTickingFrom: 5
-  minigameMusic: {fileID: 8300000, guid: b806e3f0c1762ed4e9ee46aabf3172f6, type: 3}
-  minigameMusicCrossfade: 0.8
   typewriterCharDelay: 0.015
   preFeedbackDelay: 0.3
   postFeedbackDelay: 0.35
@@ -24183,11 +23964,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 1967571828}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 1020308960}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &607255184
 GameObject:
   m_ObjectHideFlags: 0
@@ -28418,8 +28202,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -4}
-  m_SizeDelta: {x: 0, y: 290}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 310}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &717018598
 MonoBehaviour:
@@ -28434,7 +28218,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.55}
+  m_Color: {r: 0.16, g: 0.16, b: 0.16, a: 0.88}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -31654,11 +31438,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 1863525576}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 1934742852}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &787934694
 GameObject:
   m_ObjectHideFlags: 0
@@ -33751,11 +33538,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 772657176}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 1612878344}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &837856940
 GameObject:
   m_ObjectHideFlags: 0
@@ -34609,11 +34399,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 763607037}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 436693032}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &855106508
 GameObject:
   m_ObjectHideFlags: 0
@@ -36880,11 +36673,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 1119775876}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 393525780}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &920138918
 GameObject:
   m_ObjectHideFlags: 0
@@ -40819,11 +40615,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 2003494323}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 1359881406}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1024730213
 GameObject:
   m_ObjectHideFlags: 0
@@ -43095,11 +42894,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 1890043777817888559, guid: a46d62aa5eb818145bfc7f218891a5ff, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: a8b0ca4cd475f50428e067e65b72fbb7, type: 2}
-    count: 1
   - supplyItem: {fileID: 11400000, guid: ca43b3d47f9769b478d5f05fea541a88, type: 2}
     count: 3
   - supplyItem: {fileID: 11400000, guid: 4ee3b22f36a52494b8ae89245ed17d64, type: 2}
+    count: 1
+  - supplyItem: {fileID: 11400000, guid: a27cb8f9ca53c874791a887a42b01c0e, type: 2}
     count: 1
   extraParts: []
 --- !u!1 &1087685863
@@ -46827,9 +46626,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 5618743637708422069, guid: 6126e6d8f67ac9b4f8a5333ca483a4c2, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: 019ef6c0dac563346b71468d10b8676e, type: 2}
-    count: 1
-  - supplyItem: {fileID: 11400000, guid: 9459152fcfdd1e9459cef726c51af125, type: 2}
+  - supplyItem: {fileID: 11400000, guid: a8b0ca4cd475f50428e067e65b72fbb7, type: 2}
     count: 1
   extraParts: []
 --- !u!1 &1218836231
@@ -47124,11 +46921,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 1763765657}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 649638747}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1228276690
 GameObject:
   m_ObjectHideFlags: 0
@@ -47491,11 +47291,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 1466324701}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 419595128}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1233375391
 GameObject:
   m_ObjectHideFlags: 0
@@ -48026,11 +47829,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 1789902811}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 1462557993}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1252550047
 GameObject:
   m_ObjectHideFlags: 0
@@ -50183,11 +49989,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 57220329}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 1454373321}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1319885206
 GameObject:
   m_ObjectHideFlags: 0
@@ -51502,7 +51311,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 7158514907525454131, guid: e170d77d2d783de408dd0c4593fcd7ec, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: a27cb8f9ca53c874791a887a42b01c0e, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 019ef6c0dac563346b71468d10b8676e, type: 2}
+    count: 1
+  - supplyItem: {fileID: 11400000, guid: 9459152fcfdd1e9459cef726c51af125, type: 2}
     count: 1
   extraParts: []
 --- !u!1 &1359881406
@@ -51792,11 +51603,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 1300749810}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 924917389}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1385143425
 GameObject:
   m_ObjectHideFlags: 0
@@ -52645,11 +52459,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 821075181}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 585820043}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1413144756
 GameObject:
   m_ObjectHideFlags: 0
@@ -58325,11 +58142,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 1889742262}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 386414274}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1548072403
 GameObject:
   m_ObjectHideFlags: 0
@@ -61729,11 +61549,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 1582879620}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 636035695}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1660139422
 GameObject:
   m_ObjectHideFlags: 0
@@ -65455,11 +65278,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 845888714}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 69959838}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1738552260
 GameObject:
   m_ObjectHideFlags: 0
@@ -69572,11 +69398,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 552395748}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 2070043393}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1824007279
 GameObject:
   m_ObjectHideFlags: 0
@@ -72704,11 +72533,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 1327688090}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 1713839844}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1889742260
 GameObject:
   m_ObjectHideFlags: 0
@@ -75459,11 +75291,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 2076196324}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 1112669061}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &1945208320
 GameObject:
   m_ObjectHideFlags: 0
@@ -81798,11 +81633,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameObjective
   diamond: {fileID: 381901801}
-  openColor: {r: 1, g: 1, b: 1, a: 1}
-  doneColor: {r: 0.5882353, g: 0.6901961, b: 0, a: 1}
+  checkSprite: {fileID: 0}
+  crossSprite: {fileID: 0}
+  markSize: 1
   completedBanner: {fileID: 1457881354}
-  popScale: 1.35
+  popScale: 1.25
   popDuration: 0.35
+  slideDistance: 0.2
+  entranceDuration: 0.5
 --- !u!1 &2089441745
 GameObject:
   m_ObjectHideFlags: 0
