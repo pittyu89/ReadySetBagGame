@@ -319,7 +319,6 @@ public class QuizManager : MonoBehaviour
     private List<DrillScore.PackedItem> packedAtOpen = new List<DrillScore.PackedItem>();
     private float weightLimitAtOpen = 0f;
     private int essentialTargetAtOpen = 0;
-
     // True from the moment an item lands until the next question is ready for input.
     private bool isResolvingAnswer = false;
 
@@ -1347,6 +1346,10 @@ public class QuizManager : MonoBehaviour
         PlayerPrefs.SetInt("LastDrillScore", drill.FinalScore);
         PlayerPrefs.SetString("LastDrillBadge", drill.Badge);
         PlayerPrefs.Save();
+
+        // A good enough score opens the next difficulty. Before the results panel, so its
+        // NEXT DIFFICULTY button already knows.
+        DifficultyProgress.RecordScore(difficulty, drill.FinalScore);
 
         // Teacher sessions report the run to the dashboard (offline practice does nothing here)
         SessionResultUploader.Submit(drill, score, TotalQuestions, remainingTime, totalTime, difficulty);

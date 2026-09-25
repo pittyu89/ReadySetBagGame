@@ -24,8 +24,12 @@ using TMPro;
 /// random draw until the last box is ticked. With a pool of exactly six the choice of
 /// *which* six is forced, but the ordering is useful whatever the pool size.
 ///
+/// Below the questions sit the difficulty locks: tap Intermediate or Advanced to lock or
+/// unlock it for the current player, without having to earn the score first.
+///
 /// Nothing needs wiring up. The widget builds its own canvas and spawns itself after each
-/// scene load, showing only while a <see cref="QuizManager"/> is present. The choice is
+/// scene load, showing while a <see cref="QuizManager"/> or a <see cref="DifficultyPanel"/>
+/// is present; the question list only appears where there is a quiz. The choice is
 /// remembered in PlayerPrefs, so it survives entering and leaving play mode.
 /// </summary>
 public class QuizDebugPicker : MonoBehaviour
@@ -55,6 +59,16 @@ public class QuizDebugPicker : MonoBehaviour
     private readonly List<Image> optionBadges = new List<Image>();
     private readonly List<TextMeshProUGUI> optionBadgeLabels = new List<TextMeshProUGUI>();
     private readonly List<int> optionIndices = new List<int>();
+
+    // The question half of the menu, hidden in scenes without a quiz
+    private GameObject questionHeader;
+    private GameObject questionList;
+
+    // Difficulty lock rows: Intermediate, then Advanced
+    private static readonly string[] LockableDifficulties =
+        { DifficultyProgress.INTERMEDIATE, DifficultyProgress.ADVANCED };
+    private readonly Image[] lockBackgrounds = new Image[2];
+    private readonly TextMeshProUGUI[] lockLabels = new TextMeshProUGUI[2];
 
     /// <summary>
     /// Chosen questions, in the order they were clicked — which is the order the round asks
@@ -89,12 +103,14 @@ public class QuizDebugPicker : MonoBehaviour
     {
         BuildUI();
         SceneManager.sceneLoaded += OnSceneLoaded;
+        DifficultyProgress.Changed += RefreshLocks;
         Rebind();
     }
 
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        DifficultyProgress.Changed -= RefreshLocks;
         if (instance == this)
             instance = null;
     }
@@ -116,14 +132,23 @@ public class QuizDebugPicker : MonoBehaviour
         quiz = FindFirstObjectByType<QuizManager>(FindObjectsInactive.Include);
 
         bool hasQuiz = quiz != null;
-        canvas.gameObject.SetActive(hasQuiz);
+        bool hasDifficultyPanel = FindFirstObjectByType<DifficultyPanel>(FindObjectsInactive.Include) != null;
+        canvas.gameObject.SetActive(hasQuiz || hasDifficultyPanel);
+
+        CloseMenu();
+        questionHeader.SetActive(hasQuiz);
+        questionList.SetActive(hasQuiz);
+        footer.gameObject.SetActive(hasQuiz);
+        RefreshLocks();
 
         if (!hasQuiz)
+        {
+            buttonLabel.text = "LOCK";
             return;
+        }
 
         questionCount = quiz.GetAllQuestionsForDebug().Length;
 
-        CloseMenu();
         LoadSelection();
         BuildOptions();
         ApplySelection();
@@ -397,7 +422,64 @@ public class QuizDebugPicker : MonoBehaviour
         footer.color = new Color(1f, 1f, 1f, 0.45f);
         footerRT.gameObject.AddComponent<LayoutElement>().minHeight = 20f;
 
+        questionList = scrollRT.gameObject;
+
+        BuildLockSection();
+
         menu.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// A row per lockable difficulty. Tapping one flips it between locked and unlocked for
+    /// the current player; an open difficulty panel redraws straight away.
+    /// </summary>
+    private void BuildLockSection()
+    {
+        RectTransform titleRT = NewRect("LocksTitle", menu);
+        titleRT.gameObject.AddComponent<LayoutElement>().minHeight = 22f;
+        TextMeshProUGUI title = MakeText(titleRT, "DIFFICULTY LOCKS", 12f, TextAlignmentOptions.Left);
+        title.color = new Color(1f, 1f, 1f, 0.45f);
+
+        for (int i = 0; i < LockableDifficulties.Length; i++)
+        {
+            RectTransform rt = NewRect("Lock", menu);
+            rt.gameObject.AddComponent<LayoutElement>().minHeight = 30f;
+
+            Image bg = rt.gameObject.AddComponent<Image>();
+            bg.color = OptionColor;
+
+            Button btn = rt.gameObject.AddComponent<Button>();
+            btn.targetGraphic = bg;
+            string difficulty = LockableDifficulties[i];
+            btn.onClick.AddListener(delegate
+            {
+                DifficultyProgress.SetUnlocked(difficulty, !DifficultyProgress.IsUnlocked(difficulty));
+            });
+
+            RectTransform labelRT = NewRect("Label", rt);
+            Stretch(labelRT);
+            labelRT.offsetMin = new Vector2(10f, 0f);
+            labelRT.offsetMax = new Vector2(-10f, 0f);
+
+            lockBackgrounds[i] = bg;
+            lockLabels[i] = MakeText(labelRT, "", 15f, TextAlignmentOptions.Left);
+        }
+    }
+
+    private void RefreshLocks()
+    {
+        for (int i = 0; i < LockableDifficulties.Length; i++)
+        {
+            if (lockLabels[i] == null)
+                continue;
+
+            string difficulty = LockableDifficulties[i];
+            bool unlocked = DifficultyProgress.IsUnlocked(difficulty);
+            string name = char.ToUpperInvariant(difficulty[0]) + difficulty.Substring(1);
+
+            lockLabels[i].text = name + (unlocked ? " · UNLOCKED" : " · LOCKED");
+            lockBackgrounds[i].color = unlocked ? SelectedColor : OptionColor;
+        }
     }
 
     /// <summary>
@@ -407,6 +489,7 @@ public class QuizDebugPicker : MonoBehaviour
     {
         RectTransform row = NewRect("Header", menu);
         row.gameObject.AddComponent<LayoutElement>().minHeight = 22f;
+        questionHeader = row.gameObject;
 
         RectTransform titleRT = NewRect("Title", row);
         Stretch(titleRT);
@@ -556,11 +639,20 @@ public class QuizDebugPicker : MonoBehaviour
         // Behind the widget, so the widget still takes its own clicks
         blocker.transform.SetSiblingIndex(0);
 
+        RefreshLocks();
+
         // Measured here rather than in BuildOptions: the rows are built while the menu is
         // still switched off, and a layout rebuild on an inactive hierarchy reports zero,
         // which collapsed the list to nothing.
-        ResizeList();
-        RefreshRows();
+        if (quiz != null)
+        {
+            ResizeList();
+            RefreshRows();
+        }
+        else
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(menu);
+        }
     }
 
     private void CloseMenu()

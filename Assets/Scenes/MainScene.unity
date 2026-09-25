@@ -1807,9 +1807,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 203559354}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 177.29999, y: -125}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 255, y: 206}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &278902838
@@ -3202,9 +3202,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1233528374}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 34, y: -30.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 58, y: 61}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &535613760
@@ -4298,6 +4298,9 @@ MonoBehaviour:
   selectDuration: 0.28
   textFadeDuration: 0.14
   textRise: 14
+  startButton: {fileID: 1388494777}
+  lockedStartText: LOCKED
+  lockedLabelAlpha: 0.4
   bagLeftButton: {fileID: 1154329373}
   bagRightButton: {fileID: 798907124}
   bagImage: {fileID: 719434377}
@@ -4308,8 +4311,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 213214f188620744d82a3c01f1a88df0, type: 3}
   bagNames:
   - Standard Bag
-  - Small Bag
-  - Medium Bag
+  - Roll-Top Waterproof Pack
+  - Modular Tactical Duffel
   bagSwapDuration: 0.45
   bagSlideDistance: 110
   bagMinScale: 0.55
@@ -6903,9 +6906,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 203559354}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 177.29999, y: -468}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 240, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1013491921
@@ -8202,9 +8205,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 203559354}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 177.29999, y: -284}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 280, y: 96}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1162822849
@@ -8495,9 +8498,9 @@ RectTransform:
   - {fileID: 1291006582}
   m_Father: {fileID: 203559354}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 177.29999, y: -634.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 136, y: 61}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1233528375
@@ -8770,9 +8773,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1233528374}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 102, y: -30.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 58, y: 61}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1291006583
@@ -9797,9 +9800,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 203559354}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 177.29999, y: -380}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 240, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1505288523
@@ -10513,9 +10516,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 203559354}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 177.29999, y: -556}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 240, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1689981746

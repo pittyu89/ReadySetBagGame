@@ -26,6 +26,13 @@ public class DifficultyPanel : MonoBehaviour
     [Tooltip("How far the new title and description rise as they fade in.")]
     [SerializeField] private float textRise = 14f;
 
+    [Header("Locked Difficulties")]
+    [Tooltip("Disabled, and relabelled, while a locked difficulty is selected.")]
+    [SerializeField] private Button startButton;
+    [SerializeField] private string lockedStartText = "LOCKED";
+    [Tooltip("Opacity of a locked difficulty's bar label.")]
+    [SerializeField, Range(0f, 1f)] private float lockedLabelAlpha = 0.4f;
+
     [Header("Go-Bag")]
     [SerializeField] private Button bagLeftButton;
     [SerializeField] private Button bagRightButton;
@@ -84,6 +91,10 @@ public class DifficultyPanel : MonoBehaviour
     private Coroutine selectAnimation;
     private Coroutine textAnimation;
 
+    private TextMeshProUGUI[] difficultyLabels;
+    private TextMeshProUGUI startLabel;
+    private string startText;
+
     private readonly string[] difficultyNames = { "Beginner", "Intermediate", "Advanced" };
     private readonly string[] difficultyKeys = { "beginner", "intermediate", "advanced" };
     private readonly string[] difficultyDescriptions =
@@ -107,14 +118,23 @@ public class DifficultyPanel : MonoBehaviour
             panelGroup = gameObject.AddComponent<CanvasGroup>();
 
         difficultyButtonHomes = new Vector2[difficultyButtons.Length];
+        difficultyLabels = new TextMeshProUGUI[difficultyButtons.Length];
         for (int i = 0; i < difficultyButtons.Length; i++)
         {
             int index = i;
             if (difficultyButtons[i] != null)
             {
                 difficultyButtonHomes[i] = ((RectTransform)difficultyButtons[i].transform).anchoredPosition;
+                difficultyLabels[i] = difficultyButtons[i].GetComponentInChildren<TextMeshProUGUI>(true);
                 difficultyButtons[i].onClick.AddListener(() => SelectDifficulty(index));
             }
+        }
+
+        if (startButton != null)
+        {
+            startLabel = startButton.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (startLabel != null)
+                startText = startLabel.text;
         }
 
         if (difficultyTitle != null)
@@ -152,11 +172,15 @@ public class DifficultyPanel : MonoBehaviour
         SnapDifficultyVisuals();
         UpdateBagDisplay();
 
+        DifficultyProgress.Changed += OnLocksChanged;
+
         transition = StartCoroutine(PlayIntro());
     }
 
     void OnDisable()
     {
+        DifficultyProgress.Changed -= OnLocksChanged;
+
         transition = null;
 
         // Coroutines die with the panel - don't leave a half-slid bar or faded text behind
@@ -287,9 +311,47 @@ public class DifficultyPanel : MonoBehaviour
     {
         SnapDifficultyBars();
 
-        if (difficultyTitle != null) difficultyTitle.text = difficultyNames[currentDifficultyIndex];
-        if (difficultyDescription != null) difficultyDescription.text = difficultyDescriptions[currentDifficultyIndex];
+        if (difficultyTitle != null) difficultyTitle.text = TitleFor(currentDifficultyIndex);
+        if (difficultyDescription != null) difficultyDescription.text = DescriptionFor(currentDifficultyIndex);
         SetDifficultyTextAlpha(1f, 0f);
+    }
+
+    // ---- Locks ----
+
+    private bool IsLocked(int index) => !DifficultyProgress.IsUnlocked(difficultyKeys[index]);
+
+    private string TitleFor(int index) =>
+        IsLocked(index) ? difficultyNames[index] + " (Locked)" : difficultyNames[index];
+
+    // A locked difficulty says what opens it instead of what it's like
+    private string DescriptionFor(int index) =>
+        IsLocked(index) ? DifficultyProgress.Requirement(difficultyKeys[index]) : difficultyDescriptions[index];
+
+    /// <summary>
+    /// Dims the labels of locked difficulties and holds START while one is selected. A locked
+    /// bar can still be picked, so the player can watch its preview and read what opens it.
+    /// </summary>
+    private void ApplyLocks()
+    {
+        for (int i = 0; i < difficultyLabels.Length; i++)
+        {
+            if (difficultyLabels[i] != null)
+                difficultyLabels[i].alpha = IsLocked(i) ? lockedLabelAlpha : 1f;
+        }
+
+        bool locked = IsLocked(currentDifficultyIndex);
+        if (startButton != null)
+            startButton.interactable = !locked;
+        if (startLabel != null)
+            startLabel.text = locked ? lockedStartText : startText;
+    }
+
+    /// <summary>The debug picker can lock or unlock a difficulty while this panel is open.</summary>
+    private void OnLocksChanged()
+    {
+        ApplyLocks();
+        if (textAnimation == null)
+            SnapDifficultyVisuals();
     }
 
     private void SnapDifficultyBars()
@@ -422,16 +484,18 @@ public class DifficultyPanel : MonoBehaviour
             if (textAnimation != null)
                 StopCoroutine(textAnimation);
             textAnimation = StartCoroutine(AnimateDifficultyText(
-                difficultyNames[currentDifficultyIndex], difficultyDescriptions[currentDifficultyIndex]));
+                TitleFor(currentDifficultyIndex), DescriptionFor(currentDifficultyIndex)));
         }
         else
         {
             if (difficultyTitle != null)
-                difficultyTitle.text = difficultyNames[currentDifficultyIndex];
+                difficultyTitle.text = TitleFor(currentDifficultyIndex);
 
             if (difficultyDescription != null)
-                difficultyDescription.text = difficultyDescriptions[currentDifficultyIndex];
+                difficultyDescription.text = DescriptionFor(currentDifficultyIndex);
         }
+
+        ApplyLocks();
 
         // Play the preview video through VideoManager
         if (VideoManager.Instance != null)

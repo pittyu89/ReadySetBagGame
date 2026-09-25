@@ -26,6 +26,8 @@ public class ResultsPanel : MonoBehaviour
         public TextMeshProUGUI scoreText;
         public TextMeshProUGUI timeText;
         public TextMeshProUGUI difficultyText;
+        [Tooltip("Where the score came from, part by part. Optional.")]
+        public ScoreBreakdownView breakdown;
         public Button tryAgainButton;
         public Button nextDifficultyButton;
         public Button menuButton;
@@ -140,10 +142,16 @@ public class ResultsPanel : MonoBehaviour
         SetText(view.timeText, FormatTime(remainingTime, true));
         SetText(view.difficultyText, difficultyKey.ToUpperInvariant());
 
+        if (view.breakdown != null)
+            view.breakdown.Show(drill, remainingTime);
+
         // A teacher session is one run per student, so only MENU is offered there.
-        // NEXT DIFFICULTY has nowhere to go after Advanced.
+        // NEXT DIFFICULTY has nowhere to go after Advanced, and stays hidden until the next
+        // difficulty has been unlocked.
+        string next = NextDifficulty();
         SetButtonVisible(view.tryAgainButton, !isTeacherSession);
-        SetButtonVisible(view.nextDifficultyButton, !isTeacherSession && NextDifficulty() != null);
+        SetButtonVisible(view.nextDifficultyButton,
+            !isTeacherSession && next != null && DifficultyProgress.IsUnlocked(next));
         SetButtonVisible(view.menuButton, true);
 
         if (isTeacherSession)
@@ -415,7 +423,7 @@ public class ResultsPanel : MonoBehaviour
     private void OnNextDifficultyClicked()
     {
         string next = NextDifficulty();
-        if (next == null)
+        if (next == null || !DifficultyProgress.IsUnlocked(next))
             return;
 
         // GameDifficultyApplier reads this when the scene loads; the go-bag choice carries over

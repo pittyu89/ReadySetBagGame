@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// The Medium Bag (yellow) in the inventory panel. Tapping a part of the bag opens it:
+/// The Medium Bag (yellow, shown to players as the Modular Tactical Duffel) in the inventory panel. Tapping a part of the bag opens it:
 ///  - the side pockets: two normal grids, one each side of the bag
 ///  - the middle pocket: a normal grid over the bag's front
 ///  - the top: a row of three single-item slots (a BagItemCarousel), shuffled on opening and

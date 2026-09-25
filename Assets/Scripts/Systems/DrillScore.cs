@@ -89,6 +89,10 @@ public static class DrillScore
         public int Deductions;          // points lost inside S_pack
         public bool SpeedGatePassed;
 
+        public int QuestionsAsked;      // N
+        public int CorrectAnswers;      // sum of C_match
+        public int TasksCompleted;      // sum of M_task
+
         public int FinalScore;          // 0-100
         public string Badge;            // set by FinalScore alone
     }
@@ -200,6 +204,9 @@ public static class DrillScore
         // ---- 2. S_quiz and S_task ----
         // Scored apart rather than blended: naming the right item and doing the practical
         // task are two different things to learn, and the results panel shows each on its own.
+        r.QuestionsAsked = questionsAsked;
+        r.CorrectAnswers = correctAnswers;
+        r.TasksCompleted = tasksCompleted;
         if (questionsAsked > 0)
         {
             r.QuizPercent = Mathf.Clamp01(correctAnswers / (float)questionsAsked);
@@ -239,6 +246,46 @@ public static class DrillScore
             r.Badge = "Associative (Proficient)";
         else
             r.Badge = "Cognitive (Needs Support)";
+    }
+
+    /// <summary>
+    /// The four component points as whole numbers that add up to <see cref="Result.FinalScore"/>.
+    /// Rounding each one on its own can leave the parts a point off the total, and a student
+    /// adding them up would rightly ask where it went; the leftover goes to the parts that
+    /// were closest to rounding up.
+    /// </summary>
+    public static int[] WholePoints(Result r)
+    {
+        float[] exact = { r.PackingPoints, r.QuizPoints, r.TaskPoints, r.TimePoints };
+        float[] max = { PACKING_WEIGHT, QUIZ_WEIGHT, TASK_WEIGHT, TIME_WEIGHT };
+        int[] whole = new int[exact.Length];
+
+        int sum = 0;
+        for (int i = 0; i < exact.Length; i++)
+        {
+            whole[i] = Mathf.FloorToInt(exact[i] + 0.0001f);
+            sum += whole[i];
+        }
+
+        for (int left = r.FinalScore - sum; left > 0; left--)
+        {
+            int best = -1;
+            float bestFraction = -1f;
+            for (int i = 0; i < exact.Length; i++)
+            {
+                float fraction = exact[i] - whole[i];
+                if (whole[i] < max[i] && fraction > bestFraction)
+                {
+                    best = i;
+                    bestFraction = fraction;
+                }
+            }
+
+            if (best < 0)
+                break;
+            whole[best]++;
+        }
+        return whole;
     }
 
     /// <summary>

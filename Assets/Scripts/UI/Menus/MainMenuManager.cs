@@ -523,6 +523,10 @@ public class MainMenuManager : MonoBehaviour
 
     private void StartGame()
     {
+        // The difficulty panel disables START on a locked difficulty; this is the backstop
+        if (!DifficultyProgress.IsUnlocked(PlayerPrefs.GetString("SessionDifficulty", "beginner")))
+            return;
+
         // Clear SessionCode for offline mode (don't treat it as a teacher session)
         PlayerPrefs.DeleteKey("SessionCode");
         PlayerPrefs.Save();

@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// The Small Bag (blue) in the inventory panel: a single slot that shows one packed item at a
+/// The Small Bag (blue, shown to players as the Roll-Top Waterproof Pack) in the inventory panel: a single slot that shows one packed item at a
 /// time. This handles opening and closing the bag; the slot, arrows, shuffling and drag-and-drop
 /// are the BagItemCarousel's job. The contents are shuffled every time the bag is opened and
 /// whenever a storage is opened next to it.
