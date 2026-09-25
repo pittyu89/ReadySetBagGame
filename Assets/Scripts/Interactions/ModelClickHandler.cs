@@ -84,15 +84,19 @@ public class ModelClickHandler : MonoBehaviour
 
     private void HandleTouchClick(Vector2 clickPosition)
     {
+        Ray ray = mainCamera.ScreenPointToRay(clickPosition);
+        RaycastHit hit;
+
+        // Create a layer mask that ignores the "Wall" and "Sphere" layers
+        int layerMask = ~(LayerMask.GetMask("Wall") | LayerMask.GetMask("Sphere"));
+
+        // The cat can be clicked any time, bag or not
+        if (CatWander.TryClick(ray, layerMask))
+            return;
+
         // Can't click models until gobag is picked up
         if (!GoBagPickup.IsBagPickedUp())
             return;
-
-        Ray ray = mainCamera.ScreenPointToRay(clickPosition);
-        RaycastHit hit;
-        
-        // Create a layer mask that ignores the "Wall" and "Sphere" layers
-        int layerMask = ~(LayerMask.GetMask("Wall") | LayerMask.GetMask("Sphere"));
 
         // Raycast and check if the hit object is storage furniture
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))

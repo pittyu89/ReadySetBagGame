@@ -46,6 +46,13 @@ public class CatWander : MonoBehaviour
     [SerializeField] private float meowRange = 4f;
     [Tooltip("Seconds between meows, picked at random within this range.")]
     [SerializeField] private Vector2 meowInterval = new Vector2(8f, 20f);
+    [Tooltip("How far away a meow is still heard. Clicking the cat meows at any distance, " +
+             "so this is kept well past the proximity meow's range.")]
+    [SerializeField] private float meowHearingDistance = 15f;
+
+    // Every cat in the scene, so a click can be tested against their sprites
+    private static readonly System.Collections.Generic.List<CatWander> cats =
+        new System.Collections.Generic.List<CatWander>();
 
     private CharacterController controller;
     private Transform cameraTransform;
@@ -81,7 +88,7 @@ public class CatWander : MonoBehaviour
         meowSource.spatialBlend = 1f;
         meowSource.rolloffMode = AudioRolloffMode.Linear;
         meowSource.minDistance = 1f;
-        meowSource.maxDistance = meowRange * 2f;
+        meowSource.maxDistance = meowHearingDistance;
 
         if (SoundManager.Instance != null)
             SoundManager.Instance.RegisterSFXSource(meowSource);
@@ -252,14 +259,73 @@ public class CatWander : MonoBehaviour
         }
 
         if ((player.position - transform.position).sqrMagnitude <= meowRange * meowRange)
+            Meow();
+    }
+
+    private void Meow()
+    {
+        meowSource.pitch = Random.Range(0.92f, 1.08f);
+        meowSource.PlayOneShot(meowClip);
+    }
+
+    /// <summary>
+    /// Called by <see cref="ModelClickHandler"/> for every tap. If the tap lands on a cat's
+    /// sprite, and nothing solid is in front of it, that cat stops, sits and meows.
+    /// Returns true when a cat took the tap, so the click goes no further.
+    /// </summary>
+    public static bool TryClick(Ray ray, int occluderMask)
+    {
+        CatWander closest = null;
+        float closestDistance = float.MaxValue;
+
+        foreach (CatWander cat in cats)
         {
-            meowSource.pitch = Random.Range(0.92f, 1.08f);
-            meowSource.PlayOneShot(meowClip);
+            if (cat.spriteRenderer == null || !cat.spriteRenderer.isVisible)
+                continue;
+
+            // The sprite, not the collider: the collider only covers the cat's lower body
+            if (cat.spriteRenderer.bounds.IntersectRay(ray, out float distance) && distance < closestDistance)
+            {
+                closest = cat;
+                closestDistance = distance;
+            }
         }
+
+        if (closest == null)
+            return false;
+
+        // A wall or piece of furniture between the camera and the cat takes the tap instead.
+        // The cat's own layer is left out so its collider doesn't count as blocking it.
+        int mask = occluderMask & ~(1 << closest.gameObject.layer);
+        if (Physics.Raycast(ray, out RaycastHit hit, closestDistance, mask, QueryTriggerInteraction.Ignore))
+            return false;
+
+        closest.OnClicked();
+        return true;
+    }
+
+    private void OnClicked()
+    {
+        // Don't stack meows on a cat that is still mid-meow
+        if (meowClip == null || meowSource.isPlaying)
+            return;
+
+        Meow();
+        Sit();
+
+        // Clicking just made it meow; hold off the next unprompted one
+        meowTimer = Random.Range(meowInterval.x, meowInterval.y);
+    }
+
+    private void OnEnable()
+    {
+        cats.Add(this);
     }
 
     private void OnDisable()
     {
+        cats.Remove(this);
+
         if (meowSource != null)
             meowSource.Stop();
     }
