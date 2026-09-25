@@ -30,8 +30,8 @@ public class DifficultyPanel : MonoBehaviour
     [Tooltip("Disabled, and relabelled, while a locked difficulty is selected.")]
     [SerializeField] private Button startButton;
     [SerializeField] private string lockedStartText = "LOCKED";
-    [Tooltip("Opacity of a locked difficulty's bar label.")]
-    [SerializeField, Range(0f, 1f)] private float lockedLabelAlpha = 0.4f;
+    [Tooltip("The shade and lock over the preview video, shown while a locked difficulty is selected.")]
+    [SerializeField] private DifficultyLockOverlay previewLock;
 
     [Header("Go-Bag")]
     [SerializeField] private Button bagLeftButton;
@@ -91,7 +91,6 @@ public class DifficultyPanel : MonoBehaviour
     private Coroutine selectAnimation;
     private Coroutine textAnimation;
 
-    private TextMeshProUGUI[] difficultyLabels;
     private TextMeshProUGUI startLabel;
     private string startText;
 
@@ -118,14 +117,12 @@ public class DifficultyPanel : MonoBehaviour
             panelGroup = gameObject.AddComponent<CanvasGroup>();
 
         difficultyButtonHomes = new Vector2[difficultyButtons.Length];
-        difficultyLabels = new TextMeshProUGUI[difficultyButtons.Length];
         for (int i = 0; i < difficultyButtons.Length; i++)
         {
             int index = i;
             if (difficultyButtons[i] != null)
             {
                 difficultyButtonHomes[i] = ((RectTransform)difficultyButtons[i].transform).anchoredPosition;
-                difficultyLabels[i] = difficultyButtons[i].GetComponentInChildren<TextMeshProUGUI>(true);
                 difficultyButtons[i].onClick.AddListener(() => SelectDifficulty(index));
             }
         }
@@ -172,6 +169,8 @@ public class DifficultyPanel : MonoBehaviour
         SnapDifficultyVisuals();
         UpdateBagDisplay();
 
+        UpdatePreviewLock();
+
         DifficultyProgress.Changed += OnLocksChanged;
 
         transition = StartCoroutine(PlayIntro());
@@ -215,10 +214,16 @@ public class DifficultyPanel : MonoBehaviour
     private void SelectDifficulty(int index)
     {
         if (index == currentDifficultyIndex)
+        {
+            // Tapping the locked difficulty already on show just shakes its lock again
+            if (IsLocked(index) && previewLock != null)
+                previewLock.Rattle();
             return;
+        }
 
         currentDifficultyIndex = index;
         UpdateDifficultyDisplay(animateText: isActiveAndEnabled);
+        UpdatePreviewLock(rattle: true);
 
         if (!isActiveAndEnabled)
         {
@@ -328,17 +333,11 @@ public class DifficultyPanel : MonoBehaviour
         IsLocked(index) ? DifficultyProgress.Requirement(difficultyKeys[index]) : difficultyDescriptions[index];
 
     /// <summary>
-    /// Dims the labels of locked difficulties and holds START while one is selected. A locked
-    /// bar can still be picked, so the player can watch its preview and read what opens it.
+    /// Holds START while a locked difficulty is selected. A locked bar can still be picked,
+    /// so the player can watch its preview and read what opens it; its overlay says the rest.
     /// </summary>
     private void ApplyLocks()
     {
-        for (int i = 0; i < difficultyLabels.Length; i++)
-        {
-            if (difficultyLabels[i] != null)
-                difficultyLabels[i].alpha = IsLocked(i) ? lockedLabelAlpha : 1f;
-        }
-
         bool locked = IsLocked(currentDifficultyIndex);
         if (startButton != null)
             startButton.interactable = !locked;
@@ -346,12 +345,47 @@ public class DifficultyPanel : MonoBehaviour
             startLabel.text = locked ? lockedStartText : startText;
     }
 
-    /// <summary>The debug picker can lock or unlock a difficulty while this panel is open.</summary>
+    /// <summary>
+    /// Puts the preview video's lock in step with the selected difficulty. Locked: shaded and
+    /// locked, and the lock shakes if it was just tapped. Unlocked since the player last saw
+    /// it: shown locked, then broken open. Otherwise nothing covers the video.
+    /// </summary>
+    private void UpdatePreviewLock(bool rattle = false)
+    {
+        if (previewLock == null)
+            return;
+
+        string key = difficultyKeys[currentDifficultyIndex];
+
+        if (IsLocked(currentDifficultyIndex))
+        {
+            previewLock.ShowLocked();
+            if (rattle)
+                previewLock.Rattle();
+        }
+        else if (!DifficultyProgress.IsUnlockSeen(key) && currentDifficultyIndex > 0)
+        {
+            DifficultyProgress.MarkUnlockSeen(key);
+            previewLock.Unlock();
+        }
+        else if (!previewLock.IsUnlocking)
+        {
+            // Left alone mid-unlock, so the chains finish breaking
+            previewLock.Hide();
+        }
+    }
+
+    /// <summary>
+    /// The debug picker can lock or unlock a difficulty while this panel is open. The lock on
+    /// the video breaks open there and then if its difficulty is the one on show.
+    /// </summary>
     private void OnLocksChanged()
     {
         ApplyLocks();
         if (textAnimation == null)
             SnapDifficultyVisuals();
+
+        UpdatePreviewLock();
     }
 
     private void SnapDifficultyBars()

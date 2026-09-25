@@ -19,6 +19,8 @@ public static class DifficultyProgress
     public const int ADVANCED_UNLOCK_SCORE = 85;
 
     private const string UNLOCKED_SUFFIX = "_DifficultyUnlocked_";
+    // Unlocks the player has already watched open on the difficulty panel
+    private const string SEEN_SUFFIX = "_DifficultyUnlockSeen_";
 
     /// <summary>Raised whenever a difficulty is locked or unlocked, so open menus can redraw.</summary>
     public static event System.Action Changed;
@@ -86,7 +88,22 @@ public static class DifficultyProgress
             return;
 
         PlayerPrefs.SetInt(UserKey + UNLOCKED_SUFFIX + key, unlocked ? 1 : 0);
+
+        // Locking it again means the unlock is worth showing again when it's next earned
+        if (!unlocked)
+            PlayerPrefs.DeleteKey(UserKey + SEEN_SUFFIX + key);
+
         PlayerPrefs.Save();
         Changed?.Invoke();
+    }
+
+    /// <summary>True once the unlock animation for <paramref name="difficulty"/> has played.</summary>
+    public static bool IsUnlockSeen(string difficulty) =>
+        PlayerPrefs.GetInt(UserKey + SEEN_SUFFIX + (difficulty ?? "").ToLowerInvariant(), 0) == 1;
+
+    public static void MarkUnlockSeen(string difficulty)
+    {
+        PlayerPrefs.SetInt(UserKey + SEEN_SUFFIX + (difficulty ?? "").ToLowerInvariant(), 1);
+        PlayerPrefs.Save();
     }
 }
