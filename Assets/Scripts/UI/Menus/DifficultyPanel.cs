@@ -89,7 +89,7 @@ public class DifficultyPanel : MonoBehaviour
     private readonly string[] difficultyDescriptions =
     {
         "A relaxed run with a 10-minute timer and a 5kg weight limit, perfect for taking your time to learn item locations and master the basics.",
-        "Unlocks new areas to explore, featuring an 8-minute timer and a 5kg weight limit for a tighter resource management challenge.",
+        "Unlocks new areas to explore, featuring an 8-minute timer and a 5kg weight limit, with supplies shuffled to new spots every run.",
         "Unlocks all areas with a fast 6-minute countdown and a 5kg weight limit, demanding precise routing and expert packing choices."
     };
 

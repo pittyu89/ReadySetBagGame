@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 1
   importance: 0
   weightKg: 0.05
-  description: Helps with navigation if landmarks are destroyed.
+  description: Helps with direction, but only if you already know the way. A drawn map of your route is more useful.
   essentialRank: 0

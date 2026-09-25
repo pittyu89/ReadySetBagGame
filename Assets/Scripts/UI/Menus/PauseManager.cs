@@ -25,10 +25,15 @@ public class PauseManager : MonoBehaviour
     private GameTimer timerScript;
     private bool isPaused = false;
 
+    // Whether the round clock was counting when the game was paused. Continue only restarts
+    // it if so: pausing before the round starts, or once the quiz has stopped the clock,
+    // must not set it going again.
+    private bool timerWasRunning = false;
+
     private void Start()
     {
         // Find the Timer script
-        timerScript = FindObjectOfType<GameTimer>();
+        timerScript = FindFirstObjectByType<GameTimer>();
 
         // Setup pause button
         if (pauseButton != null)
@@ -95,7 +100,8 @@ public class PauseManager : MonoBehaviour
         if (!IsTeacherSession())
         {
             // Pause timer BEFORE setting timeScale to 0
-            if (timerScript != null)
+            timerWasRunning = timerScript != null && timerScript.IsRunning;
+            if (timerWasRunning)
             {
                 timerScript.PauseTimer();
             }
@@ -118,10 +124,11 @@ public class PauseManager : MonoBehaviour
         if (!IsTeacherSession())
         {
             Time.timeScale = 1f;
-            if (timerScript != null)
+            if (timerWasRunning && timerScript != null)
             {
                 timerScript.ResumeTimer();
             }
+            timerWasRunning = false;
         }
     }
 

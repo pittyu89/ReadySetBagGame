@@ -216,7 +216,7 @@ public class BlobShadow : MonoBehaviour
         Light best = null;
         float bestIntensity = -1f;
 
-        foreach (Light light in FindObjectsOfType<Light>())
+        foreach (Light light in FindObjectsByType<Light>(FindObjectsSortMode.None))
         {
             if (light.type != LightType.Directional || !light.isActiveAndEnabled)
                 continue;

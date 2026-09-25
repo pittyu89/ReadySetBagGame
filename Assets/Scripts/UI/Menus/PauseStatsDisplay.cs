@@ -38,7 +38,7 @@ public class PauseStatsDisplay : MonoBehaviour
     private void Start()
     {
         // Find Timer and InventoryManager
-        timerScript = FindObjectOfType<GameTimer>();
+        timerScript = FindFirstObjectByType<GameTimer>();
         inventoryManager = InventoryManager.Instance;
 
         // Get Image component from progressFillBar if not already assigned

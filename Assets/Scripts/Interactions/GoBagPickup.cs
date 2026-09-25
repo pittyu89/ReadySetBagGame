@@ -246,14 +246,14 @@ public class GoBagPickup : MonoBehaviour
             movement.SetMovementEnabled(true);
 
         // Start the timer
-        GameTimer timer = FindObjectOfType<GameTimer>();
+        GameTimer timer = FindFirstObjectByType<GameTimer>();
         if (timer != null)
         {
             timer.StartTimer();
         }
 
         // Show the bag button
-        InventoryPanel handler = FindObjectOfType<InventoryPanel>();
+        InventoryPanel handler = FindFirstObjectByType<InventoryPanel>();
         if (handler != null)
             handler.ShowBagButton();
 

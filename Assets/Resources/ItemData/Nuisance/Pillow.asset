@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 3
   importance: 0
   weightKg: 0.15
-  description: Provides comfort during extended shelter stays.
+  description: Comfortable, but big and bulky. A thermal blanket keeps you warmer for the space it takes.
   essentialRank: 0

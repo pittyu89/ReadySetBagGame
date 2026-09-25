@@ -27,12 +27,12 @@ public class ModelClickHandler : MonoBehaviour
             mainCamera = Camera.main;
 
         // Find the InventoryPanel in the scene
-        inventoryPanelHandler = FindObjectOfType<InventoryPanel>();
+        inventoryPanelHandler = FindFirstObjectByType<InventoryPanel>();
 
         // Players could not tell which props were clickable, so props advertise themselves.
         // Created here rather than required in the scene, so GameScene needs no extra setup;
         // add the component manually to tune its colours and ranges.
-        if (FindObjectOfType<ClickableHighlightManager>() == null)
+        if (FindFirstObjectByType<ClickableHighlightManager>() == null)
             gameObject.AddComponent<ClickableHighlightManager>();
     }
 
@@ -132,7 +132,7 @@ public class ModelClickHandler : MonoBehaviour
         }
 
         // Try to find by PlayerController component
-        PlayerController playerMovement = FindObjectOfType<PlayerController>();
+        PlayerController playerMovement = FindFirstObjectByType<PlayerController>();
         if (playerMovement != null)
         {
             playerTransform = playerMovement.transform;

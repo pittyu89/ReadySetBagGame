@@ -47,7 +47,7 @@ public class PenAndPaperMinigame : MonoBehaviour
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
     [SerializeField, TextArea] private string instructionText =
-        "Draw a way to the green field to reach the evacuation area on the paper";
+        "Draw a path on the paper to the evacuation area in the green field";
 
     [Header("Map")]
     [Tooltip("The map. Its pixels are what say where the roads, the field and the house are, " +

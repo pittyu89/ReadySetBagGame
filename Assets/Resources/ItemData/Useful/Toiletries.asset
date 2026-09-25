@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 2
   importance: 2
   weightKg: 0.15
-  description: Stores essential cleaning and hygiene supplies.
+  description: Soap, toothbrush and other hygiene supplies that help prevent illness in crowded shelters.
   essentialRank: 19

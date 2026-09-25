@@ -53,7 +53,7 @@ public class StudentLoginManager : MonoBehaviour
 
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         {
-            ShowError("Please enter username and password");
+            ShowError("Please enter your username and password.");
             return;
         }
 
@@ -87,7 +87,7 @@ public class StudentLoginManager : MonoBehaviour
                 Query query = db.Collection("students").WhereEqualTo("authUid", user.UserId).Limit(1);
                 snapshot = await query.GetSnapshotAsync();
             }
-            catch (System.Exception firebaseQueryEx)
+            catch (System.Exception)
             {
                 ShowError("Database query failed. Please try again.");
                 isLoggingIn = false;
@@ -97,7 +97,7 @@ public class StudentLoginManager : MonoBehaviour
 
             if (snapshot.Count == 0)
             {
-                ShowError("Account not found in database!");
+                ShowError("Account not found.");
                 auth.SignOut();
                 isLoggingIn = false;
                 if (loginButton != null) loginButton.interactable = true;
@@ -107,7 +107,7 @@ public class StudentLoginManager : MonoBehaviour
             // Check terms and conditions after credentials are verified
             if (!termsAndConditionsCheckbox.isOn)
             {
-                ShowError("Please accept terms and conditions first");
+                ShowError("Please accept the terms and conditions first.");
                 auth.SignOut();
                 isLoggingIn = false;
                 if (loginButton != null) loginButton.interactable = true;
@@ -139,7 +139,7 @@ public class StudentLoginManager : MonoBehaviour
             // Error code 1 from Firebase can be wrong password or wrong username
             if (ex.ErrorCode == 1)
             {
-                ShowError("Invalid username or password!");
+                ShowError("Invalid username or password.");
             }
             else if (errorMsg.Contains("permission") || errorMsg.Contains("permission denied"))
             {

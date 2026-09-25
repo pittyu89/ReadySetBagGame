@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 3
   importance: 0
   weightKg: 1
-  description: Can be used as condiment and can make food last longer.
+  description: Adds flavor, but the bottle is heavy and can spill, and canned food is already ready to eat.
   essentialRank: 0

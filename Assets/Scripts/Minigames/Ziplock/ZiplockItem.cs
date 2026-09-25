@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// One of the things laid out around the ziplock bag — the pad and pen, the ID, the money,
-/// the powerbank, the phone, the batteries.
+/// One of the things laid out around the ziplock bag. Some belong in it (the pad and pen, the
+/// contact card, the dust mask, the batteries, the medicine) and some are go-bag Nuisance items that the
+/// player has to leave out (the phone, the power bank, the matches).
 ///
 /// It only reports drag events. Whether the bag is open, whether a drop landed inside it and
 /// where the item comes to rest are all decided by <see cref="ZiplockMinigame"/>, the way
@@ -17,6 +18,12 @@ public class ZiplockItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 {
     public event Action<ZiplockItem> PickedUp;
     public event Action<ZiplockItem> Dropped;
+
+    [Tooltip("Off for the Nuisance items. The bag refuses them, and the round only needs the " +
+             "ones with this on to be packed.")]
+    [SerializeField] private bool belongsInBag = true;
+
+    public bool BelongsInBag { get { return belongsInBag; } }
 
     private RectTransform rect;
     private RectTransform dragSpace;

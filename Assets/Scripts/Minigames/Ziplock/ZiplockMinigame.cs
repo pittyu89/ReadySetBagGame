@@ -12,15 +12,19 @@ using UnityEngine.UI;
 /// the bag is named for; the seal fills in behind the zipper as it travels, so a half-done
 /// pull reads as half-open rather than staying shut until the last pixel.
 ///
-/// Once it is open the six things laid out around it — the pad and pen, the ID, the money,
-/// the powerbank, the phone and the batteries — are dragged in. All six belong in the bag;
-/// like the other minigames there is nothing to fail here, because the question has already
-/// been scored by the time this runs. An item let go anywhere but over the open bag simply
-/// goes back to where it was lying, so nothing is ever lost off the edge of the table.
+/// Once it is open, the things laid out around it are sorted. The ones that belong in the bag
+/// (the pad and pen, the contact card, the dust mask, the batteries and the medicine) are dragged in. The
+/// go-bag Nuisance items mixed in with them (the phone, the power bank and the matches) are
+/// refused: dropped on the bag, one shakes its head and goes back, and the instruction swaps to
+/// a hint the first time. The round ends once every item that belongs is packed, so the
+/// Nuisance ones just have to be left out. As with the other minigames nothing is scored here,
+/// since the question has already been scored by the time this runs. An item let go anywhere
+/// but over the open bag simply goes back to where it was lying, so nothing is ever lost off
+/// the edge of the table.
 ///
 /// An item dropped in is taken behind the bag graphic rather than left on top of it. The
 /// sprite's interior is translucent white, so it reads as being inside the plastic instead of
-/// resting in front of it, and it is shrunk into one of six slots so a full bag looks packed
+/// resting in front of it, and it is shrunk into one of the slots so a full bag looks packed
 /// rather than piled. It stays draggable afterwards and can be pulled back out.
 ///
 /// None of the geometry is authored by hand. Where the zipper sits shut, how far it travels
@@ -43,7 +47,11 @@ public class ZiplockMinigame : MonoBehaviour
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
     [SerializeField, TextArea] private string instructionText =
-        "Put only the important things in the zip lock";
+        "Unzip the ziplock bag, then pack only the items that belong in it";
+    [Tooltip("Swapped in the first time a Nuisance item is dropped on the bag. Leave empty to " +
+             "keep the instruction as it is.")]
+    [SerializeField, TextArea] private string rejectHintText =
+        "That item doesn't belong in a go-bag, so leave it out";
 
     [Header("Board")]
     [Tooltip("Everything is positioned inside this rect, and items are dragged in its space.")]
@@ -61,7 +69,7 @@ public class ZiplockMinigame : MonoBehaviour
 
     [Header("Packing")]
     [Tooltip("Columns and rows the inside of the bag is divided into. Three by two holds the " +
-             "six things the round asks for.")]
+             "five things that belong in it.")]
     [SerializeField] private int packColumns = 3;
     [SerializeField] private int packRows = 2;
     [Tooltip("How much of its slot a packed item fills. Under 1 so neighbours do not touch.")]
@@ -70,6 +78,11 @@ public class ZiplockMinigame : MonoBehaviour
     [SerializeField] private float settleDuration = 0.22f;
     [Tooltip("How far a packed item is tilted, in degrees, so the bag looks packed by hand.")]
     [SerializeField] private float packTilt = 7f;
+    [Tooltip("How far a Nuisance item dropped on the bag wobbles before going back, in " +
+             "degrees. Zero for no wobble.")]
+    [SerializeField] private float rejectShake = 9f;
+    [Tooltip("How long that wobble lasts.")]
+    [SerializeField] private float rejectShakeDuration = 0.25f;
 
     [Header("Timing")]
     [SerializeField] private float panelFadeDuration = 0.25f;
@@ -116,6 +129,8 @@ public class ZiplockMinigame : MonoBehaviour
     private Rect interior;
 
     private bool homesCaptured = false;
+
+    private bool hintShown = false;
 
     public bool IsPlaying { get { return isPlaying; } }
 
@@ -196,7 +211,7 @@ public class ZiplockMinigame : MonoBehaviour
 
         // Waits on the bag itself rather than a running tally, so pulling something back out
         // un-counts it exactly the way putting it in counted it.
-        while (PackedCount() < items.Count)
+        while (PackedCount() < BelongingCount())
             yield return null;
 
         foreach (ZiplockItem item in items)
@@ -251,6 +266,15 @@ public class ZiplockMinigame : MonoBehaviour
             return;
         }
 
+        // A Nuisance item over the open bag is refused where it was let go, so the "no" reads
+        // as coming from the bag rather than from missing it.
+        if (!item.BelongsInBag)
+        {
+            ShowRejectHint();
+            StartSettling(item, Reject(item));
+            return;
+        }
+
         int slot = NearestFreeSlot(item.Rect.anchoredPosition);
         if (slot < 0)
         {
@@ -277,6 +301,26 @@ public class ZiplockMinigame : MonoBehaviour
                 n++;
 
         return n;
+    }
+
+    /// <summary>How many of the items on the table belong in the bag.</summary>
+    private int BelongingCount()
+    {
+        int n = 0;
+        for (int i = 0; i < items.Count; i++)
+            if (items[i] != null && items[i].BelongsInBag)
+                n++;
+
+        return n;
+    }
+
+    private void ShowRejectHint()
+    {
+        if (hintShown || instructionLabel == null || string.IsNullOrEmpty(rejectHintText))
+            return;
+
+        hintShown = true;
+        instructionLabel.text = rejectHintText;
     }
 
     /// <summary>
@@ -321,7 +365,7 @@ public class ZiplockMinigame : MonoBehaviour
 
     /// <summary>
     /// Size a packed item is shrunk to: as large as fits its slot without distorting the art,
-    /// so the phone stays tall and the money stays wide.
+    /// so the phone stays tall and the dust mask stays wide.
     /// </summary>
     private Vector2 PackedSize(ZiplockItem item)
     {
@@ -358,6 +402,33 @@ public class ZiplockMinigame : MonoBehaviour
     private IEnumerator SendHome(ZiplockItem item)
     {
         yield return Settle(item, item.HomePosition, item.HomeSize, 0f);
+    }
+
+    private IEnumerator Reject(ZiplockItem item)
+    {
+        if (rejectShake > 0f && rejectShakeDuration > 0f)
+            yield return Shake(item);
+
+        yield return SendHome(item);
+    }
+
+    /// <summary>The little "no" wobble a refused item gives before heading back.</summary>
+    private IEnumerator Shake(ZiplockItem item)
+    {
+        RectTransform rect = item.Rect;
+        Quaternion from = rect.localRotation;
+
+        for (float t = 0f; t < rejectShakeDuration; t += Time.unscaledDeltaTime)
+        {
+            float k = t / rejectShakeDuration;
+
+            // Three swings, damped, so it settles rather than stopping dead mid-swing
+            float angle = Mathf.Sin(k * Mathf.PI * 6f) * rejectShake * (1f - k);
+            rect.localRotation = from * Quaternion.Euler(0f, 0f, angle);
+            yield return null;
+        }
+
+        rect.localRotation = from;
     }
 
     /// <summary>
@@ -437,7 +508,7 @@ public class ZiplockMinigame : MonoBehaviour
         zipper.Configure(travelCols / SHEET * w, board, owning);
 
         // Under the seal and inside the bag's own edges — where a dropped item has to land,
-        // and the space the six slots are laid out in.
+        // and the space the slots are laid out in.
         float x0 = left + BAG_LEFT_COL / SHEET * w;
         float x1 = left + BAG_RIGHT_COL / SHEET * w;
         float y0 = bottom + BAG_BOTTOM_ROW / SHEET * h;
@@ -479,7 +550,8 @@ public class ZiplockMinigame : MonoBehaviour
 
         homesCaptured = true;
 
-        slots = new ZiplockItem[Mathf.Max(items.Count, packColumns * packRows)];
+        // Only what belongs ever goes in, so that is all the bag has to make room for
+        slots = new ZiplockItem[Mathf.Max(BelongingCount(), packColumns * packRows)];
     }
 
     // ------------------------------------------------------------------ lifecycle
@@ -500,6 +572,11 @@ public class ZiplockMinigame : MonoBehaviour
 
         if (completedBanner != null)
             completedBanner.SetActive(false);
+
+        // A hint shown last round is put back to the plain instruction
+        hintShown = false;
+        if (instructionLabel != null && !string.IsNullOrEmpty(instructionText))
+            instructionLabel.text = instructionText;
 
         // Sizes are only real once the layout has been built, so the geometry is worked out
         // here rather than in Awake.

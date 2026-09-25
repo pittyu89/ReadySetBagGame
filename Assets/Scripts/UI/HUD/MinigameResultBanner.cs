@@ -5,14 +5,14 @@ using UnityEngine.UI;
 
 /// <summary>
 /// The banner across the middle of the screen when a minigame ends: the chibi over a dark
-/// grey strip (the same #2A2A2A as the objective tab), with COMPLETE! or TIMES UP! beneath her.
+/// grey strip (the same #2A2A2A as the objective tab), with COMPLETE! or TIME'S UP! beneath her.
 ///
 /// One banner serves all twenty minigames. The quiz drives it, since the quiz is what
 /// already knows both endings: the objective card tells it when the player is done, and its
 /// own clock tells it when they ran out of time.
 ///
 /// COMPLETE! plays the thumbs-up once and holds the last frame, fading out with the
-/// minigame's panel. TIMES UP! is a Mario death: the chibi freezes, hops, and drops off the
+/// minigame's panel. TIME'S UP! is a Mario death: the chibi freezes, hops, and drops off the
 /// bottom of the screen, and the quiz waits for her to land before tearing the minigame down.
 ///
 /// Realtime throughout, like the minigames, so a banner never hangs on a paused timeScale.
@@ -34,10 +34,10 @@ public class MinigameResultBanner : MonoBehaviour
     [SerializeField] private AudioClip completeSFX;
 
     [Header("Times Up")]
-    [SerializeField] private string timesUpText = "TIMES UP!";
+    [SerializeField] private string timesUpText = "TIME'S UP!";
     [SerializeField] private Color timesUpColor = new Color(1f, 0.302f, 0.302f, 1f);
     [SerializeField] private Sprite timesUpSprite;
-    [Tooltip("Played as TIMES UP! lands. Optional.")]
+    [Tooltip("Played as TIME'S UP! lands. Optional.")]
     [SerializeField] private AudioClip timesUpSFX;
     [Tooltip("Played as she hops, the way Mario's death jingle kicks in. Optional.")]
     [SerializeField] private AudioClip fallSFX;
@@ -104,7 +104,7 @@ public class MinigameResultBanner : MonoBehaviour
     }
 
     /// <summary>
-    /// Raises TIMES UP! and plays the fall. Yield on it: it returns once she is off screen
+    /// Raises TIME'S UP! and plays the fall. Yield on it: it returns once she is off screen
     /// and the banner has held, with the banner still up for the minigame to close under.
     /// </summary>
     public IEnumerator PlayTimesUp()
@@ -156,7 +156,7 @@ public class MinigameResultBanner : MonoBehaviour
         {
             canvasGroup.alpha = 0f;
             // The strip swallows taps for as long as it is up, so a minigame frozen by the
-            // clock can't be finished behind TIMES UP!
+            // clock can't be finished behind TIME'S UP!
             canvasGroup.blocksRaycasts = true;
         }
     }

@@ -287,7 +287,7 @@ public class LoginModeToggle : MonoBehaviour
         if (!termsAndConditionsCheckbox.isOn)
         {
             if (errorText != null)
-                errorText.text = "Please accept terms and conditions first";
+                errorText.text = "Please accept the terms and conditions first.";
             return;
         }
 

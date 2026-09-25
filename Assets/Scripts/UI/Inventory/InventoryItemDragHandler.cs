@@ -240,7 +240,7 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         // Find the InventoryPanel to show the "Go Bag full" message. Shared for the same
         // reason as the panel: every spawned item was running its own scene-wide search.
         if (sharedPanelHandler == null)
-            sharedPanelHandler = FindObjectOfType<InventoryPanel>();
+            sharedPanelHandler = FindFirstObjectByType<InventoryPanel>();
         inventoryPanelHandler = sharedPanelHandler;
     }
 
@@ -510,7 +510,7 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         // always the single-item weight. The format string is what stops raw float
         // interpolation printing values like "0.30000001kg".
         if (weightText != null)
-            weightText.text = $"{item.weightKg:0.##} Kg";
+            weightText.text = $"{item.weightKg:0.##}kg";
 
         if (sharedItemImage != null)
         {

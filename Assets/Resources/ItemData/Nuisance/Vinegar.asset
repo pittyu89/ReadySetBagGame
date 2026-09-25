@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 3
   importance: 0
   weightKg: 1
-  description: Can be used as condiment and can make food last longer.
+  description: A heavy bottle that can break or leak, and ready-to-eat canned food does not need it.
   essentialRank: 0

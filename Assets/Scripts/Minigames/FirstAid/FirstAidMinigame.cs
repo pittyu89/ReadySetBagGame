@@ -30,7 +30,7 @@ public class FirstAidMinigame : MonoBehaviour
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
     [SerializeField, TextArea] private string instructionText =
-        "Inspect the hands for bruises and wound,\nthen clean the bruises and patch the wound with gauze";
+        "Check the arm for bruises and wounds,\nthen clean the bruises and cover the wound with gauze";
 
     [Header("Arm")]
     [Tooltip("The window onto the arm. Turns it, and reports where a tool is touching.")]

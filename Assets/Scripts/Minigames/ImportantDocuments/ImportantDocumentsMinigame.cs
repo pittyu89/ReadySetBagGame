@@ -64,7 +64,7 @@ public class ImportantDocumentsMinigame : MonoBehaviour
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
     [SerializeField, TextArea] private string instructionText =
-        "Sort the documents into the designated filename in the folder";
+        "Put each document in the folder with its name on the tab";
 
     [Header("Board")]
     [Tooltip("Everything is positioned inside this rect, and papers are dragged in its space.")]

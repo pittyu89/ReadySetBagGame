@@ -4,7 +4,8 @@ using UnityEngine;
 public class FloorVisibilityManager : MonoBehaviour
 {
     [SerializeField] private GameObject stairs;
-    [SerializeField] private GameObject secondFloor;
+    [Tooltip("Every piece of the 2nd floor. The house comes straight from its FBX, so these are the model's own objects rather than children of one group.")]
+    [SerializeField] private GameObject[] secondFloorParts = new GameObject[0];
 
     [Header("Reveal Animation")]
     [Tooltip("How far above its resting spot each piece starts when the 2nd floor appears. 0 or less = a fraction of the stairs' height.")]
@@ -56,7 +57,7 @@ public class FloorVisibilityManager : MonoBehaviour
         }
 
         // Find the player
-        playerTransform = FindObjectOfType<PlayerController>()?.transform;
+        playerTransform = FindFirstObjectByType<PlayerController>()?.transform;
 
         if (playerTransform == null)
         {
@@ -67,10 +68,10 @@ public class FloorVisibilityManager : MonoBehaviour
         }
 
         // Initially hide second floor
-        if (secondFloor != null)
+        if (secondFloorParts.Length > 0)
         {
             CachePieces();
-            secondFloor.SetActive(false);
+            SetSecondFloorActive(false);
             isSecondFloorVisible = false;
         }
     }
@@ -78,7 +79,7 @@ public class FloorVisibilityManager : MonoBehaviour
     private void Update()
     {
         // Only check if we have a player reference
-        if (playerTransform == null || secondFloor == null)
+        if (playerTransform == null || secondFloorParts.Length == 0)
             return;
 
         float playerHeight = playerTransform.position.y;
@@ -104,21 +105,39 @@ public class FloorVisibilityManager : MonoBehaviour
     private void CachePieces()
     {
         pieces.Clear();
-        foreach (Transform child in secondFloor.transform)
+        foreach (GameObject part in secondFloorParts)
         {
+            if (part == null)
+                continue;
             pieces.Add(new Piece
             {
-                transform = child,
-                restLocalPosition = child.localPosition
+                transform = part.transform,
+                restLocalPosition = part.transform.localPosition
             });
         }
     }
 
+    private void SetSecondFloorActive(bool active)
+    {
+        foreach (GameObject part in secondFloorParts)
+        {
+            if (part != null)
+                part.SetActive(active);
+        }
+    }
+
+    // The drop in a piece's own parent space, so it works whatever the house is scaled or turned by
+    private Vector3 LocalDrop(Piece piece)
+    {
+        Transform parent = piece.transform.parent;
+        Vector3 drop = Vector3.up * dropHeight;
+        return parent != null ? parent.InverseTransformVector(drop) : drop;
+    }
+
     private void BeginShow()
     {
-        secondFloor.SetActive(true);
+        SetSecondFloorActive(true);
 
-        Vector3 localDrop = secondFloor.transform.InverseTransformVector(Vector3.up * dropHeight);
         Vector3 playerFlat = new Vector3(playerTransform.position.x, 0f, playerTransform.position.z);
 
         float longestDelay = 0f;
@@ -128,7 +147,7 @@ public class FloorVisibilityManager : MonoBehaviour
                 continue;
 
             // If the floor was mid-lift, start from where the piece is now rather than snapping.
-            Vector3 raised = piece.restLocalPosition + localDrop;
+            Vector3 raised = piece.restLocalPosition + LocalDrop(piece);
             piece.startLocalPosition = isAnimating ? piece.transform.localPosition : raised;
             piece.transform.localPosition = piece.startLocalPosition;
 
@@ -138,7 +157,8 @@ public class FloorVisibilityManager : MonoBehaviour
             }
             else
             {
-                Vector3 worldRest = secondFloor.transform.TransformPoint(piece.restLocalPosition);
+                Transform parent = piece.transform.parent;
+                Vector3 worldRest = parent != null ? parent.TransformPoint(piece.restLocalPosition) : piece.restLocalPosition;
                 float distance = Vector3.Distance(playerFlat, new Vector3(worldRest.x, 0f, worldRest.z));
                 // Everything else waits a beat so the floor lands first, then ripples out from the player.
                 piece.delay = Mathf.Min(0.08f + distance * delayPerUnit, maxDelay);
@@ -170,7 +190,6 @@ public class FloorVisibilityManager : MonoBehaviour
     private void Animate()
     {
         animationTime += Time.deltaTime;
-        Vector3 localDrop = secondFloor.transform.InverseTransformVector(Vector3.up * dropHeight);
 
         foreach (Piece piece in pieces)
         {
@@ -187,7 +206,7 @@ public class FloorVisibilityManager : MonoBehaviour
             {
                 float t = Mathf.Clamp01(animationTime / hideDuration);
                 piece.transform.localPosition = Vector3.LerpUnclamped(
-                    piece.startLocalPosition, piece.restLocalPosition + localDrop, EaseInCubic(t));
+                    piece.startLocalPosition, piece.restLocalPosition + LocalDrop(piece), EaseInCubic(t));
             }
         }
 
@@ -203,7 +222,7 @@ public class FloorVisibilityManager : MonoBehaviour
         }
 
         if (!isSecondFloorVisible)
-            secondFloor.SetActive(false);
+            SetSecondFloorActive(false);
     }
 
     // Slight overshoot then settle, which reads as the piece "landing".

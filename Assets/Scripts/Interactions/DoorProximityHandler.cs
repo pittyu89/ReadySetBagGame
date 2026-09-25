@@ -46,7 +46,7 @@ public class DoorProximityHandler : MonoBehaviour
     {
         // Include inactive doors: upper floors start hidden and are revealed later, so a
         // scan of active objects only would miss them permanently.
-        doors = FindObjectsOfType<DoorToggle>(true);
+        doors = FindObjectsByType<DoorToggle>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
         // Cache each door's collider so the proximity test can measure to the door surface
         // without a GetComponent per door per frame.
@@ -244,7 +244,7 @@ public class DoorProximityHandler : MonoBehaviour
     {
         Canvas best = null;
 
-        foreach (Canvas c in FindObjectsOfType<Canvas>())
+        foreach (Canvas c in FindObjectsByType<Canvas>(FindObjectsSortMode.None))
         {
             if (!c.isRootCanvas) continue;
             if (c.renderMode != RenderMode.ScreenSpaceOverlay) continue;

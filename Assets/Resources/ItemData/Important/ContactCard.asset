@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 1
   importance: 3
   weightKg: 0.01
-  description: Used to identify and contact in case of being lost.
+  description: Lists your name, address and family phone numbers, so you or anyone helping you can reach them.
   essentialRank: 18

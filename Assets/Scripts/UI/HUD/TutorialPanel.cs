@@ -172,7 +172,7 @@ public class TutorialPanel : MonoBehaviour
         if (!startsGameTimer)
             return;
 
-        GameTimer timer = FindObjectOfType<GameTimer>();
+        GameTimer timer = FindFirstObjectByType<GameTimer>();
         if (timer != null)
             timer.StartTimer();
     }

@@ -41,7 +41,7 @@ public class RadioMinigame : MonoBehaviour
     [Header("Instruction")]
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
-    [SerializeField, TextArea] private string instructionText = "Turn till the signal becomes green";
+    [SerializeField, TextArea] private string instructionText = "Turn the dial until the signal turns green";
 
     [Header("Radio")]
     [SerializeField] private RadioTunerDial dial;

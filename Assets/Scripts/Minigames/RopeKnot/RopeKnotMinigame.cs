@@ -34,7 +34,7 @@ public class RopeKnotMinigame : MonoBehaviour
     [Header("Instruction")]
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
-    [SerializeField, TextArea] private string instructionText = "Draw to make a tie knot in the rope";
+    [SerializeField, TextArea] private string instructionText = "Trace the rope to tie a knot";
 
     [Header("Guide")]
     [Tooltip("Shows the figure-of-eight. Its sprite is swapped through guideFrames to run " +

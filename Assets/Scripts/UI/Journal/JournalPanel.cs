@@ -50,7 +50,7 @@ public class JournalPanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI detailWeightText;
     [SerializeField] private TextMeshProUGUI detailImportanceText;
     [SerializeField] private TextMeshProUGUI detailDescriptionText;
-    [SerializeField] private string lockedDescription = "Pack this item in your go bag and finish a drill to unlock it.";
+    [SerializeField] private string lockedDescription = "Pack this item in your go-bag and finish a drill to unlock it.";
 
     [Header("Audio")]
     [SerializeField] private AudioClip openSFX;

@@ -30,7 +30,7 @@ public class ContactCardMinigame : MonoBehaviour
     [Header("Instruction")]
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
-    [SerializeField, TextArea] private string instructionText = "Wipe the smudges of your contact card";
+    [SerializeField, TextArea] private string instructionText = "Wipe the smudges off your contact card";
 
     [Header("Card")]
     [Tooltip("The mud over the card. Its rect sits exactly over the card art, so the two " +

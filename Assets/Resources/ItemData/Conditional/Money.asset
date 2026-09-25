@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 1
   importance: 1
   weightKg: 0.05
-  description: Can be used to buy more supplies from others and currency
+  description: Buys supplies from others when stores are closed.
   essentialRank: 0

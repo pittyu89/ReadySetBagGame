@@ -51,7 +51,7 @@ public class QuizAnswerBox : MonoBehaviour, IDropHandler
         // Resolved in Awake because the handler calls PrepareForQuestion on this box
         // during the same frame the quiz panel is switched on.
         if (quizHandler == null)
-            quizHandler = FindObjectOfType<QuizManager>(true);
+            quizHandler = FindFirstObjectByType<QuizManager>(FindObjectsInactive.Include);
 
         ResetVisuals();
     }

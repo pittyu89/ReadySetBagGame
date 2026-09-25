@@ -14,6 +14,9 @@ public class GameTimer : MonoBehaviour
     private float totalTime; // Store the original total time
     private bool isRunning = false;
     private bool tickingStarted = false;
+
+    /// <summary>True while the round clock is counting down.</summary>
+    public bool IsRunning => isRunning;
     private AudioSource tickingAudioSource;
 
     // Whole seconds currently shown on the timer labels. -1 means "nothing drawn yet", which
@@ -49,7 +52,7 @@ public class GameTimer : MonoBehaviour
 
 
         // Find the ScreenPulseEffect component
-        screenPulseEffect = FindObjectOfType<ScreenPulseEffect>();
+        screenPulseEffect = FindFirstObjectByType<ScreenPulseEffect>();
         
         // Update display immediately
         UpdateDisplay();

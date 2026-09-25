@@ -35,7 +35,7 @@ public class GlovesMinigame : MonoBehaviour
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
     [SerializeField, TextArea] private string instructionText =
-        "Tap the timing ring to safely clear the glass shards!";
+        "Tap the timing ring to clear the glass shards safely";
 
     [Header("Shards")]
     [Tooltip("Every shard to pick up. Each one's place in the scene is its starting spot.")]

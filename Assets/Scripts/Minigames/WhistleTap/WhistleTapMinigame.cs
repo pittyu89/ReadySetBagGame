@@ -28,7 +28,7 @@ public class WhistleTapMinigame : MonoBehaviour
     [Header("Instruction")]
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
-    [SerializeField, TextArea] private string instructionText = "Keep tapping till the rescuer notice you!";
+    [SerializeField, TextArea] private string instructionText = "Keep tapping until the rescuers notice you";
 
     [Header("Tapping")]
     [SerializeField] private WhistleTapButton tapButton;

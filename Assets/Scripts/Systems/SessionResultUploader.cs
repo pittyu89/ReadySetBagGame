@@ -106,8 +106,8 @@ public static class SessionResultUploader
             { "stage", StageFor(drill.FinalScore) },
             { "essentials", drill.EssentialsPacked },
             { "essentialsMax", Mathf.Max(1, drill.EssentialsTarget) },
-            // Everything that cost points: unnecessary items, wrong scenario answers, going over weight
-            { "errors", drill.JunkCount + wrongAnswers + (drill.OverWeight ? 1 : 0) },
+            // Everything that cost points: unnecessary items and wrong scenario answers
+            { "errors", drill.JunkCount + wrongAnswers },
             { "difficulty", (difficulty ?? "").ToLowerInvariant() },
             { "createdAt", FieldValue.ServerTimestamp },
             { "updatedAt", FieldValue.ServerTimestamp }

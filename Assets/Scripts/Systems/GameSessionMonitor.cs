@@ -63,12 +63,12 @@ public class GameSessionMonitor : MonoBehaviour
                             }
                         }
                     }
-                    catch (System.Exception e)
+                    catch (System.Exception)
                     {
                     }
                 });
             }
-        catch (System.Exception e)
+        catch (System.Exception)
         {
         }
     }

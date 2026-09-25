@@ -75,7 +75,7 @@ public class ClickableHighlightManager : MonoBehaviour
     {
         // Include inactive props: upper floors start hidden and are revealed later, so an
         // active-only scan would miss them permanently.
-        models = FindObjectsOfType<StorageFurniture>(true);
+        models = FindObjectsByType<StorageFurniture>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         indicators = new ClickableIndicator[models.Length];
 
         for (int i = 0; i < models.Length; i++)
@@ -200,7 +200,7 @@ public class ClickableHighlightManager : MonoBehaviour
             return;
         }
 
-        PlayerController playerMovement = FindObjectOfType<PlayerController>();
+        PlayerController playerMovement = FindFirstObjectByType<PlayerController>();
         if (playerMovement != null)
             playerTransform = playerMovement.transform;
     }

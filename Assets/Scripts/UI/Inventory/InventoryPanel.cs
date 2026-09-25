@@ -965,12 +965,12 @@ public class InventoryPanel : MonoBehaviour
     
     public void ShowGoBagFullMessage()
     {
-        ShowGoBagMessage("Go Bag is Full!");
+        ShowGoBagMessage("Go-bag is full!");
     }
 
     public void ShowWeightLimitMessage()
     {
-        ShowGoBagMessage("Item Exceeds Weight Limit!");
+        ShowGoBagMessage("Item exceeds the weight limit!");
     }
 
     private void ShowGoBagMessage(string messageText)

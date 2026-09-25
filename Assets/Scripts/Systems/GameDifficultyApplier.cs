@@ -10,8 +10,10 @@ public class GameDifficultyApplier : MonoBehaviour
     private static readonly float[] WEIGHT_LIMITS = { 5f, 5f, 5f }; // beginner, intermediate, advanced
     private static readonly string[] DIFFICULTY_NAMES = { "beginner", "intermediate", "advanced" };
 
-    [SerializeField] private GameObject garage;
-    [SerializeField] private GameObject secondFloor;
+    // The house is the model straight from its FBX, so the garage and the second floor are
+    // lists of that model's pieces rather than a single group object each.
+    [SerializeField] private GameObject[] garageParts = new GameObject[0];
+    [SerializeField] private GameObject[] secondFloorParts = new GameObject[0];
     [SerializeField] private GameObject stairs;
 
     private string currentDifficulty = "beginner";
@@ -30,23 +32,23 @@ public class GameDifficultyApplier : MonoBehaviour
 
     private void ApplyDifficulty(string difficulty)
     {
+        // WEIGHT_LIMITS is the one place the limit is set, so the editor's essential-weight
+        // check and the game can never disagree about it
+        weightLimit = GetWeightLimitForDifficulty(difficulty);
+
         switch (difficulty.ToLower())
         {
             // The weight limit is the same throughout; only the clock tightens.
             case "beginner":
-                weightLimit = 5f;
                 timeLimit = 600f; // 10 minutes
                 break;
             case "intermediate":
-                weightLimit = 5f;
                 timeLimit = 480f; // 8 minutes
                 break;
             case "advanced":
-                weightLimit = 5f;
                 timeLimit = 360f; // 6 minutes
                 break;
             default:
-                weightLimit = 5f;
                 timeLimit = 600f;
                 break;
         }
@@ -71,8 +73,8 @@ public class GameDifficultyApplier : MonoBehaviour
     public bool IsAreaOpen(Transform target)
     {
         string difficulty = PlayerPrefs.GetString("SessionDifficulty", "beginner").ToLowerInvariant();
-        bool inGarage = garage != null && target.IsChildOf(garage.transform);
-        bool upstairs = secondFloor != null && target.IsChildOf(secondFloor.transform);
+        bool inGarage = IsInside(target, garageParts);
+        bool upstairs = IsInside(target, secondFloorParts);
 
         switch (difficulty)
         {
@@ -85,31 +87,44 @@ public class GameDifficultyApplier : MonoBehaviour
         }
     }
 
+    private static bool IsInside(Transform target, GameObject[] parts)
+    {
+        foreach (GameObject part in parts)
+        {
+            if (part != null && target.IsChildOf(part.transform))
+                return true;
+        }
+        return false;
+    }
+
+    private static void SetActive(GameObject[] parts, bool active)
+    {
+        foreach (GameObject part in parts)
+        {
+            if (part != null)
+                part.SetActive(active);
+        }
+    }
+
     private void ApplyFloorVisibility(string difficulty)
     {
         switch (difficulty)
         {
             case "beginner":
-                if (garage != null)
-                    garage.SetActive(false);
-                if (secondFloor != null)
-                    secondFloor.SetActive(false);
+                SetActive(garageParts, false);
+                SetActive(secondFloorParts, false);
                 if (stairs != null)
                     stairs.SetActive(false);
                 break;
             case "intermediate":
-                if (garage != null)
-                    garage.SetActive(true);
-                if (secondFloor != null)
-                    secondFloor.SetActive(false);
+                SetActive(garageParts, true);
+                SetActive(secondFloorParts, false);
                 if (stairs != null)
                     stairs.SetActive(false);
                 break;
             case "advanced":
-                if (garage != null)
-                    garage.SetActive(true);
-                if (secondFloor != null)
-                    secondFloor.SetActive(false); // Initially hidden, FloorVisibilityManager will show it
+                SetActive(garageParts, true);
+                SetActive(secondFloorParts, false); // Initially hidden, FloorVisibilityManager will show it
                 if (stairs != null)
                     stairs.SetActive(true);
                 break;
@@ -119,7 +134,7 @@ public class GameDifficultyApplier : MonoBehaviour
     private void ApplyToGameSystems()
     {
         // Apply time limit directly to Timer
-        GameTimer timer = FindObjectOfType<GameTimer>();
+        GameTimer timer = FindFirstObjectByType<GameTimer>();
         if (timer != null)
         {
             timer.SetTimeLimit(timeLimit);
@@ -158,6 +173,15 @@ public class GameDifficultyApplier : MonoBehaviour
                 return WEIGHT_LIMITS[i];
             }
         }
-        return 5f; // Default to beginner
+        return WEIGHT_LIMITS[0]; // Default to beginner
+    }
+
+    /// <summary>The tightest weight limit across every difficulty.</summary>
+    public static float SmallestWeightLimit()
+    {
+        float smallest = float.MaxValue;
+        foreach (float limit in WEIGHT_LIMITS)
+            smallest = Mathf.Min(smallest, limit);
+        return smallest;
     }
 }

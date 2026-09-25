@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 1
   importance: 2
   weightKg: 0.15
-  description: Multi-use tool for cutting, opening cans, and minor repairs.
+  description: Multi-use tool for cutting rope and cloth, and for minor repairs.
   essentialRank: 13

@@ -32,7 +32,7 @@ public class FlashlightMinigame : MonoBehaviour
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
     [SerializeField, TextArea] private string instructionText =
-        "Keep Flashing the light till you find every person\nDRAG & HOLD the light till the circle is full";
+        "Shine the flashlight around until you find everyone\nDrag and hold the light on each person until the circle is full";
 
     [Header("Torch")]
     [Tooltip("Clicked once to open the beam. Hidden for the rest of the round — by then " +

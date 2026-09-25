@@ -4,11 +4,17 @@ using UnityEngine;
 /// <summary>
 /// The 100-point emergency preparedness drill score.
 ///
-///   S_total = 0.40*S_pack + 0.45*S_quiz + 0.15*S_time
+///   S_total = 0.40*S_pack + 0.20*S_quiz + 0.20*S_task + 0.20*S_time
 ///
-///   S_pack  = Max(0, (E_packed / E_target)*100 - (D_packed*10) - P_weight)
-///   S_quiz  = (1/N) * Sum(0.60*C_match + 0.40*M_task) * 100
-///   S_time  = gated on S_pack >= 60 AND S_quiz >= 60, else 0
+///   S_pack  = Max(0, (E_packed / E_target)*100 - (D_packed*10))
+///   S_quiz  = (C_match / N) * 100          — answering with the right item from the bag
+///   S_task  = (M_task  / N) * 100          — seeing the minigame through
+///   S_time  = gated on S_pack >= 60 AND the quiz side >= 60, else 0
+///
+/// S_quiz is not independent of S_pack, by design. A question is answered by dragging an
+/// item out of the go bag, so an essential left behind can't be given as an answer either:
+/// forgetting the water bottle costs its packing share and, if its question comes up, that
+/// question too. In an emergency you only have what you packed.
 ///
 /// Packing is scored against an authored list of essentials rather than against the
 /// heaviest-value bag arithmetic could build. That matters: an optimiser maximising
@@ -22,23 +28,23 @@ using UnityEngine;
 public static class DrillScore
 {
     public const float PACKING_WEIGHT = 40f;
-    public const float QUIZ_WEIGHT = 45f;
-    public const float TIME_WEIGHT = 15f;
 
-    /// <summary>Split of a question's own score: naming the right item vs doing the task.</summary>
-    public const float IDENTIFY_SHARE = 0.60f;
-    public const float TASK_SHARE = 0.40f;
+    /// <summary>Answering the scenario with the right item out of the bag.</summary>
+    public const float QUIZ_WEIGHT = 20f;
+
+    /// <summary>Seeing the scenario's minigame through before its clock runs out.</summary>
+    public const float TASK_WEIGHT = 20f;
+
+    public const float TIME_WEIGHT = 20f;
 
     /// <summary>Cost of each nuisance item carried, in S_pack points (D_packed * 10).</summary>
     public const int JUNK_PENALTY = 10;
 
-    /// <summary>Cost of exceeding the weight limit, in S_pack points (P_weight).</summary>
-    public const int OVERWEIGHT_PENALTY = 10;
-
     /// <summary>
     /// Anti-rush rule: finishing early earns nothing unless the bag and the quiz were both
     /// good enough. Sprinting out with an empty bag is not preparedness. Measured on S_pack
-    /// after deductions, so a bag full of junk forfeits the time bonus too.
+    /// after deductions, so a bag full of junk forfeits the time bonus too, and on the quiz
+    /// and minigame halves together, so neither alone can open the gate.
     /// </summary>
     public const float SPEED_GATE = 60f;
 
@@ -67,12 +73,14 @@ public static class DrillScore
     public struct Result
     {
         public float PackingPercent;    // S_pack, 0-1 (after deductions)
-        public float QuizPercent;       // S_quiz, 0-1
+        public float QuizPercent;       // S_quiz, 0-1 — right items given from the bag
+        public float TaskPercent;       // S_task, 0-1 — minigames seen through
         public float TimePercent;       // S_time, 0-1
 
         public float PackingPoints;     // of 40
-        public float QuizPoints;        // of 45
-        public float TimePoints;        // of 15
+        public float QuizPoints;        // of 20
+        public float TaskPoints;        // of 20
+        public float TimePoints;        // of 20
 
         public int EssentialsPacked;    // E_packed
         public int EssentialsTarget;    // E_target
@@ -82,8 +90,7 @@ public static class DrillScore
         public bool SpeedGatePassed;
 
         public int FinalScore;          // 0-100
-        public string Badge;
-        public string BadgeMeaning;
+        public string Badge;            // set by FinalScore alone
     }
 
     /// <summary>One packed item, reduced to just what scoring cares about.</summary>
@@ -178,62 +185,85 @@ public static class DrillScore
         }
 
         r.JunkCount = junk;
-        // A hair of tolerance: the limit is a design figure, not a float-equality test
+        // Reported for the dashboards, but not deducted: the bag itself refuses anything
+        // that would push it past the limit, so this can only happen if that check is
+        // bypassed. A hair of tolerance, since the limit is a design figure rather than a
+        // float-equality test.
         r.OverWeight = weightLimitKg > 0f && carried > weightLimitKg + 0.0001f;
-        r.Deductions = junk * JUNK_PENALTY + (r.OverWeight ? OVERWEIGHT_PENALTY : 0);
+        r.Deductions = junk * JUNK_PENALTY;
 
         float coverage = target > 0 ? (found / (float)target) * 100f : 0f;
         float sPack = Mathf.Max(0f, coverage - r.Deductions);
         r.PackingPercent = sPack / 100f;
         r.PackingPoints = r.PackingPercent * PACKING_WEIGHT;
 
-        // ---- 2. S_quiz ----
+        // ---- 2. S_quiz and S_task ----
+        // Scored apart rather than blended: naming the right item and doing the practical
+        // task are two different things to learn, and the results panel shows each on its own.
         if (questionsAsked > 0)
         {
-            float identify = Mathf.Clamp01(correctAnswers / (float)questionsAsked);
-            float task = Mathf.Clamp01(tasksCompleted / (float)questionsAsked);
-            r.QuizPercent = identify * IDENTIFY_SHARE + task * TASK_SHARE;
+            r.QuizPercent = Mathf.Clamp01(correctAnswers / (float)questionsAsked);
+            r.TaskPercent = Mathf.Clamp01(tasksCompleted / (float)questionsAsked);
         }
         r.QuizPoints = r.QuizPercent * QUIZ_WEIGHT;
+        r.TaskPoints = r.TaskPercent * TASK_WEIGHT;
 
         // ---- 3. S_time ----
         float used = timeTotal > 0f ? Mathf.Clamp01(1f - (timeRemaining / timeTotal)) : 1f;
         float par = Mathf.Clamp(timeParFraction, 0f, 0.99f);
         float promptness = used <= par ? 1f : Mathf.Clamp01((1f - used) / (1f - par));
 
-        r.SpeedGatePassed = sPack >= SPEED_GATE && (r.QuizPercent * 100f) >= SPEED_GATE;
+        float quizSide = (r.QuizPoints + r.TaskPoints) / (QUIZ_WEIGHT + TASK_WEIGHT) * 100f;
+        r.SpeedGatePassed = sPack >= SPEED_GATE && quizSide >= SPEED_GATE;
         r.TimePercent = r.SpeedGatePassed ? promptness : 0f;
         r.TimePoints = r.TimePercent * TIME_WEIGHT;
 
         // ---- total ----
         r.FinalScore = Mathf.Clamp(
-            Mathf.RoundToInt(r.PackingPoints + r.QuizPoints + r.TimePoints), 0, 100);
+            Mathf.RoundToInt(r.PackingPoints + r.QuizPoints + r.TaskPoints + r.TimePoints), 0, 100);
 
         AssignBadge(ref r);
         return r;
     }
 
+    /// <summary>
+    /// The badge is a score band and nothing more. It deliberately carries no description of
+    /// what the student did: the old ones promised things the score never checked (a Master
+    /// could carry junk, and every essential counts the same however urgent it is).
+    /// </summary>
     private static void AssignBadge(ref Result r)
     {
         if (r.FinalScore >= BADGE_MASTER_MIN)
-        {
             r.Badge = "Autonomous (Master)";
-            r.BadgeMeaning = "Intuitive & Flawless: Rapid item selection with zero distractors " +
-                             "and swift emergency response. Ready for real evacuation.";
-        }
         else if (r.FinalScore >= BADGE_PROFICIENT_MIN)
-        {
             r.Badge = "Associative (Proficient)";
-            r.BadgeMeaning = "Good Competence: Understands survival priorities (water and " +
-                             "medical first), makes only minor errors, and demonstrates safe " +
-                             "decision-making.";
-        }
         else
-        {
             r.Badge = "Cognitive (Needs Support)";
-            r.BadgeMeaning = "Needs Practice: Hesitant item selection, brought unnecessary " +
-                             "weight, or missed key scenarios. Dashboard alerts teacher for " +
-                             "remediation.";
+    }
+
+    /// <summary>
+    /// The weight of the lightest bag that covers every essential: the lightest item of each
+    /// rank, added up. If this is over the weight limit, a perfect packing score can't be
+    /// reached. Checked in the editor by EssentialWeightCheck.
+    /// </summary>
+    public static float LightestFullSetKg(IEnumerable<SupplyItem> allItems)
+    {
+        Dictionary<int, float> lightest = new Dictionary<int, float>();
+        if (allItems != null)
+        {
+            foreach (SupplyItem item in allItems)
+            {
+                if (item == null || !item.IsEssential)
+                    continue;
+
+                if (!lightest.TryGetValue(item.EssentialRank, out float kg) || item.WeightKg < kg)
+                    lightest[item.EssentialRank] = item.WeightKg;
+            }
         }
+
+        float total = 0f;
+        foreach (float kg in lightest.Values)
+            total += kg;
+        return total;
     }
 }

@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 2
   importance: 0
   weightKg: 0.1
-  description: Backup light source when batteries fail.
+  description: Backup light, but an open flame is a fire risk after an earthquake, when gas lines may be leaking.
   essentialRank: 0

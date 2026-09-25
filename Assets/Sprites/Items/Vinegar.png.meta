@@ -1,7 +1,10 @@
 fileFormatVersion: 2
 guid: 90f8a85caf1f2f54e87787ccec7645b2
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: -6583524493842645155
+    second: Vinegar_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -108,7 +111,29 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: Vinegar_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 658
+        height: 1988
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5ffc669a5f92a4a0800000000000000
+      internalID: -6583524493842645155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []

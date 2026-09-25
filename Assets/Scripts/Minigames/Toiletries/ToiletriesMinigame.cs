@@ -29,7 +29,7 @@ public class ToiletriesMinigame : MonoBehaviour
     [Header("Instruction")]
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
-    [SerializeField, TextArea] private string instructionText = "Put the item to its designated holder";
+    [SerializeField, TextArea] private string instructionText = "Put each item in its holder";
 
     [Header("Items")]
     [Tooltip("Every item to pack. Each one names its own silhouette in the bag.")]

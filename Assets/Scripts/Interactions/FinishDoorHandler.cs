@@ -23,6 +23,10 @@ public class FinishDoorHandler : MonoBehaviour
     private GameTimer timerScript;
     private bool isPlayerInRange = false;
 
+    // Set once the quiz has opened. Opening it again would restart it from question one and
+    // re-score a bag that correct answers have already emptied, so a later time-up is ignored.
+    private bool quizOpened = false;
+
     void Start()
     {
         // Ensure panels are hidden initially
@@ -46,10 +50,10 @@ public class FinishDoorHandler : MonoBehaviour
             playerTransform = playerObj.transform;
 
         // Find InventoryPanel
-        inventoryPanelHandler = FindObjectOfType<InventoryPanel>();
+        inventoryPanelHandler = FindFirstObjectByType<InventoryPanel>();
 
         // Find Timer script
-        timerScript = FindObjectOfType<GameTimer>();
+        timerScript = FindFirstObjectByType<GameTimer>();
 
         // Subscribe to timer event
         GameTimer.OnTimeUp += ShowQuizAtTimeUp;
@@ -57,8 +61,6 @@ public class FinishDoorHandler : MonoBehaviour
         // Don't find QuizManager here - it may be inactive
         // We'll find it when needed
     }
-
-    private int frameCount = 0;
 
     void LateUpdate()
     {
@@ -123,6 +125,10 @@ public class FinishDoorHandler : MonoBehaviour
 
     private void ShowQuizAtTimeUp()
     {
+        if (quizOpened)
+            return;
+        quizOpened = true;
+
         // Pause the timer first to prevent any audio updates
         if (timerScript != null)
         {
@@ -148,7 +154,7 @@ public class FinishDoorHandler : MonoBehaviour
         // Find QuizManager if not already cached (may be on inactive object initially)
         if (quizHandler == null)
         {
-            quizHandler = FindObjectOfType<QuizManager>(true); // includeInactive = true
+            quizHandler = FindFirstObjectByType<QuizManager>(FindObjectsInactive.Include); // includeInactive = true
         }
 
         // Open the quiz

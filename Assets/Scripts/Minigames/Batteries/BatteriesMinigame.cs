@@ -64,7 +64,7 @@ public class BatteriesMinigame : MonoBehaviour
     [Header("Instruction")]
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
-    [SerializeField, TextArea] private string instructionText = "Change the batteries of the radio";
+    [SerializeField, TextArea] private string instructionText = "Change the radio's batteries";
     [Tooltip("Swapped in the first time a battery is dropped in backwards, since tapping to " +
              "turn one over is the one move the round never shows. Leave empty to keep the " +
              "instruction as it is.")]

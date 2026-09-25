@@ -34,7 +34,7 @@ public class ClothesMinigame : MonoBehaviour
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
     [SerializeField, TextArea]
-    private string instruction = "Fold the clothes by swiping your finger at the right direction";
+    private string instruction = "Swipe in the right direction to fold the clothes";
 
     [Header("Shirt")]
     [Tooltip("The shirt. Its sprite is stepped through the fold stages as the player swipes.")]

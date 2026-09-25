@@ -27,7 +27,7 @@ public class WaterPourMinigame : MonoBehaviour
     [Header("Instruction")]
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
-    [SerializeField, TextArea] private string instructionText = "Fill the cup by tap then hold the water Bottle";
+    [SerializeField, TextArea] private string instructionText = "Tap and hold the water bottle to fill the cup";
 
     [Header("Glasses")]
     [Tooltip("Filled in order. Each glass is paired with the bottle at the same index.")]

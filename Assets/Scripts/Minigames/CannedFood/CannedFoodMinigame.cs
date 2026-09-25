@@ -46,7 +46,7 @@ public class CannedFoodMinigame : MonoBehaviour
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
     [SerializeField, TextArea] private string peelInstruction =
-        "Open the emergency can food";
+        "Open the canned food";
     [Tooltip("Swapped in for the second half, once the lid is off.")]
     [SerializeField, TextArea] private string tapInstruction =
         "Tap the can to shake the food out";

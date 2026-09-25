@@ -84,7 +84,7 @@ public class QuizManager : MonoBehaviour
              "Its look and its colours belong to the CountdownBar itself, so the quiz's bar " +
              "and this one cannot drift apart.")]
     [SerializeField] private CountdownBar minigameTimerBar;
-    [Tooltip("The COMPLETE! / TIMES UP! banner shown when a minigame ends, shared by every " +
+    [Tooltip("The COMPLETE! / TIME'S UP! banner shown when a minigame ends, shared by every " +
              "minigame. Optional.")]
     [SerializeField] private MinigameResultBanner minigameResultBanner;
     [Tooltip("Looping tick for the minigame's last seconds — the same clip as the round " +
@@ -236,8 +236,8 @@ public class QuizManager : MonoBehaviour
     [Header("Results")]
     [SerializeField] private GameObject inventoryPanel;
     [SerializeField] private GameObject resultsPanel;
-    [SerializeField] private AudioClip highScoreSFX;  // Plays when score >= 3
-    [SerializeField] private AudioClip lowScoreSFX;   // Plays when score < 3
+    [SerializeField] private AudioClip highScoreSFX;  // Plays when the drill score is Proficient or better (70+)
+    [SerializeField] private AudioClip lowScoreSFX;   // Plays when the drill score is below Proficient (under 70)
 
     private const string SELECTED_CHARACTER_SUFFIX = "_SelectedCharacter";
 
@@ -362,14 +362,16 @@ public class QuizManager : MonoBehaviour
         },
         new QuestionData
         {
-            questionText = "Nadisinfect na ang galos. Anong gamit mula sa go-bag ang naglalaman ng sterile gauze at plaster upang ibendahe ang sugat at mapigilan ang pagdurugo at dumi?",
+            // Stands on its own: questions are shuffled, so it cannot lean on the water
+            // question having mentioned the wound first
+            questionText = "May galos at sugat ka sa braso mula sa gumuhong pader. Anong gamit mula sa go-bag ang naglalaman ng sterile gauze at plaster upang ibendahe ang sugat at mapigilan ang pagdurugo at dumi?",
             correctAnswerItemNames = new string[] { "First Aid Kit" },
-            correctFeedback = "Tama! Ang First Aid Kit ang nagbibigay ng agarang proteksyon sa sugat upang hindi ito mapasukan ng dumi or ma infect.",
+            correctFeedback = "Tama! Ang First Aid Kit ang nagbibigay ng agarang proteksyon sa sugat upang hindi ito mapasukan ng dumi o ma-impeksyon.",
             incorrectFeedback = "Dapat may first aid kit! Ito ang kumpletong kagamitan sa pagbendahe ng sugat habang naghihintay ng medic."
         },
         new QuestionData
         {
-            questionText = "Nakalabas ka na sa open field ngunit naputol ang linya ng tubig sa gripo dahil sa lindol. Tuyong-tuyo ang lalamunan mo at may maruming buhangin ang iyong galos. Anong gamit ang kailangan upang ligtas na makainom at mahugasan ang dumi sa sugat?",
+            questionText = "Nakalabas ka na sa open field ngunit naputol ang linya ng tubig sa gripo dahil sa lindol. Tuyong-tuyo ang lalamunan mo at may galos ka na napasukan ng maruming buhangin. Anong gamit ang kailangan upang ligtas na makainom at mahugasan ang dumi sa sugat?",
             correctAnswerItemNames = new string[] { "Water Bottle" },
             correctFeedback = "Magaling! Ang malinis na nakaboteng tubig ang numero unong kailangan para sa hydration at paglilinis ng sugat kapag bagsak ang water supply.",
             incorrectFeedback = "Laging unahin ang tubig! Sa lindol, pumuputok ang mga tubo sa ilalim ng lupa. Ang nakaimbak na malinis na tubig ang bubuhay sa iyo sa 72 oras."
@@ -379,14 +381,16 @@ public class QuizManager : MonoBehaviour
             questionText = "Kasunod ng malakas na pagyanig, gumuho ang kisame at napuno ng makapal na alikabok at pinong semento ang daanan. Anong gamit ang dapat mong isuot agad upang hindi malanghap ang mapanganib na alikabok habang lumilikas?",
             correctAnswerItemNames = new string[] { "Dust Mask" },
             correctFeedback = "Magaling! Sinasala ng N95 dust mask ang mapanganib na alikabok at pinong semento upang maprotektahan ang iyong baga habang lumalabas ng gumuhong gusali.",
-            incorrectFeedback = "Tandaan ito! Pagkatapos ng lindol, makapal ang alikabok ng semento. Ang N95 mask ang kailangan upang makahinga nang ligtas at maiwasan ang pagka-suffocate."
+            incorrectFeedback = "Tandaan ito! Pagkatapos ng lindol, makapal ang alikabok ng semento. Ang N95 mask ang kailangan upang makahinga nang ligtas at maiwasan ang hirap sa paghinga."
         },
         new QuestionData
         {
-            questionText = "Napansin mong nawawala wala na ang ilaw ng gamit mong flashlight kung sakaling mapundi ang gamit mong flashlight. Anong gamit pwede mong gamitin magbibigay ng liwanag kapalit ng flashlight?",
+            // Rules out batteries (and the candle and matches) on purpose, so a dying
+            // flashlight's obvious fix is not marked wrong here
+            questionText = "Nabasa ng baha ang iyong mga gamit at hindi na gumagana ang mga de-bateryang ilaw. Anong ligtas na ilaw na hindi kailangan ng baterya o apoy ang maaari mong gamitin sa dilim?",
             correctAnswerItemNames = new string[] { "Glow Sticks" },
-            correctFeedback = "Tama! Ang glowstick ay alternatibong gamit na maari mong gamitin kung sakaling wala ng baterya ang iyong flashlight upang magamit ito kapag madilim ang paligid.",
-            incorrectFeedback = "Isama ang glowstick! dahil ito ang alternatibong gamit na maari mong gamitin kung sakaling wala ng baterya ang ilaw o baterya iyong flashlight upang magamit ito kapag madilim ang paligid."
+            correctFeedback = "Tama! Ang glow stick ay nagbibigay ng liwanag nang walang baterya o apoy, kaya ligtas itong gamitin kahit basa ang paligid o may tagas ng gas.",
+            incorrectFeedback = "Isama ang glow stick! Ito ang alternatibong ilaw kapag hindi na magamit ang iyong flashlight sa dilim, at hindi ito nangangailangan ng baterya o apoy."
         },
         new QuestionData
         {
@@ -397,21 +401,21 @@ public class QuizManager : MonoBehaviour
         },
         new QuestionData
         {
-            questionText = "Kailangan mo nang kagamitan upang makapagputol ng matigas na lubid. Anong gamit ang mabilis na makakaputol nito?",
+            questionText = "Kailangan mo ng kagamitan upang makapagputol ng matigas na lubid. Anong gamit ang mabilis na makakaputol nito?",
             correctAnswerItemNames = new string[] { "Pocket Knife" },
             correctFeedback = "Magaling! Ang multi-tool o pocket knife ay maraming gamit para sa pagputol ng lubid.",
             incorrectFeedback = "Isama ang multi-tool o pocket knife! Napakahalaga nito sa pagputol ng mga materyales habang nagtatayo ng proteksyon sa init at ulan."
         },
         new QuestionData
         {
-            questionText = "Dahil sa takot at alikabok ng lindol, inatake ng hika ang iyong kapatid o alta presyon ang lola mo, at sarado ang lahat ng botika. Anong gamit ang dapat nakahanda para sa kanilang tiyak na sakit?",
+            questionText = "Dahil sa takot at alikabok ng lindol, inatake ng hika ang iyong kapatid o tumaas ang alta presyon ng lola mo, at sarado ang lahat ng botika. Anong gamit ang dapat nakahanda para sa kanilang tiyak na sakit?",
             correctAnswerItemNames = new string[] { "Medication" },
             correctFeedback = "Mahusay! Ang sariling maintenance medicines ay hindi maibibigay agad ng relief teams kaya dapat nakahanda ito sa go-bag.",
             incorrectFeedback = "Huwag kalimutan ito! Ang personal na gamot sa hika o maintenance ay kailangang laging nasa go-bag dahil sarado ang mga botika matapos ang lindol."
         },
         new QuestionData
         {
-            questionText = "Biglang bumuhos ang malakas na ulan sa evacuation center. Paano mo poprotektahan ang iyong posporo, pera, at gamot upang hindi mabasa at masira ng tubig-ulan?",
+            questionText = "Biglang bumuhos ang malakas na ulan sa evacuation center. Paano mo poprotektahan ang iyong gamot, contact card, baterya, at dust mask upang hindi mabasa at masira ng tubig-ulan?",
             correctAnswerItemNames = new string[] { "Ziplock Bag" },
             correctFeedback = "Tama! Ang ziplock bags ay 100% waterproof at nagpoprotekta sa mga sensitibong gamit laban sa ulan at baha.",
             incorrectFeedback = "Mahalaga ang ziplock! Pinapanatili nitong tuyo at hindi madumi ang mga gamit na madaling masira sa tubig o alikabok habang nasa evacuation center."
@@ -428,7 +432,7 @@ public class QuizManager : MonoBehaviour
             questionText = "Basang-basa at puno ng maruming putik ang suot mong damit mula sa paglikas sa gumuhong lugar. Ano ang dapat mong ipalit upang hindi magkasakit at ginawin sa gabi?",
             correctAnswerItemNames = new string[] { "Spare Clothes" },
             correctFeedback = "Tama! Ang tuyong ekstrang damit ay nagpoprotekta laban sa pulmonya, lagnat, at impeksyon sa balat sa evacuation shelter.",
-            incorrectFeedback = "Magbaon ng tuyong damit! Ang pagpapalit ng tuyong damit ay nagliligtas sa mga bata laban sa sakit."
+            incorrectFeedback = "Magbaon ng tuyong damit! Ang pagpapalit ng tuyong damit ay nagliligtas sa iyo laban sa sakit."
         },
         new QuestionData
         {
@@ -442,8 +446,8 @@ public class QuizManager : MonoBehaviour
         {
             questionText = "Dumating ang mga opisyal ng barangay upang irehistro ang mga biktima ng lindol para sa relief assistance at ayuda. Anong gamit ang magpapatunay ng iyong pagkakakilanlan at pamilya?",
             correctAnswerItemNames = new string[] { "Important Documents" },
-            correctFeedback = "Tama! Ang kopya ng birth certificate at valid ID ang patunay ng pagkakakilanlan upang mapadali ang tulong at emergency aid.",
-            incorrectFeedback = "Isama ang mga dokumento! Kapag nawalan ng bahay dahil sa lindol, ang kopya ng birth certificate na magpapatunay sa inyong pamilya para sa tulong."
+            correctFeedback = "Tama! Ang kopya ng birth certificate at iba pang dokumento ang patunay ng pagkakakilanlan upang mapadali ang tulong at emergency aid.",
+            incorrectFeedback = "Isama ang mga dokumento! Kapag nawalan ng bahay dahil sa lindol, ang kopya ng birth certificate ang magpapatunay sa inyong pamilya para sa tulong."
         },
         new QuestionData
         {
@@ -454,21 +458,21 @@ public class QuizManager : MonoBehaviour
         },
         new QuestionData
         {
-            questionText = "Anong alternatibong gamit ang maari mong gamitin upang makagawa ng mapa papunta sa evacuation center kung sakaling hindi mo magamit ang iyong telepono at walang signal?",
+            questionText = "Anong alternatibong gamit ang maaari mong gamitin upang makagawa ng mapa papunta sa evacuation center kung sakaling hindi mo magamit ang iyong telepono at walang signal?",
             correctAnswerItemNames = new string[] { "Pen & Paper" },
-            correctFeedback = "Tama! Ang panulat at papel ay ang bagay na pwede mong gamitin upang makagawa ng mapa na maari niyong gawing gabay sakaling kayo ay maligaw.",
-            incorrectFeedback = "Isama ito sa go-bag! Kapag walang kuryente at cellphone, maari mo ito gamiting gabay at pang komunikasyon."
+            correctFeedback = "Tama! Ang panulat at papel ay ang bagay na pwede mong gamitin upang makagawa ng mapa na maaari niyong gawing gabay sakaling kayo ay maligaw.",
+            incorrectFeedback = "Isama ito sa go-bag! Kapag walang kuryente at cellphone, maaari mo itong gamitin na gabay at pangkomunikasyon."
         },
         new QuestionData
         {
-            questionText = "Nalock at naubusan ng baterya ang iyong cellphone. Paano mo malalaman ang opisyal na numero ng Valenzuela CDRRMO at mga kamag-anak upang humingi ng tulong?",
+            questionText = "Naubusan ng baterya ang iyong cellphone at hindi mo na ito mabuksan. Paano mo malalaman ang opisyal na numero ng Valenzuela CDRRMO at mga kamag-anak upang humingi ng tulong?",
             correctAnswerItemNames = new string[] { "Contact Card" },
-            correctFeedback = "Tama! Ang nakasulat sa Contact Card ay napakahalaga at makaktulong ito sa mga oras na need ng tulong at sakuna pagkatapos ng lindol.",
+            correctFeedback = "Tama! Ang nakasulat sa Contact Card ay napakahalaga at makatutulong ito sa mga oras na kailangan ng tulong at sakuna pagkatapos ng lindol.",
             incorrectFeedback = "Laging magbaon nito! Ang nakasulat na emergency numbers sa papel ang sasagip sa iyo kapag walang baterya ang smartphone."
         },
         new QuestionData
         {
-            questionText = "Namatay na ang iyong radyo at flashlight dahil naubusan ng power, at nananatiling walang kuryente sa inyong barangay. Anong gamit ang kailangan mo para mapagana ulit ang mga ito?",
+            questionText = "Namatay na ang iyong radyo at flashlight dahil naubusan ng karga, at nananatiling walang kuryente sa inyong barangay. Anong gamit ang kailangan mo para mapagana ulit ang mga ito?",
             correctAnswerItemNames = new string[] { "Batteries" },
             correctFeedback = "Tama! Ang mga extra na baterya ay ang magsisilbing kuryente upang patuloy na magamit ang radyo at flashlight sa oras ng emergency.",
             incorrectFeedback = "Huwag kalimutan ang mga extra na baterya! Walang silbi ang iyong radyo at flashlight kung wala itong power."
@@ -858,7 +862,7 @@ public class QuizManager : MonoBehaviour
 
             if (remaining <= 0f)
             {
-                // Freeze the minigame where it stands and play TIMES UP! over it before
+                // Freeze the minigame where it stands and play TIME'S UP! over it before
                 // tearing it down, so the player sees what ended it
                 StopCoroutine(routine);
                 minigameRunning = false;
@@ -1238,7 +1242,7 @@ public class QuizManager : MonoBehaviour
             inventoryPanel.SetActive(false);
 
         // Get results data
-        GameTimer timerScript = FindObjectOfType<GameTimer>();
+        GameTimer timerScript = FindFirstObjectByType<GameTimer>();
         float remainingTime = timerScript != null ? timerScript.GetTimeRemaining() : 0f;
         float totalTime = timerScript != null ? timerScript.GetTotalTime() : 0f;
         string difficulty = PlayerPrefs.GetString(DIFFICULTY_PREF, "beginner");
@@ -1315,7 +1319,7 @@ public class QuizManager : MonoBehaviour
             else
             {
                 // Something in the bag with no SupplyItem behind it: carry its weight so the
-                // limit still bites, but it earns nothing.
+                // limit still bites, and count it as junk (it costs the junk penalty).
                 packedAtOpen.Add(new DrillScore.PackedItem(
                     item.itemName, ItemImportance.Nuisance, item.weightKg));
             }

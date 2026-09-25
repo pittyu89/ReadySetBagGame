@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 2
   importance: 3
   weightKg: 0.1
-  description: Stores essential documents and important files.
+  description: Copies of your birth certificate, school and medical records, needed to register for relief and aid.
   essentialRank: 17

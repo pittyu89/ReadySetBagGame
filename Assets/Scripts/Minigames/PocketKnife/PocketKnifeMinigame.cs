@@ -30,7 +30,7 @@ public class PocketKnifeMinigame : MonoBehaviour
     [Header("Instruction")]
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
-    [SerializeField, TextArea] private string instructionText = "Slide the knife to the target length, then cut the rope!";
+    [SerializeField, TextArea] private string instructionText = "Slide the knife to the target length, then cut the rope";
 
     [Header("Measuring")]
     [Tooltip("Marks the 0 m end of the rope. Everything is measured from here, so the " +

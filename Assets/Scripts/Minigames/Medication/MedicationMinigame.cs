@@ -43,7 +43,7 @@ public class MedicationMinigame : MonoBehaviour
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
     [SerializeField, TextArea] private string instructionText =
-        "Drag & Drop the pills to sort the right medication to the right day";
+        "Drag each pill into the day with the matching lid colour";
 
     [Header("Board")]
     [Tooltip("Everything is positioned inside this rect, and pills are dragged in its space.")]

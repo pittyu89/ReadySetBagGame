@@ -23,7 +23,7 @@ public class VideoBackgroundIntro : MonoBehaviour
     private void Awake()
     {
         // Force camera to solid black so the skybox never flashes
-        foreach (var cam in FindObjectsOfType<Camera>())
+        foreach (var cam in FindObjectsByType<Camera>(FindObjectsSortMode.None))
         {
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = Color.black;
