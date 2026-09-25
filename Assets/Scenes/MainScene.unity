@@ -7967,21 +7967,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DifficultyLockOverlay
   group: {fileID: 1140687614}
   lockImage: {fileID: 1376753915}
-  lockedSprite: {fileID: 21300000, guid: 46411a1b7d865714186863bd398ca2f9, type: 3}
+  lockedSprite: {fileID: 4331218617358360502, guid: 04c26e21b07a08a42aec4b21ee79e9dc,
+    type: 3}
   unlockFrames:
-  - {fileID: -8212354365989856694, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: 6877711827288399234, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: 7415066784791234635, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: -7801711250533895978, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: -795989904667881196, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: 6210686131907464069, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: -5170044650092619542, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: 647671349730702432, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: -2215159416188681077, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: 5309868702425087178, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: 3039153912576095217, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: 7830402661472019587, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
-  - {fileID: 3535244729554506060, guid: a860b2fb4ea81034396f9e24e3c927ad, type: 3}
+  - {fileID: -801245406994353396, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
+  - {fileID: -2357331865577890141, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
+  - {fileID: -4177451030733747515, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
+  - {fileID: 8382955915275458552, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
+  - {fileID: -4946814424515035352, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
+  - {fileID: 6266210497103847769, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
+  - {fileID: -1168010276052552443, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
+  - {fileID: 7804481710031861225, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
+  - {fileID: -1749008503098189485, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
+  - {fileID: -2549068098365811378, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
+  - {fileID: -7954242412535368625, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
+  - {fileID: 2653348091414428438, guid: 04c26e21b07a08a42aec4b21ee79e9dc, type: 3}
   unlockFrameDuration: 0.05
   unlockSFX: {fileID: 0}
   fadeDuration: 0.3
@@ -9363,7 +9363,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 46411a1b7d865714186863bd398ca2f9, type: 3}
+  m_Sprite: {fileID: 4331218617358360502, guid: 04c26e21b07a08a42aec4b21ee79e9dc,
+    type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
