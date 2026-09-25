@@ -3,9 +3,8 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Full-screen "READY-SET-BAG!!" splash shown when the tutorial is dismissed.
-/// Lives on its own GameObject so the timing keeps running after the
-/// tutorial panel that triggered it has been deactivated.
+/// Full-screen "READY-SET-BAG!!" splash that opens every real drill. OnboardingManager
+/// switches it on and starts the round clock when it raises <see cref="Finished"/>.
 ///
 /// The frosted background is delegated to <see cref="ScreenBlurBackdrop"/>, the same
 /// component the quiz feedback uses, so both share one blur implementation and one set
@@ -66,7 +65,7 @@ public class ReadySetBagOverlay : MonoBehaviour
             canvasGroup.alpha = 1f;
 
         // Realtime waits so the splash still finishes if the game is paused
-        // (Time.timeScale == 0) while the tutorial is up.
+        // (Time.timeScale == 0) while it is up.
         yield return new WaitForSecondsRealtime(displayDuration);
 
         // The group fade takes the backdrop and the title band down together, which is

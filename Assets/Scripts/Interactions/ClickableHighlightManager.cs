@@ -140,8 +140,11 @@ public class ClickableHighlightManager : MonoBehaviour
                 continue;
             }
 
+            // In the practice run only the furniture being taught is marked, so the arrow
+            // never advertises a prop the tap would refuse
             bool nearby = model.IsWithinReach(playerPosition, discoveryRange,
-                                              discoveryVerticalReach);
+                                              discoveryVerticalReach)
+                          && OnboardingManager.StorageAllowed(model);
 
             indicator.SetVisible(nearby && (!hideBehindWalls || HasLineOfSight(indicator)));
         }

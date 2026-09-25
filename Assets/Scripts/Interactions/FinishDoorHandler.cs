@@ -74,7 +74,8 @@ public class FinishDoorHandler : MonoBehaviour
                 return;
         }
 
-        if (!GoBagPickup.IsBagPickedUp())
+        // The practice run keeps the door shut until it has taught everything before it
+        if (!GoBagPickup.IsBagPickedUp() || !OnboardingManager.FinishDoorAllowed)
         {
             isPlayerInRange = false;
             return;
@@ -110,7 +111,15 @@ public class FinishDoorHandler : MonoBehaviour
     {
         if (finishPromptPanel != null)
             finishPromptPanel.SetActive(true);
+
+        // The practice run has one way forward: Yes
+        if (noButton != null)
+            noButton.gameObject.SetActive(!OnboardingManager.IsPracticeRun);
     }
+
+    /// <summary>The Are-you-finished prompt, for the onboarding to point at.</summary>
+    public GameObject FinishPromptPanel => finishPromptPanel;
+    public Button YesButton => yesButton;
 
     public void OnYesClicked()
     {
@@ -160,7 +169,11 @@ public class FinishDoorHandler : MonoBehaviour
         // Open the quiz
         if (quizHandler != null)
         {
-            quizHandler.OpenQuiz();
+            // The practice run asks the one question it set up, and scores nothing
+            if (OnboardingManager.IsPracticeRun)
+                quizHandler.OpenPracticeQuiz(OnboardingManager.PracticeAnswerItem);
+            else
+                quizHandler.OpenQuiz();
         }
     }
 

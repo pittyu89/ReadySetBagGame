@@ -31,6 +31,9 @@ public class SmallBagController : MonoBehaviour
     private State state = State.Closed;
     private Coroutine animating;
 
+    /// <summary>True once the bag has finished opening and items can be dropped in.</summary>
+    public bool IsOpen => state == State.Open;
+
     void Awake()
     {
         if (openButton != null)

@@ -177,7 +177,11 @@ public class HouseSpawnRandomizer : MonoBehaviour
 
         if (goBag != null)
         {
-            Vector3 bagPoint = PickPointAwayFrom(playerPoint, minSeparation);
+            // The practice run is about learning the controls, not searching, so its bag
+            // starts a short, clear walk away
+            Vector3 bagPoint = OnboardingManager.IsPracticeRun
+                ? PickPracticeBagPoint(playerPoint)
+                : PickPointAwayFrom(playerPoint, minSeparation);
             goBag.transform.position = bagPoint + Vector3.up * (BaseOffset(goBag) + groundClearance);
         }
     }
@@ -238,6 +242,34 @@ public class HouseSpawnRandomizer : MonoBehaviour
             }
         }
         return farthest;
+    }
+
+    /// <summary>
+    /// A floor point a few steps from the player with nothing solid in between, so the practice
+    /// bag is in the same room and in view. Falls back to the nearest point past the minimum.
+    /// </summary>
+    private Vector3 PickPracticeBagPoint(Vector3 origin)
+    {
+        const float minDistance = 3f;
+        const float maxDistance = 7f;
+        Vector3 eye = origin + Vector3.up * 1f;
+
+        List<Vector3> candidates = new List<Vector3>();
+        for (int i = 0; i < floorPoints.Count; i++)
+        {
+            Vector3 point = floorPoints[i];
+            float distance = Vector3.Distance(point, origin);
+            if (distance < minDistance || distance > maxDistance || Mathf.Abs(point.y - origin.y) > 0.5f)
+                continue;
+
+            if (!Physics.Linecast(eye, point + Vector3.up * 1f, ~0, QueryTriggerInteraction.Ignore))
+                candidates.Add(point);
+        }
+
+        if (candidates.Count > 0)
+            return candidates[rng.Next(candidates.Count)];
+
+        return PickPointAwayFrom(origin, minDistance);
     }
 
     private int ResolveSeed()

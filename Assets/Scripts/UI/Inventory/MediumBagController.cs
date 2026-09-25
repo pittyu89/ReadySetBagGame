@@ -47,6 +47,9 @@ public class MediumBagController : MonoBehaviour
     [SerializeField] private AudioClip topAudio;
 
     private Part openPart = Part.None;
+
+    /// <summary>True while one of the bag's compartments is open.</summary>
+    public bool IsOpen => openPart != Part.None;
     private bool animating;
     private Coroutine running;
 

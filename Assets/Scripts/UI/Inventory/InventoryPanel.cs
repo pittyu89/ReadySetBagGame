@@ -66,6 +66,72 @@ public class InventoryPanel : MonoBehaviour
     private GameObject currentOpenPanel;
     private Vector2 originalTopButtonSize;
 
+    /// <summary>True while the inventory is on screen, from the bag button or a furniture tap.</summary>
+    public bool IsOpen => inventoryPanel != null && inventoryPanel.activeInHierarchy;
+
+    /// <summary>True while a furniture's storage is showing beside the bag.</summary>
+    public bool IsStorageOpen => IsOpen && storageSide != null && storageSide.gameObject.activeInHierarchy;
+
+    /// <summary>
+    /// True once a pocket of whichever bag is in use is open and ready to take items. The
+    /// standard bag shows its pocket's grid only after the opening animation, so this waits for
+    /// that too.
+    /// </summary>
+    public bool IsBagPocketOpen
+    {
+        get
+        {
+            if (smallBag != null && smallBag.isActiveAndEnabled)
+                return smallBag.IsOpen;
+
+            if (mediumBag != null && mediumBag.isActiveAndEnabled)
+                return mediumBag.IsOpen;
+
+            return currentOpenPanel != null && currentOpenPanel.activeInHierarchy;
+        }
+    }
+
+    /// <summary>The pieces of the panel the onboarding points at.</summary>
+    public RectTransform GoBagSide => goBagSide;
+    public RectTransform StorageSide => storageSide;
+
+    /// <summary>The picture of the furniture being searched, with its compartments on it.</summary>
+    public RectTransform StoragePicture => modelDisplayImage != null ? modelDisplayImage.rectTransform : storageSide;
+
+    /// <summary>The picture of whichever bag is in use: the thing tapped to open a pocket.</summary>
+    public RectTransform BagArt
+    {
+        get
+        {
+            if (smallBag != null && smallBag.isActiveAndEnabled)
+                return (RectTransform)smallBag.transform;
+            if (mediumBag != null && mediumBag.isActiveAndEnabled)
+                return (RectTransform)mediumBag.transform;
+            if (BagAnimator != null && BagAnimator.isActiveAndEnabled)
+                return (RectTransform)BagAnimator.transform;
+            return goBagSide;
+        }
+    }
+
+    /// <summary>
+    /// The open pocket items can be dropped into, or the bag itself while none is open. The
+    /// Small and Medium Bags open in place, so for them it is the bag.
+    /// </summary>
+    public RectTransform OpenPocket
+    {
+        get
+        {
+            bool standardPocketOpen = (smallBag == null || !smallBag.isActiveAndEnabled)
+                                      && (mediumBag == null || !mediumBag.isActiveAndEnabled)
+                                      && currentOpenPanel != null && currentOpenPanel.activeInHierarchy;
+
+            // Both side pockets open together; the left one stands for the pair
+            return standardPocketOpen ? (RectTransform)currentOpenPanel.transform : BagArt;
+        }
+    }
+    public Button CloseButton => closeButton;
+    public GameObject BagButtonGroup => bagButtonGroup;
+
     private void PlayZipBagSFX()
     {
         SoundManager.Sfx(openZipBagAudio);

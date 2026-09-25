@@ -38,9 +38,8 @@ public class QuizManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI questionText;
 
     [Header("Character")]
+    [Tooltip("The teacher asking the questions. Its own Animator plays the talking loop.")]
     [SerializeField] private Image characterPortrait;
-    [SerializeField] private Sprite femaleAvatar;
-    [SerializeField] private Sprite maleAvatar;
 
     [Header("Answer")]
     [SerializeField] private QuizAnswerBox answerBox;
@@ -239,8 +238,6 @@ public class QuizManager : MonoBehaviour
     [SerializeField] private AudioClip highScoreSFX;  // Plays when the drill score is Proficient or better (70+)
     [SerializeField] private AudioClip lowScoreSFX;   // Plays when the drill score is below Proficient (under 70)
 
-    private const string SELECTED_CHARACTER_SUFFIX = "_SelectedCharacter";
-
     /// <summary>
     /// How long a round is at each difficulty. The question list is a pool: hold more than
     /// the round asks for and each run draws a random selection from it.
@@ -340,6 +337,32 @@ public class QuizManager : MonoBehaviour
 
     // Plays minigameTickingSFX. Made on first use and handed to the SFX bus.
     private AudioSource minigameTickingSource;
+
+    // The onboarding's practice quiz: one question, nothing timed, nothing scored or uploaded
+    private bool practiceQuiz = false;
+
+    // Set by the onboarding once the player has read the practice question's feedback
+    private bool practiceFeedbackRead = false;
+
+    /// <summary>Raised when an answer lands (or the question times out), with the verdict.</summary>
+    public event System.Action<bool> AnswerResolved;
+    /// <summary>
+    /// Practice quiz only: raised once the verdict has played and its explanation is on screen.
+    /// The quiz then waits for <see cref="ContinueAfterFeedback"/>.
+    /// </summary>
+    public event System.Action<bool> FeedbackShown;
+    /// <summary>Raised as a minigame opens, with the minigame's component.</summary>
+    public event System.Action<MonoBehaviour> MinigameStarted;
+    /// <summary>Raised once a minigame has closed.</summary>
+    public event System.Action MinigameFinished;
+    /// <summary>Raised instead of the results screen when the practice quiz is over.</summary>
+    public event System.Action PracticeQuizFinished;
+
+    /// <summary>The pieces of the quiz the onboarding points at.</summary>
+    public GameObject DialogueBox => dialogueBox;
+    public QuizAnswerBox AnswerBox => answerBox;
+    public CountdownBar QuestionTimerBar => questionTimerBar;
+    public CountdownBar MinigameTimerBar => minigameTimerBar;
 
     // The earthquake preparedness questions - arranged from easiest to hardest beginner
     // difficulty. Add to this list and the round grows to match: the length drives how many
@@ -529,6 +552,7 @@ public class QuizManager : MonoBehaviour
     /// </summary>
     public void OpenQuiz()
     {
+        practiceQuiz = false;
         currentQuestionIndex = 0;
         correctCount = 0;
         tasksCompleted = 0;
@@ -538,7 +562,63 @@ public class QuizManager : MonoBehaviour
         CaptureBagSnapshot();
 
         RandomizeQuestions();
-        ApplySelectedCharacterPortrait();
+
+        if (dialogueBox != null)
+            dialogueBox.SetActive(true);
+
+        if (characterPortrait != null)
+            characterPortrait.gameObject.SetActive(true);
+
+        if (feedbackBanner != null)
+            feedbackBanner.Hide();
+
+        if (questionTimerText != null)
+            questionTimerText.gameObject.SetActive(true);
+
+        ShowQuestion(0);
+    }
+
+    /// <summary>Lets the practice quiz move on from the feedback it is holding on.</summary>
+    public void ContinueAfterFeedback()
+    {
+        practiceFeedbackRead = true;
+    }
+
+    /// <summary>
+    /// The onboarding's quiz: just the question <paramref name="answerItemName"/> answers, then
+    /// its minigame. The clocks are shown but held full, nothing is scored, the Journal is left
+    /// alone and nothing reaches the teacher dashboard; <see cref="PracticeQuizFinished"/> is
+    /// raised where the results would have been.
+    /// </summary>
+    public void OpenPracticeQuiz(string answerItemName)
+    {
+        practiceQuiz = true;
+        currentQuestionIndex = 0;
+        correctCount = 0;
+        tasksCompleted = 0;
+        isResolvingAnswer = false;
+
+        randomizedQuestions.Clear();
+        foreach (QuestionData question in allQuestions)
+        {
+            foreach (string answer in question.correctAnswerItemNames)
+            {
+                if (answer.Equals(answerItemName, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    randomizedQuestions.Add(question);
+                    break;
+                }
+            }
+
+            if (randomizedQuestions.Count > 0)
+                break;
+        }
+
+        if (randomizedQuestions.Count == 0)
+        {
+            Debug.LogWarning($"No quiz question is answered by {answerItemName}; the practice quiz has nothing to ask.", this);
+            randomizedQuestions.Add(allQuestions[0]);
+        }
 
         if (dialogueBox != null)
             dialogueBox.SetActive(true);
@@ -640,24 +720,6 @@ public class QuizManager : MonoBehaviour
 #endif
 
     /// <summary>
-    /// Shows the portrait of whichever character this player picked, matching
-    /// the avatar the game spawned them with.
-    /// </summary>
-    private void ApplySelectedCharacterPortrait()
-    {
-        if (characterPortrait == null)
-            return;
-
-        bool isGuest = PlayerPrefs.GetString("IsGuest", "false") == "true";
-        string userName = isGuest ? "Guest" : PlayerPrefs.GetString("StudentName", "User");
-        string selectedCharacter = PlayerPrefs.GetString(userName + SELECTED_CHARACTER_SUFFIX, "Female");
-
-        Sprite portrait = selectedCharacter == "Male" ? maleAvatar : femaleAvatar;
-        if (portrait != null)
-            characterPortrait.sprite = portrait;
-    }
-
-    /// <summary>
     /// Loads a question into the dialogue box and re-arms the answer box.
     /// </summary>
     private void ShowQuestion(int index)
@@ -696,7 +758,9 @@ public class QuizManager : MonoBehaviour
     {
         StopQuestionTimer();
 
-        if (questionTimeLimit <= 0f)
+        // The practice quiz leaves its bar standing full: shown, so it can be pointed out,
+        // but never counting against someone still learning where to drag
+        if (questionTimeLimit <= 0f || practiceQuiz)
             return;
 
         questionTimerRoutine = StartCoroutine(RunQuestionTimer());
@@ -809,19 +873,24 @@ public class QuizManager : MonoBehaviour
             : null;
 
         float remaining = minigameTimeLimit;
-        bool timed = minigameTimeLimit > 0f;
 
-        if (minigameTimerText != null && timed)
+        // The practice quiz shows the clock, full, but never runs it down
+        bool shown = minigameTimeLimit > 0f;
+        bool timed = shown && !practiceQuiz;
+
+        if (minigameTimerText != null && shown)
         {
             UpdateTimerLabel(minigameTimerText, remaining);
             minigameTimerText.gameObject.SetActive(true);
         }
 
-        if (timed && minigameTimerBar != null)
+        if (shown && minigameTimerBar != null)
         {
             minigameTimerBar.Begin();
             minigameTimerBar.SetTime(remaining, minigameTimeLimit);
         }
+
+        MinigameStarted?.Invoke(minigame);
 
         bool completed = false;
 
@@ -884,6 +953,8 @@ public class QuizManager : MonoBehaviour
 
         if (minigameResultBanner != null)
             minigameResultBanner.Hide();
+
+        MinigameFinished?.Invoke();
     }
 
     /// <summary>
@@ -1009,6 +1080,8 @@ public class QuizManager : MonoBehaviour
         if (isCorrect)
             correctCount++;
 
+        AnswerResolved?.Invoke(isCorrect);
+
         // The typewriter may still be running — snap the question to fully visible
         // so the player can read what they just answered.
         if (typewriterRoutine != null)
@@ -1054,11 +1127,23 @@ public class QuizManager : MonoBehaviour
         // way the question was. It waits until the scrim has cleared, or the explanation
         // would be spelling itself out behind a blur nobody can read.
         string feedback = GetFeedback(answerBoxIndex, isCorrect);
-        if (!string.IsNullOrEmpty(feedback) && questionText != null)
+        bool hasFeedback = !string.IsNullOrEmpty(feedback) && questionText != null;
+        if (hasFeedback)
         {
             typewriterRoutine = StartCoroutine(TypeQuestion(feedback));
             yield return typewriterRoutine;
+        }
 
+        if (practiceQuiz)
+        {
+            // The practice holds here until the onboarding has explained the verdict, rather
+            // than moving on while the player is still reading about it
+            practiceFeedbackRead = false;
+            FeedbackShown?.Invoke(isCorrect);
+            yield return new WaitUntil(() => practiceFeedbackRead);
+        }
+        else if (hasFeedback)
+        {
             yield return new WaitForSecondsRealtime(feedbackReadSeconds);
         }
 
@@ -1224,6 +1309,14 @@ public class QuizManager : MonoBehaviour
 
         if (feedbackScrim != null)
             feedbackScrim.Clear();
+
+        // Practice has no results screen and nothing to report: the onboarding takes it from here
+        if (practiceQuiz)
+        {
+            isResolvingAnswer = false;
+            PracticeQuizFinished?.Invoke();
+            return;
+        }
 
         StartCoroutine(HideInventoryAndShowResults(correctCount));
     }

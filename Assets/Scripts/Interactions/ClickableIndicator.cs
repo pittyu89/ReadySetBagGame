@@ -221,6 +221,12 @@ public class ClickableIndicator : MonoBehaviour
     }
 
     /// <summary>
+    /// The built-in marker arrow, white so it can be tinted. The onboarding's coach arrow uses
+    /// it too, so both arrows in the game share one shape.
+    /// </summary>
+    public static Sprite ArrowSprite => GetDefaultSprite();
+
+    /// <summary>
     /// Builds a downward arrow with softly rounded corners and no outline.
     ///
     /// Drawn white so SpriteRenderer.color decides the final colour, and generated from a

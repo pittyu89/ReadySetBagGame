@@ -69,6 +69,14 @@ public class JournalPanel : MonoBehaviour
     private bool isBusy;
     private Coroutine selectionRoutine;
 
+    /// <summary>True while the book is up.</summary>
+    public bool IsOpen => overlay != null && overlay.activeInHierarchy;
+
+    /// <summary>The HUD button and the book's close button, for the onboarding to point at.</summary>
+    public Button OpenButton => openButton;
+    public Button CloseButton => closeButton;
+    public GameObject OpenButtonGroup => openButtonGroup;
+
     private int PageCount => Mathf.Max(1, Mathf.CeilToInt(items.Count / (float)SLOTS_PER_PAGE));
 
     void Awake()

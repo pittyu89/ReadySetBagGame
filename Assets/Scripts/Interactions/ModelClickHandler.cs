@@ -107,7 +107,8 @@ public class ModelClickHandler : MonoBehaviour
                 return;
 
             StorageFurniture furniture = StorageFurniture.FromCollider(hit.collider);
-            if (furniture != null)
+            // The practice run opens only the furniture it is pointing the player at
+            if (furniture != null && OnboardingManager.StorageAllowed(furniture))
             {
                 // Measured to the prop's collider surface, not its pivot. A wide cabinet's
                 // pivot can sit further than interactionDistance while the player is standing

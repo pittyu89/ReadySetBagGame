@@ -14,14 +14,12 @@ public class TutorialPanel : MonoBehaviour
     [SerializeField] private Button skipButton;
     [SerializeField] private Button startButton;
 
-    // Optional: shown when the tutorial is dismissed. Left unassigned on the
-    // pause menu's How-To-Play panel, which just closes without a splash.
-    [SerializeField] private GameObject readySetBagOverlay;
+    [Tooltip("Starts the guided practice run over. Hidden in teacher sessions.")]
+    [SerializeField] private Button replayPracticeButton;
 
-    [Tooltip("Starts the round timer the moment this tutorial is dismissed. Only the " +
-             "tutorial that opens the round sets this - the pause menu's How-To-Play " +
-             "panel leaves it off so reading the help never starts the clock.")]
-    [SerializeField] private bool startsGameTimer = false;
+    // The How-to-Play slideshow, behind the How-to-Play buttons on the main menu and the pause
+    // menu. It used to open every round as well; first-time players now get the guided practice
+    // run instead (OnboardingManager), which also owns the round's READY-SET-BAG splash.
 
     private int currentTutorialIndex = 0;
 
@@ -46,6 +44,9 @@ public class TutorialPanel : MonoBehaviour
         if (startButton != null)
             startButton.onClick.AddListener(CloseTutorial);
 
+        if (replayPracticeButton != null)
+            replayPracticeButton.onClick.AddListener(OnboardingManager.ReplayPractice);
+
         UpdateDisplay();
 
         // Hide start button initially
@@ -61,6 +62,10 @@ public class TutorialPanel : MonoBehaviour
         // Reset tutorial to first page when opened
         currentTutorialIndex = 0;
         UpdateDisplay();
+
+        // Checked each time it opens: the same panel sits in the pause menu of a teacher session
+        if (replayPracticeButton != null)
+            replayPracticeButton.gameObject.SetActive(OnboardingManager.CanReplayPractice);
     }
 
     private void NavigateLeft()
@@ -125,55 +130,7 @@ public class TutorialPanel : MonoBehaviour
 
     private void CloseTutorial()
     {
-        // Activate the splash before hiding the panel — the overlay owns its
-        // own timing, so it keeps running once this panel is deactivated.
-        ReadySetBagOverlay splash = null;
-
-        if (readySetBagOverlay != null)
-        {
-            splash = readySetBagOverlay.GetComponent<ReadySetBagOverlay>();
-
-            // Subscribed before the SetActive, since that is what starts the splash
-            if (splash != null)
-                splash.Finished += OnSplashFinished;
-
-            readySetBagOverlay.SetActive(true);
-        }
-
         if (tutorialPanel != null)
             tutorialPanel.SetActive(false);
-
-        // The clock waits for the splash to clear, so the two-odd seconds of
-        // "READY-SET-BAG!!" are not counted against a player who cannot see the room
-        // yet. With no splash to wait on there is nothing to cover, so it starts now.
-        if (splash == null)
-            StartGameTimer();
-    }
-
-    private void OnSplashFinished()
-    {
-        ReadySetBagOverlay splash = readySetBagOverlay != null
-            ? readySetBagOverlay.GetComponent<ReadySetBagOverlay>()
-            : null;
-
-        // One start per dismissal — the splash can be shown again on a replay
-        if (splash != null)
-            splash.Finished -= OnSplashFinished;
-
-        StartGameTimer();
-    }
-
-    /// <summary>
-    /// Puts the round clock in motion once the tutorial and its splash are both out of
-    /// the way, so the run is timed from the first moment the player can actually move.
-    /// </summary>
-    private void StartGameTimer()
-    {
-        if (!startsGameTimer)
-            return;
-
-        GameTimer timer = FindFirstObjectByType<GameTimer>();
-        if (timer != null)
-            timer.StartTimer();
     }
 }

@@ -245,9 +245,9 @@ public class GoBagPickup : MonoBehaviour
         if (movement != null)
             movement.SetMovementEnabled(true);
 
-        // Start the timer
+        // Start the timer. The practice run is untimed, so it stays put there.
         GameTimer timer = FindFirstObjectByType<GameTimer>();
-        if (timer != null)
+        if (timer != null && !OnboardingManager.IsPracticeRun)
         {
             timer.StartTimer();
         }

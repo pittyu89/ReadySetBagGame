@@ -52,6 +52,12 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
     // OnDisable close the panel outright instead of relying on that coroutine finishing.
     private static InventoryItemDragHandler panelOwner;
 
+    /// <summary>True while an item's description popup is up. The onboarding waits on it.</summary>
+    public static bool IsDescriptionOpen => panelOwner != null && panelOwner.descriptionOpen;
+
+    /// <summary>The description popup while it is open, else null. The onboarding keeps its cards off it.</summary>
+    public static RectTransform OpenDescriptionPanel => IsDescriptionOpen ? sharedPanelRect : null;
+
     // Scene the cache above belongs to. Statics outlive scene loads, so the handle is what
     // tells us the cached panel is from a scene that no longer exists.
     private static int panelResolvedForScene = -1;
@@ -331,6 +337,10 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         // The popup sits over the item while its description is open; the item stays put until
         // it is closed (a tap on the item, or anywhere else)
         if (panelOwner == this && descriptionOpen)
+            return;
+
+        // The practice run only lets the item it is teaching be moved
+        if (!OnboardingManager.DragAllowed(itemUI.GetItem()))
             return;
 
         // Mark that we're now dragging an item, and that THIS handler is the owner of that drag

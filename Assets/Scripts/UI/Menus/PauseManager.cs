@@ -25,6 +25,10 @@ public class PauseManager : MonoBehaviour
     private GameTimer timerScript;
     private bool isPaused = false;
 
+    /// <summary>True while the pause menu is up. The onboarding steps aside for it.</summary>
+    public bool IsPaused => isPaused;
+    public Button PauseButton => pauseButton;
+
     // Whether the round clock was counting when the game was paused. Continue only restarts
     // it if so: pausing before the round starts, or once the quiz has stopped the clock,
     // must not set it going again.
