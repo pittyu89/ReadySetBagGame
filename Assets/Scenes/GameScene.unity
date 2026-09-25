@@ -19449,9 +19449,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 7158514907525454131, guid: e170d77d2d783de408dd0c4593fcd7ec, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: 9cc595e1f0ae9e449bada309bdd992a1, type: 2}
-    count: 1
-  - supplyItem: {fileID: 11400000, guid: add5d55e847e5ab44a2975e3c7db13e5, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 857c5107b7b824746b213a7e31cbc2ea, type: 2}
+    count: 4
+  - supplyItem: {fileID: 11400000, guid: 4ee3b22f36a52494b8ae89245ed17d64, type: 2}
     count: 1
   extraParts: []
 --- !u!1 &503336396
@@ -21699,11 +21699,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 1890043777817888559, guid: a46d62aa5eb818145bfc7f218891a5ff, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: ca43b3d47f9769b478d5f05fea541a88, type: 2}
-    count: 3
-  - supplyItem: {fileID: 11400000, guid: 4ee3b22f36a52494b8ae89245ed17d64, type: 2}
-    count: 1
   - supplyItem: {fileID: 11400000, guid: a27cb8f9ca53c874791a887a42b01c0e, type: 2}
+    count: 1
+  - supplyItem: {fileID: 11400000, guid: add5d55e847e5ab44a2975e3c7db13e5, type: 2}
+    count: 1
+  - supplyItem: {fileID: 11400000, guid: 0090acd98ed8434cb2624a9329138909, type: 2}
+    count: 1
+  - supplyItem: {fileID: 11400000, guid: a43ef046dccd5fa48833780df22a7393, type: 2}
     count: 1
   extraParts: []
 --- !u!64 &555099759
@@ -38350,14 +38352,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 1890043777817888559, guid: a46d62aa5eb818145bfc7f218891a5ff, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: 857c5107b7b824746b213a7e31cbc2ea, type: 2}
-    count: 4
-  - supplyItem: {fileID: 11400000, guid: 3b59618664f617e4382e3628663d9e4f, type: 2}
-    count: 1
-  - supplyItem: {fileID: 11400000, guid: 3a071eb51f108594cb8e38c16d369bb7, type: 2}
-    count: 1
   - supplyItem: {fileID: 11400000, guid: 5b3586b760717b04b9b3fb209751f274, type: 2}
     count: 1
+  - supplyItem: {fileID: 11400000, guid: ca43b3d47f9769b478d5f05fea541a88, type: 2}
+    count: 3
   extraParts: []
 --- !u!1 &978334954
 GameObject:
@@ -40129,9 +40127,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 7158514907525454131, guid: e170d77d2d783de408dd0c4593fcd7ec, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: 019ef6c0dac563346b71468d10b8676e, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 3b59618664f617e4382e3628663d9e4f, type: 2}
     count: 1
-  - supplyItem: {fileID: 11400000, guid: 9459152fcfdd1e9459cef726c51af125, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 3a071eb51f108594cb8e38c16d369bb7, type: 2}
     count: 1
   extraParts: []
 --- !u!1 &1015469179
@@ -42915,12 +42913,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 875956574512840124, guid: df02b9bf0487f854ab42dc28baa5168b, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: f70a40d11530cf5438f601faca02a6ee, type: 2}
-    count: 2
-  - supplyItem: {fileID: 11400000, guid: 2956c4ff54895404aa15e302788d2d46, type: 2}
-    count: 1
   - supplyItem: {fileID: 11400000, guid: faf47bc6c4f1fb44f947d270ab829a67, type: 2}
     count: 1
+  - supplyItem: {fileID: 11400000, guid: 2956c4ff54895404aa15e302788d2d46, type: 2}
+    count: 1
+  - supplyItem: {fileID: 11400000, guid: f70a40d11530cf5438f601faca02a6ee, type: 2}
+    count: 2
   extraParts: []
 --- !u!1 &1087685863
 GameObject:
@@ -48729,7 +48727,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 7158514907525454131, guid: e170d77d2d783de408dd0c4593fcd7ec, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: 02f05484a83763c44b52d57cad362395, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 019ef6c0dac563346b71468d10b8676e, type: 2}
+    count: 1
+  - supplyItem: {fileID: 11400000, guid: 9459152fcfdd1e9459cef726c51af125, type: 2}
+    count: 1
+  - supplyItem: {fileID: 11400000, guid: 9cc595e1f0ae9e449bada309bdd992a1, type: 2}
     count: 1
   extraParts: []
 --- !u!64 &1272853250
@@ -51193,10 +51195,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClickableModel
   layout: {fileID: 5618743637708422069, guid: 6126e6d8f67ac9b4f8a5333ca483a4c2, type: 3}
   startingItems:
-  - supplyItem: {fileID: 11400000, guid: a8b0ca4cd475f50428e067e65b72fbb7, type: 2}
+  - supplyItem: {fileID: 11400000, guid: b819a01de6a04b33b2bac9b359c7b2b2, type: 2}
     count: 1
-  - supplyItem: {fileID: 11400000, guid: c123d76db3865a34dbb1290358e6d3b5, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 02f05484a83763c44b52d57cad362395, type: 2}
     count: 1
+  - supplyItem: {fileID: 11400000, guid: c73dacc22c283bb4181090fc78b57f17, type: 2}
+    count: 2
   - supplyItem: {fileID: 11400000, guid: 3f307c912b129bb4f9a3c0655d7bc12e, type: 2}
     count: 1
   extraParts: []
@@ -52213,9 +52217,11 @@ MonoBehaviour:
     count: 1
   - supplyItem: {fileID: 11400000, guid: b3b9c9f56f5cf374d826593f8e69cb6c, type: 2}
     count: 1
-  - supplyItem: {fileID: 11400000, guid: c73dacc22c283bb4181090fc78b57f17, type: 2}
-    count: 2
-  - supplyItem: {fileID: 11400000, guid: e993b212d39a8ee4ca734e0642673d0a, type: 2}
+  - supplyItem: {fileID: 11400000, guid: 172c6963a055453a98eeedf136bcfe39, type: 2}
+    count: 1
+  - supplyItem: {fileID: 11400000, guid: a8b0ca4cd475f50428e067e65b72fbb7, type: 2}
+    count: 1
+  - supplyItem: {fileID: 11400000, guid: c9fb6e8bde2c45d093f0ae589012ec06, type: 2}
     count: 1
   extraParts: []
 --- !u!1 &1386667495
@@ -79974,8 +79980,6 @@ MonoBehaviour:
   - supplyItem: {fileID: 11400000, guid: f58a31be3aa27ac43b3e37715111dd44, type: 2}
     count: 1
   - supplyItem: {fileID: 11400000, guid: 2f0d9775a9280cb4c86568bd886f4656, type: 2}
-    count: 1
-  - supplyItem: {fileID: 11400000, guid: a43ef046dccd5fa48833780df22a7393, type: 2}
     count: 1
   extraParts:
   - {fileID: 1696764838}

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e666a92da011bf445819d625ea5344ee
+guid: 33a33542f8874e29a17114f34c53be4b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5522679370650975596
-    second: Pogs_0
+      213: 1100390803355737984
+    second: Smartwatch_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Pogs_0
+      name: Smartwatch_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 464
-        height: 512
+        width: 320
+        height: 528
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c6d770090af74ac40800000000000000
-      internalID: 5522679370650975596
+      spriteID: db6c3bfb3abc48968b4da5e10f742bbc
+      internalID: 1100390803355737984
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 8185471c30f54e728b2ba0d8627fc4b5
     internalID: 0
     vertices: []
     indices: 

@@ -10,14 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 33d380b31234ab945948444eeb2a0e1d, type: 3}
-  m_Name: Trumpo
+  m_Name: NintendoSwitch
   m_EditorClassIdentifier: Assembly-CSharp::SupplyItem
-  itemName: Trumpo
-  itemImage: {fileID: 21300000, guid: 3a6cd87a3c311e44992d715476c12703, type: 3}
-  gridWidth: 1
+  itemName: Nintendo Switch
+  itemImage: {fileID: 21300000, guid: 8598fe8975ff46feb9734121ac093b72, type: 3}
+  gridWidth: 2
   gridHeight: 1
   importance: 0
-  weightKg: 0.15
-  description: A classic spinning top, but its sharp metal tip and long string are
-    no help in an emergency.
+  weightKg: 0.4
+  description: Heavy for what it does, the battery runs out in a few hours, and it drains the power you need for your phone and radio.
   essentialRank: 0
