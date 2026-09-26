@@ -4313,7 +4313,7 @@ MonoBehaviour:
   bagNames:
   - Standard Backpack
   - Roll-Top Waterproof Pack
-  - Modular Tactical Duffel
+  - Tactical Modular Duffel
   bagSwapDuration: 0.45
   bagSlideDistance: 110
   bagMinScale: 0.55

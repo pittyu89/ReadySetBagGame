@@ -63,7 +63,7 @@ public class DifficultyPanel : MonoBehaviour
 
     /// <summary>
     /// The bag this run uses (0 = Standard Backpack, 1 = Small = Roll-Top Waterproof Pack,
-    /// 2 = Medium = Modular Tactical Duffel): the teacher's pick in a
+    /// 2 = Medium = Tactical Modular Duffel): the teacher's pick in a
     /// teacher session, otherwise whatever the player chose on this panel.
     /// </summary>
     public static int GetActiveGoBag()
