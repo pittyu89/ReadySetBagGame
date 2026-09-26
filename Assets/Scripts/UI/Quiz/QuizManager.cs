@@ -504,7 +504,7 @@ public class QuizManager : MonoBehaviour
             questionText = "Bagsak ang internet at cell signal sa buong siyudad, at kumakalat ang fake news tungkol sa lindol. Anong gamit ang makakasagap ng opisyal na balita at aftershock advisories mula sa PHIVOLCS?",
             correctAnswerItemNames = new string[] { "Radio" },
             correctFeedback = "Tumpak! Ang radyo ang pinakamatatag na linya ng komunikasyon upang makasagap ng totoong balita mula sa gobyerno kapag walang internet.",
-            incorrectFeedback = "Isama ang radyo! Ito ang tanging paraan upang malaman ang opisyal na babala ng PHIVOLCS kapag walang internet at kuryente."
+            incorrectFeedback = "Isama ang radyo! Ito ang maaasahang paraan upang malaman ang opisyal na babala ng PHIVOLCS kapag walang internet at kuryente."
         },
         new QuestionData
         {
