@@ -4311,7 +4311,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: dfc6355a3b736ba4f8ef3f45fd926b3f, type: 3}
   - {fileID: 21300000, guid: 213214f188620744d82a3c01f1a88df0, type: 3}
   bagNames:
-  - Standard Bag
+  - Standard Backpack
   - Roll-Top Waterproof Pack
   - Modular Tactical Duffel
   bagSwapDuration: 0.45
@@ -12885,7 +12885,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Standard Bag
+  m_text: Standard Backpack
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cb9e1039b0a3b8246bd89a8ec45dc46c, type: 2}
   m_sharedMaterial: {fileID: 7669671442221834601, guid: cb9e1039b0a3b8246bd89a8ec45dc46c,

@@ -62,7 +62,8 @@ public class DifficultyPanel : MonoBehaviour
     public const string SESSION_GO_BAG_KEY = "SessionGoBag";
 
     /// <summary>
-    /// The bag this run uses (0 = Standard, 1 = Small, 2 = Medium): the teacher's pick in a
+    /// The bag this run uses (0 = Standard Backpack, 1 = Small = Roll-Top Waterproof Pack,
+    /// 2 = Medium = Modular Tactical Duffel): the teacher's pick in a
     /// teacher session, otherwise whatever the player chose on this panel.
     /// </summary>
     public static int GetActiveGoBag()
