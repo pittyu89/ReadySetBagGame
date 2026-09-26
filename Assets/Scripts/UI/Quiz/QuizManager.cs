@@ -373,7 +373,7 @@ public class QuizManager : MonoBehaviour
             questionText = "Nawalan ng kuryente dahil sa lindol at sobrang dilim ng paligid. Anong gamit ang magbibigay ng ligtas na liwanag upang makakita sa dilim?",
             correctAnswerItemNames = new string[] { "Small Flashlight", "Big Flashlight" },
             correctFeedback = "Tama! Ang flashlight ang nagbibigay ng matinding liwanag upang makakita sa dilim.",
-            incorrectFeedback = "Mahalaga ang flashlight! Kapag nagka-blackout matapos ang lindol, ito ang tanging ligtas na gabay upang makakita sa paligid na madilim."
+            incorrectFeedback = "Mahalaga ang flashlight! Kapag nagka-blackout matapos ang lindol, ito ang pangunahing ligtas na gabay upang makakita sa paligid na madilim."
         },
         new QuestionData
         {
