@@ -25,6 +25,10 @@ public class StorageFurniture : MonoBehaviour
              "Tapping any of them opens this storage, and reach is measured to the nearest one.")]
     [SerializeField] private Collider[] extraParts = new Collider[0];
 
+    [Tooltip("Doors and drawers that open while this storage is searched. They must be separate " +
+             "objects in the house model; furniture modelled as one mesh just gets the camera zoom.")]
+    [SerializeField] private StorageMovingPart[] movingParts = new StorageMovingPart[0];
+
     // Furniture that can be tapped right now, for finding which one owns a tapped part
     private static readonly List<StorageFurniture> enabledFurniture = new List<StorageFurniture>();
 
@@ -37,6 +41,7 @@ public class StorageFurniture : MonoBehaviour
 
     public StorageLayout Layout => layout;
     public SupplyItemStack[] StartingItems => startingItems;
+    public StorageMovingPart[] MovingParts => movingParts;
 
     void OnEnable() => enabledFurniture.Add(this);
     void OnDisable() => enabledFurniture.Remove(this);
@@ -163,6 +168,51 @@ public class StorageFurniture : MonoBehaviour
         }
 
         return nearest;
+    }
+
+    /// <summary>
+    /// World bounds of everything that makes up this furniture: its own mesh, its extra parts
+    /// and its doors and drawers. Read while it is shown and shut, which is when it is tapped.
+    /// </summary>
+    public Bounds GetWorldBounds()
+    {
+        Renderer own = GetComponent<Renderer>();
+        Bounds bounds = own != null ? own.bounds : new Bounds(transform.position, Vector3.zero);
+
+        if (extraParts != null)
+        {
+            foreach (Collider part in extraParts)
+            {
+                Renderer r = part != null ? part.GetComponent<Renderer>() : null;
+                if (r != null)
+                    bounds.Encapsulate(r.bounds);
+            }
+        }
+
+        foreach (StorageMovingPart moving in movingParts)
+        {
+            Renderer r = moving != null && moving.part != null ? moving.part.GetComponent<Renderer>() : null;
+            if (r != null)
+                bounds.Encapsulate(r.bounds);
+        }
+
+        return bounds;
+    }
+
+    /// <summary>Whether a collider is part of this furniture, so view checks can look past it.</summary>
+    public bool Owns(Collider collider)
+    {
+        if (collider == null)
+            return false;
+        if (collider.transform.IsChildOf(transform))
+            return true;
+        if (extraParts != null)
+        {
+            foreach (Collider part in extraParts)
+                if (part == collider)
+                    return true;
+        }
+        return false;
     }
 
     private static float PlanarDistance(Vector3 a, Vector3 b)

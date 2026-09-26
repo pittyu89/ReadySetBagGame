@@ -34,6 +34,10 @@ public class ModelClickHandler : MonoBehaviour
         // add the component manually to tune its colours and ranges.
         if (FindFirstObjectByType<ClickableHighlightManager>() == null)
             gameObject.AddComponent<ClickableHighlightManager>();
+
+        // Opening a storage zooms in on it first; same no-setup approach as the highlight
+        if (FindFirstObjectByType<StorageFocus>() == null)
+            gameObject.AddComponent<StorageFocus>();
     }
 
     void Update()
@@ -98,6 +102,10 @@ public class ModelClickHandler : MonoBehaviour
         if (!GoBagPickup.IsBagPickedUp())
             return;
 
+        // Another storage is still zooming in or out
+        if (StorageFocus.IsBusy)
+            return;
+
         // Raycast and check if the hit object is storage furniture
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))
         {
@@ -121,7 +129,7 @@ public class ModelClickHandler : MonoBehaviour
                 {
                     return;
                 }
-                OpenInventoryWithStorage(furniture);
+                StorageFocus.Open(furniture, playerTransform, () => OpenInventoryWithStorage(furniture));
             }
         }
     }
