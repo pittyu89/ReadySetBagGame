@@ -56,10 +56,20 @@ public class ArmInspector : MonoBehaviour, IPointerDownHandler, IDragHandler, IP
         parentCanvas = GetComponentInParent<Canvas>();
     }
 
+    // The arm camera only films while this window is showing, so it isn't rendering an
+    // unseen arm every frame for the rest of the game
+    private void OnEnable()
+    {
+        if (armCamera != null)
+            armCamera.enabled = true;
+    }
+
     private void OnDisable()
     {
         IsHeld = false;
         spinVelocity = 0f;
+        if (armCamera != null)
+            armCamera.enabled = false;
     }
 
     private void Update()
