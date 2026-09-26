@@ -24804,7 +24804,7 @@ MonoBehaviour:
   glowstickMinigame: {fileID: 1812266524}
   glowstickMinigameItemName: Glow Sticks
   dustMaskMinigame: {fileID: 1090271601}
-  dustMaskMinigameItemName: Dust Mask
+  dustMaskMinigameItemName: N95 Mask
   pocketKnifeMinigame: {fileID: 1142114026}
   pocketKnifeMinigameItemName: Pocket Knife
   ropeKnotMinigame: {fileID: 2085778699}

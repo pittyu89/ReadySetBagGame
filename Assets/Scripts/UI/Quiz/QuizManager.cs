@@ -139,11 +139,11 @@ public class QuizManager : MonoBehaviour
     [Tooltip("The question whose correct answer is this item hands over to the minigame " +
              "once its feedback has finished.")]
     [SerializeField] private string glowstickMinigameItemName = "Glow Sticks";
-    [Tooltip("Runs after the dust mask question, whether the answer was right or wrong.")]
+    [Tooltip("Runs after the N95 mask question, whether the answer was right or wrong.")]
     [SerializeField] private DustMaskMinigame dustMaskMinigame;
     [Tooltip("The question whose correct answer is this item hands over to the minigame " +
              "once its feedback has finished.")]
-    [SerializeField] private string dustMaskMinigameItemName = "Dust Mask";
+    [SerializeField] private string dustMaskMinigameItemName = "N95 Mask";
     [Tooltip("Runs after the pocket knife question, whether the answer was right or wrong. " +
              "The rope is only what the knife is demonstrated on — the item being taught " +
              "is the knife.")]
@@ -222,7 +222,7 @@ public class QuizManager : MonoBehaviour
     [SerializeField] private string toiletriesMinigameItemName = "Toiletries";
 
     [Header("Scoring")]
-    [Tooltip("Par time for the 15 urgency points, as a fraction of the difficulty's limit. " +
+    [Tooltip("Par time for the 20 time points, as a fraction of the difficulty's limit. " +
              "Reach the finish door within this and the time points are all yours; after it " +
              "they taper to nothing as the clock runs out.\n\n" +
              "0.5 means half the limit — five minutes of ten on beginner — which is what " +
@@ -286,8 +286,8 @@ public class QuizManager : MonoBehaviour
     }
 
     /// <summary>
-    /// How many questions this round actually asks — <see cref="QUESTIONS_PER_ROUND"/>, or
-    /// the whole pool if it is somehow smaller. Read off the built round so the score
+    /// How many questions this round actually asks — <see cref="QuestionsPerRound"/>, which is
+    /// already capped at the pool size. Read off the built round so the score
     /// denominator can never disagree with what was played. Falls back to the pool size
     /// before <see cref="RandomizeQuestions"/> has run.
     /// </summary>
@@ -363,8 +363,8 @@ public class QuizManager : MonoBehaviour
     public CountdownBar QuestionTimerBar => questionTimerBar;
     public CountdownBar MinigameTimerBar => minigameTimerBar;
 
-    // The earthquake preparedness questions - arranged from easiest to hardest beginner
-    // difficulty. Add to this list and the round grows to match: the length drives how many
+    // The earthquake preparedness question pool. Each round draws a random selection from it
+    // (see RandomizeQuestions), so the order here does not matter. Add to this list and the round grows to match: the length drives how many
     // questions are asked, the score denominator, and the debug picker's dropdown.
     private QuestionData[] allQuestions = new QuestionData[]
     {
@@ -401,17 +401,17 @@ public class QuizManager : MonoBehaviour
         new QuestionData
         {
             questionText = "Kasunod ng malakas na pagyanig, gumuho ang kisame at napuno ng makapal na alikabok at pinong semento ang daanan. Anong gamit ang dapat mong isuot agad upang hindi malanghap ang mapanganib na alikabok habang lumilikas?",
-            correctAnswerItemNames = new string[] { "Dust Mask" },
-            correctFeedback = "Magaling! Sinasala ng N95 dust mask ang mapanganib na alikabok at pinong semento upang maprotektahan ang iyong baga habang lumalabas ng gumuhong gusali.",
+            correctAnswerItemNames = new string[] { "N95 Mask" },
+            correctFeedback = "Magaling! Sinasala ng N95 mask ang mapanganib na alikabok at pinong semento upang maprotektahan ang iyong baga habang lumalabas ng gumuhong gusali.",
             incorrectFeedback = "Tandaan ito! Pagkatapos ng lindol, makapal ang alikabok ng semento. Ang N95 mask ang kailangan upang makahinga nang ligtas at maiwasan ang hirap sa paghinga."
         },
         new QuestionData
         {
-            // Rules out batteries (and the candle and matches) on purpose, so a dying
-            // flashlight's obvious fix is not marked wrong here
-            questionText = "Nabasa ng baha ang iyong mga gamit at hindi na gumagana ang mga de-bateryang ilaw. Anong ligtas na ilaw na hindi kailangan ng baterya o apoy ang maaari mong gamitin sa dilim?",
+            // Rules out batteries (the flashlight is broken, not flat) and the candle and matches
+            // (leaking gas) on purpose, so neither obvious alternative is marked wrong here
+            questionText = "Nadurog ng gumuhong pader ang iyong flashlight, at may naaamoy kang tumatagas na gas kaya bawal magsindi ng apoy. Anong ligtas na ilaw na hindi kailangan ng baterya o apoy ang maaari mong gamitin sa dilim?",
             correctAnswerItemNames = new string[] { "Glow Sticks" },
-            correctFeedback = "Tama! Ang glow stick ay nagbibigay ng liwanag nang walang baterya o apoy, kaya ligtas itong gamitin kahit basa ang paligid o may tagas ng gas.",
+            correctFeedback = "Tama! Ang glow stick ay nagbibigay ng liwanag nang walang baterya o apoy, kaya ligtas itong gamitin kahit may tagas ng gas.",
             incorrectFeedback = "Isama ang glow stick! Ito ang alternatibong ilaw kapag hindi na magamit ang iyong flashlight sa dilim, at hindi ito nangangailangan ng baterya o apoy."
         },
         new QuestionData
@@ -437,14 +437,14 @@ public class QuizManager : MonoBehaviour
         },
         new QuestionData
         {
-            questionText = "Biglang bumuhos ang malakas na ulan sa evacuation center. Paano mo poprotektahan ang iyong gamot, contact card, baterya, at dust mask upang hindi mabasa at masira ng tubig-ulan?",
+            questionText = "Biglang bumuhos ang malakas na ulan sa evacuation center. Paano mo poprotektahan ang iyong gamot, contact card, baterya, at N95 mask upang hindi mabasa at masira ng tubig-ulan?",
             correctAnswerItemNames = new string[] { "Ziplock Bag" },
-            correctFeedback = "Tama! Ang ziplock bags ay 100% waterproof at nagpoprotekta sa mga sensitibong gamit laban sa ulan at baha.",
+            correctFeedback = "Tama! Hindi pinapasok ng tubig ang nakasarang ziplock bag, kaya napoprotektahan nito ang mga sensitibong gamit laban sa ulan.",
             incorrectFeedback = "Mahalaga ang ziplock! Pinapanatili nitong tuyo at hindi madumi ang mga gamit na madaling masira sa tubig o alikabok habang nasa evacuation center."
         },
         new QuestionData
         {
-            questionText = "Gabi na at magdamag kayong matutulog sa malamig na semento ng evacuation center dahil sa mga aftershock. Anong magaan at makintab na kumot ang nagbabalik ng 90% ng init ng iyong katawan?",
+            questionText = "Gabi na at magdamag kayong matutulog sa malamig na semento ng evacuation center dahil sa mga aftershock. Anong magaan at makintab na kumot ang tumutulong mapanatili ang init ng iyong katawan?",
             correctAnswerItemNames = new string[] { "Thermal Blanket" },
             correctFeedback = "Tama! Ang thermal foil blanket ay nagpapanatili ng init ng katawan at pumipigil sa hypothermia kapag natutulog sa labas.",
             incorrectFeedback = "Kailangan ang thermal blanket! Napakagaan nito ngunit mabisang panlaban sa matinding lamig kapag bawal pumasok sa mga gusali dahil sa aftershocks."
@@ -577,6 +577,25 @@ public class QuizManager : MonoBehaviour
         ShowQuestion(0);
     }
 
+    /// <summary>
+    /// Time ran out with nothing in the go-bag: every answer is an item from the bag, so there
+    /// is nothing to answer with. Scores the round as it stands (no answers, no tasks) and
+    /// goes straight to the results instead of sitting the student through a quiz they cannot
+    /// play. The quiz panel must be active — the results are shown from a coroutine.
+    /// </summary>
+    public void SkipToResults()
+    {
+        practiceQuiz = false;
+        currentQuestionIndex = 0;
+        correctCount = 0;
+        tasksCompleted = 0;
+        isResolvingAnswer = true;
+
+        CaptureBagSnapshot();
+        RandomizeQuestions();
+        FinishQuiz();
+    }
+
     /// <summary>Lets the practice quiz move on from the feedback it is holding on.</summary>
     public void ContinueAfterFeedback()
     {
@@ -673,7 +692,7 @@ public class QuizManager : MonoBehaviour
     /// <summary>
     /// Test-only hook, driven by QuizDebugPicker's floating button: the indices into
     /// <see cref="allQuestions"/> to ask, <b>in the order they should be asked</b>. Ignored
-    /// unless it names exactly <see cref="QUESTIONS_PER_ROUND"/> of them, since a round is a
+    /// unless it names exactly <see cref="QuestionsPerRound"/> of them, since a round is a
     /// fixed length. Null means the normal random draw. Compiled out of a release build
     /// along with the picker.
     /// </summary>

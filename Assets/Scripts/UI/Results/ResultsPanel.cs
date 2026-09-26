@@ -396,13 +396,15 @@ public class ResultsPanel : MonoBehaviour
                             }
                         }
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Debug.LogWarning($"Couldn't read the session status: {e.Message}");
                     }
                 });
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Debug.LogWarning($"Couldn't watch the session for its end: {e.Message}");
         }
 
         // Wait indefinitely (the listener will handle the detection)
@@ -416,8 +418,9 @@ public class ResultsPanel : MonoBehaviour
 
     private void OnTryAgainClicked()
     {
-        // Reload the current scene to restart the game
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        // Reload the current scene to restart the game, behind the same loading screen as
+        // every other scene change
+        LoadingScreen.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     private void OnNextDifficultyClicked()

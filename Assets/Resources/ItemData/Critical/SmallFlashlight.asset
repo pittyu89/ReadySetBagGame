@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 2
   importance: 4
   weightKg: 0.2
-  description: Bright, reliable light during power outages.
+  description: Light and compact, so it leaves weight for other supplies during power outages.
   essentialRank: 3

@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Remembers which supply items each player has unlocked in the Journal. An item unlocks
 /// once it is in the go bag when a drill ends, and shows up in the Journal from the next
-/// game on. Stored per user in PlayerPrefs, the same way the selected character is.
+/// game on. Stored per student in PlayerPrefs, keyed by <see cref="ProgressUser"/>.
 /// </summary>
 public static class JournalProgress
 {
@@ -13,14 +13,10 @@ public static class JournalProgress
     private const string SEEN_SUFFIX = "_JournalSeen";
     private const char SEPARATOR = '|';
 
-    private static string UserKey
-    {
-        get
-        {
-            bool isGuest = PlayerPrefs.GetString("IsGuest", "false") == "true";
-            return isGuest ? "Guest" : PlayerPrefs.GetString("StudentName", "User");
-        }
-    }
+    // Items that have been renamed since they were first saved, old name first
+    private static readonly string[,] RENAMED = { { "Dust Mask", "N95 Mask" } };
+
+    private static string UserKey => ProgressUser.Key;
 
     public static HashSet<string> GetUnlocked() => Load(UNLOCKED_SUFFIX);
 
@@ -62,6 +58,8 @@ public static class JournalProgress
 
     private static HashSet<string> Load(string suffix)
     {
+        ProgressUser.CarryOverString(suffix);
+
         HashSet<string> names = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
         string raw = PlayerPrefs.GetString(UserKey + suffix, "");
 
@@ -70,6 +68,20 @@ public static class JournalProgress
             if (!string.IsNullOrEmpty(itemName))
                 names.Add(itemName);
         }
+
+        // An unlock saved under an item's old name still counts for the item
+        bool renamed = false;
+        for (int i = 0; i < RENAMED.GetLength(0); i++)
+        {
+            if (names.Remove(RENAMED[i, 0]))
+            {
+                names.Add(RENAMED[i, 1]);
+                renamed = true;
+            }
+        }
+        if (renamed)
+            Save(suffix, names);
+
         return names;
     }
 

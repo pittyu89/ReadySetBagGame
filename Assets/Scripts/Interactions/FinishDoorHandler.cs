@@ -172,9 +172,22 @@ public class FinishDoorHandler : MonoBehaviour
             // The practice run asks the one question it set up, and scores nothing
             if (OnboardingManager.IsPracticeRun)
                 quizHandler.OpenPracticeQuiz(OnboardingManager.PracticeAnswerItem);
+            // Every answer comes out of the go-bag, so with nothing in it there is no quiz
+            // to play: straight to the results
+            else if (GoBagIsEmpty())
+                quizHandler.SkipToResults();
             else
                 quizHandler.OpenQuiz();
         }
+    }
+
+    private static bool GoBagIsEmpty()
+    {
+        if (!GoBagPickup.IsBagPickedUp())
+            return true;
+
+        return InventoryManager.Instance == null
+            || InventoryManager.Instance.GetGoBagItems().Count == 0;
     }
 
     private void OnNoClicked()

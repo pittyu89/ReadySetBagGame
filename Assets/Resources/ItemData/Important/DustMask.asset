@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33d380b31234ab945948444eeb2a0e1d, type: 3}
   m_Name: DustMask
   m_EditorClassIdentifier: Assembly-CSharp::SupplyItem
-  itemName: Dust Mask
+  itemName: N95 Mask
   itemImage: {fileID: 21300000, guid: 4622ba96dedfb4c46863511836f6beed, type: 3}
   gridWidth: 1
   gridHeight: 1
   importance: 3
   weightKg: 0.02
-  description: Protects your lungs from debris, dust and smoke.
+  description: Filters fine dust, debris and smoke so you can breathe safely.
   essentialRank: 6

@@ -5,7 +5,7 @@ using UnityEngine;
 /// with a drill score of <see cref="INTERMEDIATE_UNLOCK_SCORE"/> or better on Beginner, and
 /// Advanced with <see cref="ADVANCED_UNLOCK_SCORE"/> or better on Intermediate.
 ///
-/// Stored per user in PlayerPrefs, keyed the same way as the Journal. Only offline play is
+/// Stored per student in PlayerPrefs, keyed the same way as the Journal (<see cref="ProgressUser"/>). Only offline play is
 /// gated: in a teacher session the teacher picks the difficulty, though a good score there
 /// still unlocks the next one for offline practice.
 /// </summary>
@@ -25,14 +25,7 @@ public static class DifficultyProgress
     /// <summary>Raised whenever a difficulty is locked or unlocked, so open menus can redraw.</summary>
     public static event System.Action Changed;
 
-    private static string UserKey
-    {
-        get
-        {
-            bool isGuest = PlayerPrefs.GetString("IsGuest", "false") == "true";
-            return isGuest ? "Guest" : PlayerPrefs.GetString("StudentName", "User");
-        }
-    }
+    private static string UserKey => ProgressUser.Key;
 
     public static bool IsUnlocked(string difficulty)
     {
@@ -40,6 +33,7 @@ public static class DifficultyProgress
         if (key != INTERMEDIATE && key != ADVANCED)
             return true;
 
+        ProgressUser.CarryOverInt(UNLOCKED_SUFFIX + key);
         return PlayerPrefs.GetInt(UserKey + UNLOCKED_SUFFIX + key, 0) == 1;
     }
 
@@ -87,6 +81,10 @@ public static class DifficultyProgress
         if (key != INTERMEDIATE && key != ADVANCED)
             return;
 
+        // So an old name-keyed value can't resurface over what is set here
+        ProgressUser.CarryOverInt(UNLOCKED_SUFFIX + key);
+        ProgressUser.CarryOverInt(SEEN_SUFFIX + key);
+
         PlayerPrefs.SetInt(UserKey + UNLOCKED_SUFFIX + key, unlocked ? 1 : 0);
 
         // Locking it again means the unlock is worth showing again when it's next earned
@@ -98,8 +96,12 @@ public static class DifficultyProgress
     }
 
     /// <summary>True once the unlock animation for <paramref name="difficulty"/> has played.</summary>
-    public static bool IsUnlockSeen(string difficulty) =>
-        PlayerPrefs.GetInt(UserKey + SEEN_SUFFIX + (difficulty ?? "").ToLowerInvariant(), 0) == 1;
+    public static bool IsUnlockSeen(string difficulty)
+    {
+        string suffix = SEEN_SUFFIX + (difficulty ?? "").ToLowerInvariant();
+        ProgressUser.CarryOverInt(suffix);
+        return PlayerPrefs.GetInt(UserKey + suffix, 0) == 1;
+    }
 
     public static void MarkUnlockSeen(string difficulty)
     {

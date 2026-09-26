@@ -148,7 +148,7 @@ public class PauseManager : MonoBehaviour
         Time.timeScale = 1f;
 
         // Reload the current scene
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        LoadingScreen.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     private void OnExitClicked()

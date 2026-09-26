@@ -18,5 +18,5 @@ MonoBehaviour:
   gridHeight: 1
   importance: 3
   weightKg: 0.2
-  description: Ties down tents and tarps, and secures or carries items.
+  description: At least 7 meters of rope ties down tents and tarps, and secures or carries items.
   essentialRank: 10
