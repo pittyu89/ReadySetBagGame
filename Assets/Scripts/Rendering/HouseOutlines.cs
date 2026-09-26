@@ -7,7 +7,7 @@ using UnityEngine;
 /// furniture and a thin one around small items. Walls, floors, doors, windows, rugs and posters
 /// get none.
 ///
-/// Each prop gets a child renderer drawing its own mesh with the outline material
+/// Each prop gets a child renderer drawing its mesh (or HouseOutlineMesh's merged copy) with the outline material
 /// (ReadySetBag/MeshOutline), so the outline follows it when a door swings or the 2nd floor drops
 /// in, and hides with it. The children are built whenever the component is enabled - in the
 /// editor too, so the Scene view shows them - and are hidden from the Hierarchy and never saved.
@@ -164,15 +164,20 @@ public class HouseOutlines : MonoBehaviour
         if (filter == null || filter.sharedMesh == null)
             return;
 
+        // A prop with several material slots has a one-slot copy made on import, so its outline
+        // is one draw instead of one per slot
+        HouseOutlineMesh merged = source.GetComponent<HouseOutlineMesh>();
+        Mesh mesh = merged != null && merged.mesh != null ? merged.mesh : filter.sharedMesh;
+
         var outline = new GameObject(OUTLINE_NAME);
         // Built fresh in the editor and in play; hidden from the Hierarchy and never saved
         outline.hideFlags = HideFlags.HideAndDontSave;
         outline.layer = source.gameObject.layer;
         outline.transform.SetParent(source.transform, false);
-        outline.AddComponent<MeshFilter>().sharedMesh = filter.sharedMesh;
+        outline.AddComponent<MeshFilter>().sharedMesh = mesh;
 
         var renderer = outline.AddComponent<MeshRenderer>();
-        var materials = new Material[filter.sharedMesh.subMeshCount];
+        var materials = new Material[mesh.subMeshCount];
         for (int i = 0; i < materials.Length; i++)
             materials[i] = material;
         renderer.sharedMaterials = materials;

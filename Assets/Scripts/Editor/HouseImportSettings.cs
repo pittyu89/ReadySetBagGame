@@ -44,12 +44,51 @@ public class HouseImportSettings : AssetPostprocessor
         if (assetPath != HOUSE_MODEL)
             return;
 
+        var outlines = new System.Collections.Generic.Dictionary<Mesh, Mesh>();
         foreach (MeshFilter filter in root.GetComponentsInChildren<MeshFilter>(true))
         {
             Mesh mesh = filter.sharedMesh;
-            if (mesh != null)
-                BakeSmoothNormals(mesh);
+            if (mesh == null)
+                continue;
+            BakeSmoothNormals(mesh);
+
+            // The outline draws every slot with the same material, so a prop with several slots
+            // gets a one-slot copy for it (see HouseOutlineMesh)
+            if (mesh.subMeshCount < 2)
+                continue;
+            if (!outlines.TryGetValue(mesh, out Mesh outline))
+            {
+                outline = BuildOutlineMesh(mesh);
+                context.AddObjectToAsset("outline/" + mesh.name + "/" + outlines.Count, outline);
+                outlines[mesh] = outline;
+            }
+            filter.gameObject.AddComponent<HouseOutlineMesh>().mesh = outline;
         }
+    }
+
+    // Only what ReadySetBag/MeshOutline reads - position, normal and the smoothed normal in UV3 -
+    // with every submesh's triangles in one
+    private static Mesh BuildOutlineMesh(Mesh source)
+    {
+        var outline = new Mesh { name = source.name + " Outline", indexFormat = source.indexFormat };
+        outline.SetVertices(source.vertices);
+        outline.SetNormals(source.normals);
+        var smooth = new System.Collections.Generic.List<Vector3>();
+        source.GetUVs(3, smooth);
+        if (smooth.Count == source.vertexCount)
+            outline.SetUVs(3, smooth);
+
+        var triangles = new System.Collections.Generic.List<int>();
+        for (int i = 0; i < source.subMeshCount; i++)
+            triangles.AddRange(source.GetTriangles(i));
+        outline.SetTriangles(triangles, 0);
+        outline.RecalculateBounds();
+
+        // Like the imported meshes, keep no CPU-side copy in the player
+        var serialized = new SerializedObject(outline);
+        serialized.FindProperty("m_IsReadable").boolValue = false;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+        return outline;
     }
 
     private static void BakeSmoothNormals(Mesh mesh)
@@ -118,10 +157,11 @@ public class HouseImportSettings : AssetPostprocessor
     }
 
     // Bump when this postprocessor's output changes, so Unity reimports the house instead of
-    // reporting an inconsistent import result. 2 = smoothed outline normals in UV3.
+    // reporting an inconsistent import result. 2 = smoothed outline normals in UV3,
+    // 3 = merged outline meshes (HouseOutlineMesh).
     public override uint GetVersion()
     {
-        return 2;
+        return 3;
     }
 
     // Run after URP's own FBX material importer, which would otherwise rebuild these as opaque
