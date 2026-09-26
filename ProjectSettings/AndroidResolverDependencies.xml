@@ -21,7 +21,7 @@
     <file>Assets/GeneratedLocalRepo/Firebase/m2repository/com/google/firebase/firebase-firestore-unity/13.9.0/firebase-firestore-unity-13.9.0.pom</file>
   </files>
   <settings>
-    <setting name="androidAbis" value="arm64-v8a,armeabi-v7a" />
+    <setting name="androidAbis" value="arm64-v8a" />
     <setting name="bundleId" value="com.dev.readysetbag" />
     <setting name="explodeAars" value="True" />
     <setting name="gradleBuildEnabled" value="True" />
