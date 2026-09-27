@@ -29,16 +29,32 @@ public class CameraOrbitController : MonoBehaviour
     [SerializeField] private float minPitch = -5f;
     [SerializeField] private float maxPitch = 60f;
 
+    [Header("Petting the Cat")]
+    [Tooltip("Camera distance while petting; it eases in on the player and cat and holds still.")]
+    [SerializeField] private float petDistance = 3f;
+    [Tooltip("Height aimed at while petting: lower than the usual pivot so the short cat is " +
+             "framed along with the player.")]
+    [SerializeField] private float petPivotHeight = 1f;
+    [Tooltip("Seconds to zoom in (and back out).")]
+    [SerializeField] private float petZoomTime = 0.5f;
+
     [Header("Input")]
     [Tooltip("Degrees turned when dragging the full height of the screen. Measured against " +
              "screen height so the feel is the same on every resolution.")]
     [SerializeField] private float sensitivity = 220f;
     [SerializeField] private bool invertY = false;
 
+    private CinemachineVirtualCamera vcam;
     private CinemachineTransposer transposer;
     private CinemachineComposer composer;
     private float yaw;
     private float pitch;
+
+    // 0 = normal view, 1 = zoomed in on the petting. The shift from the player to the petting
+    // focus is kept after petting ends, so the zoom-out drifts back instead of snapping.
+    private PlayerController player;
+    private float petBlend;
+    private Vector3 petShift;
 
     // Finger currently orbiting the camera, or -1. Only one finger orbits at a time so a
     // joystick thumb plus a camera thumb never fight over the view.
@@ -48,7 +64,7 @@ public class CameraOrbitController : MonoBehaviour
 
     void Awake()
     {
-        var vcam = GetComponent<CinemachineVirtualCamera>();
+        vcam = GetComponent<CinemachineVirtualCamera>();
         transposer = vcam.GetCinemachineComponent<CinemachineTransposer>();
         composer = vcam.GetCinemachineComponent<CinemachineComposer>();
 
@@ -59,9 +75,11 @@ public class CameraOrbitController : MonoBehaviour
 
     void Update()
     {
-        // The view holds still while the character shows off the go-bag. Any drag in progress
-        // is dropped, so the camera doesn't jump when the pose ends mid-drag.
-        if (BagPickupPose.IsPlaying)
+        UpdatePetZoom();
+
+        // The view holds still while the character shows off the go-bag or pets the cat. Any
+        // drag in progress is dropped, so the camera doesn't jump when that ends mid-drag.
+        if (BagPickupPose.IsPlaying || petBlend > 0f)
         {
             orbitFingerId = -1;
             mouseOrbiting = false;
@@ -145,15 +163,43 @@ public class CameraOrbitController : MonoBehaviour
             : EventSystem.current.IsPointerOverGameObject(pointerId);
     }
 
+    private void UpdatePetZoom()
+    {
+        // The follow target is assigned when the character spawns
+        if (player == null && vcam.Follow != null)
+            player = vcam.Follow.GetComponentInParent<PlayerController>();
+
+        bool petting = player != null && player.IsPetting;
+        if (petting)
+        {
+            // Offsets are world-space (the transposer binds in world space)
+            petShift = player.PetFocus - player.transform.position;
+            petShift.y = 0f;
+        }
+
+        float step = petZoomTime > 0f ? Time.deltaTime / petZoomTime : 1f;
+        petBlend = Mathf.MoveTowards(petBlend, petting ? 1f : 0f, step);
+    }
+
     private void ApplyOffset()
     {
         Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
-        Vector3 pivot = Vector3.up * pivotHeight;
+        float zoom = Mathf.SmoothStep(0f, 1f, petBlend);
+        Vector3 pivot = Vector3.up * Mathf.Lerp(pivotHeight, petPivotHeight, zoom) + petShift * zoom;
+        float currentDistance = Mathf.Lerp(distance, petDistance, zoom);
 
         if (transposer != null)
-            transposer.m_FollowOffset = pivot + rotation * new Vector3(0f, 0f, -distance);
+            transposer.m_FollowOffset = pivot + rotation * new Vector3(0f, 0f, -currentDistance);
 
+        // The aim offset is in the look-at target's local space, and BillboardToCamera turns
+        // the character to the camera's yaw - so undo that turn, or the sideways shift toward
+        // the cat would swing around with the camera
         if (composer != null)
-            composer.m_TrackedObjectOffset = pivot;
+        {
+            Transform target = vcam.LookAt;
+            composer.m_TrackedObjectOffset = target != null
+                ? Quaternion.Inverse(target.rotation) * pivot
+                : pivot;
+        }
     }
 }

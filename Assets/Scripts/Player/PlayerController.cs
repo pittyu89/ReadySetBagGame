@@ -34,6 +34,24 @@ public class PlayerController : MonoBehaviour
     // destroyed and replaced (scene reloads, cutscene cameras).
     private Transform cameraTransform;
 
+    // Petting the cat: first a short walk to the spot beside it, then the pet loop.
+    // Input is ignored for the whole of it.
+    private enum PetPhase { None, Approaching, Petting }
+    private const float PET_APPROACH_TIMEOUT = 0.75f;
+    private PetPhase petPhase;
+    private Vector3 petStandAt;
+    private bool petFaceRight;
+    private float petDuration;
+    private float petTimer;
+    private System.Action onPetReached;
+    private System.Action onPetFinished;
+
+    /// <summary>True while walking over to pet the cat or petting it.</summary>
+    public bool IsPetting => petPhase != PetPhase.None;
+
+    /// <summary>Where the camera frames the petting: between the player and the cat.</summary>
+    public Vector3 PetFocus { get; private set; }
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -60,9 +78,105 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (petPhase != PetPhase.None)
+        {
+            UpdatePetting();
+            return;
+        }
+
         HandleInput();
         MoveCharacter();
         UpdateAnimation();
+    }
+
+    /// <summary>
+    /// Walks to <paramref name="standAt"/>, then plays the pet loop facing the given way for
+    /// <paramref name="duration"/> seconds. <paramref name="onReached"/> fires as the hand comes
+    /// down (the cat starts its own loop then), <paramref name="onFinished"/> when it's over.
+    /// <paramref name="focus"/> is the point the camera zooms in on meanwhile.
+    /// Returns false, doing nothing, when the player can't move right now or is already petting.
+    /// </summary>
+    public bool TryStartPetting(Vector3 standAt, Vector3 focus, bool faceRight, float duration,
+                                System.Action onReached, System.Action onFinished)
+    {
+        if (!enabled || petPhase != PetPhase.None || controller == null)
+            return false;
+
+        petPhase = PetPhase.Approaching;
+        petStandAt = standAt;
+        PetFocus = focus;
+        petFaceRight = faceRight;
+        petDuration = duration;
+        petTimer = 0f;
+        onPetReached = onReached;
+        onPetFinished = onFinished;
+        moveDirection = Vector3.zero;
+        return true;
+    }
+
+    void UpdatePetting()
+    {
+        if (controller.isGrounded)
+            velocity.y = gravity * groundDrag;
+        else
+            velocity.y += gravity * Time.deltaTime;
+
+        Vector3 motion = Vector3.up * velocity.y;
+        petTimer += Time.deltaTime;
+
+        if (petPhase == PetPhase.Approaching)
+        {
+            Vector3 toSpot = petStandAt - transform.position;
+            toSpot.y = 0f;
+            float distance = toSpot.magnitude;
+
+            // Something in the way? Pet from wherever the player got to
+            if (distance < 0.05f || petTimer >= PET_APPROACH_TIMEOUT)
+            {
+                BeginPetLoop();
+            }
+            else
+            {
+                float step = Mathf.Min(moveSpeed, distance / Mathf.Max(Time.deltaTime, 1e-4f));
+                motion += toSpot / distance * step;
+                PlayFootsteps();
+
+                if (animator != null)
+                {
+                    float side = cameraTransform != null ? Vector3.Dot(toSpot, cameraTransform.right) : 0f;
+                    animator.Play(side >= 0f ? "WalkRight" : "WalkLeft");
+                }
+            }
+        }
+        else if (petTimer >= petDuration)
+        {
+            EndPetting();
+        }
+
+        controller.Move(motion * Time.deltaTime);
+    }
+
+    void BeginPetLoop()
+    {
+        petPhase = PetPhase.Petting;
+        petTimer = 0f;
+        StopFootsteps();
+
+        if (animator != null)
+            animator.Play(petFaceRight ? "PetRight" : "PetLeft", 0, 0f);
+
+        System.Action reached = onPetReached;
+        onPetReached = null;
+        reached?.Invoke();
+    }
+
+    void EndPetting()
+    {
+        petPhase = PetPhase.None;
+
+        System.Action finished = onPetFinished;
+        onPetFinished = null;
+        finished?.Invoke();
     }
 
     void CacheCamera()
@@ -222,6 +336,10 @@ public class PlayerController : MonoBehaviour
     {
         // A disabled controller doesn't update, so it would never stop the looping steps
         StopFootsteps();
+
+        // Nor finish petting - let the cat go rather than leave it waiting
+        if (petPhase != PetPhase.None)
+            EndPetting();
     }
 
     private void OnDestroy()

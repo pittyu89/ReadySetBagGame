@@ -15,15 +15,25 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class CatWander : MonoBehaviour
 {
-    private enum State { Sitting, Walking }
+    private enum State { Sitting, Walking, AwaitingPet, Petted }
 
     [Header("Sprite")]
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Sprite[] walkRightFrames;
     [SerializeField] private Sprite[] walkLeftFrames;
     [SerializeField] private Sprite[] sitFrames;
+    [SerializeField] private Sprite[] pettedFrames;
     [SerializeField] private float walkFps = 9f;
     [SerializeField] private float sitFps = 3f;
+    [Tooltip("Matches the player's pet loop (0.18 s a frame), so each stroke lands with a heart.")]
+    [SerializeField] private float pettedFps = 5.5f;
+
+    [Header("Petting")]
+    [Tooltip("Tapping the cat with the player this close pets it; from further away the tap does nothing.")]
+    [SerializeField] private float petRange = 2.5f;
+    [Tooltip("How far to the cat's side (across the screen) the player stands so the hand lands on its head.")]
+    [SerializeField] private float petStandDistance = 0.95f;
+    [SerializeField] private float petDuration = 2.2f;
 
     [Header("Wandering")]
     [SerializeField] private float walkSpeed = 1.1f;
@@ -46,8 +56,7 @@ public class CatWander : MonoBehaviour
     [SerializeField] private float meowRange = 4f;
     [Tooltip("Seconds between meows, picked at random within this range.")]
     [SerializeField] private Vector2 meowInterval = new Vector2(8f, 20f);
-    [Tooltip("How far away a meow is still heard. Clicking the cat meows at any distance, " +
-             "so this is kept well past the proximity meow's range.")]
+    [Tooltip("How far away a meow is still heard, so a meow from the next room still carries.")]
     [SerializeField] private float meowHearingDistance = 15f;
 
     // Every cat in the scene, so a click can be tested against their sprites
@@ -101,7 +110,13 @@ public class CatWander : MonoBehaviour
     {
         stateTimer -= Time.deltaTime;
 
-        if (state == State.Walking)
+        if (state == State.AwaitingPet || state == State.Petted)
+        {
+            // Only a fallback: the player normally ends this through EndPetted
+            if (stateTimer <= 0f)
+                Sit();
+        }
+        else if (state == State.Walking)
         {
             if (stateTimer <= 0f)
                 Sit();
@@ -217,7 +232,7 @@ public class CatWander : MonoBehaviour
         if (currentFrames == null || currentFrames.Length == 0 || spriteRenderer == null)
             return;
 
-        float fps = state == State.Walking ? walkFps : sitFps;
+        float fps = state == State.Walking ? walkFps : state == State.Petted ? pettedFps : sitFps;
         frameTimer += Time.deltaTime;
         if (frameTimer >= 1f / fps)
         {
@@ -250,16 +265,19 @@ public class CatWander : MonoBehaviour
 
         meowTimer = Random.Range(meowInterval.x, meowInterval.y);
 
+        if (FindPlayer() && (player.position - transform.position).sqrMagnitude <= meowRange * meowRange)
+            Meow();
+    }
+
+    private bool FindPlayer()
+    {
         if (player == null)
         {
             GameObject found = GameObject.FindGameObjectWithTag("Player");
-            if (found == null)
-                return;
-            player = found.transform;
+            if (found != null)
+                player = found.transform;
         }
-
-        if ((player.position - transform.position).sqrMagnitude <= meowRange * meowRange)
-            Meow();
+        return player != null;
     }
 
     private void Meow()
@@ -270,7 +288,8 @@ public class CatWander : MonoBehaviour
 
     /// <summary>
     /// Called by <see cref="ModelClickHandler"/> for every tap. If the tap lands on a cat's
-    /// sprite, and nothing solid is in front of it, that cat stops, sits and meows.
+    /// sprite, and nothing solid is in front of it, that cat is petted when the player is
+    /// close enough; otherwise the tap is ignored.
     /// Returns true when a cat took the tap, so the click goes no further.
     /// </summary>
     public static bool TryClick(Ray ray, int occluderMask)
@@ -306,6 +325,19 @@ public class CatWander : MonoBehaviour
 
     private void OnClicked()
     {
+        if (state == State.AwaitingPet || state == State.Petted)
+            return;
+
+        // Out of reach: the tap is taken (so it doesn't fall through to what's behind) but
+        // nothing happens
+        if (!PlayerInPetRange())
+            return;
+
+        if (TryPet())
+            return;
+
+        // In reach but the player can't move right now (a menu, a pickup): just a meow
+
         // Don't stack meows on a cat that is still mid-meow
         if (meowClip == null || meowSource.isPlaying)
             return;
@@ -315,6 +347,80 @@ public class CatWander : MonoBehaviour
 
         // Clicking just made it meow; hold off the next unprompted one
         meowTimer = Random.Range(meowInterval.x, meowInterval.y);
+    }
+
+    /// <summary>
+    /// With the player close by, the cat sits and the player steps up beside it - on whichever
+    /// side of the screen they already are - and pets it. The two loops start together when
+    /// the player's hand arrives (see <see cref="PlayerController.TryStartPetting"/>).
+    /// </summary>
+    private bool PlayerInPetRange()
+    {
+        if (!FindPlayer())
+            return false;
+
+        Vector3 toPlayer = player.position - transform.position;
+        toPlayer.y = 0f;
+        return toPlayer.sqrMagnitude <= petRange * petRange;
+    }
+
+    private bool TryPet()
+    {
+        if (pettedFrames == null || pettedFrames.Length == 0 || !PlayerInPetRange())
+            return false;
+
+        Vector3 toPlayer = player.position - transform.position;
+        toPlayer.y = 0f;
+
+        PlayerController petter = player.GetComponent<PlayerController>();
+        if (petter == null)
+            return false;
+
+        if (cameraTransform == null && Camera.main != null)
+            cameraTransform = Camera.main.transform;
+        if (cameraTransform == null)
+            return false;
+
+        Vector3 right = cameraTransform.right;
+        right.y = 0f;
+        right.Normalize();
+        Vector3 forward = cameraTransform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        // Beside the cat across the screen, a touch nearer the camera so the hand draws over it
+        float side = Vector3.Dot(toPlayer, right) >= 0f ? 1f : -1f;
+        Vector3 standAt = transform.position + right * (side * petStandDistance) - forward * 0.05f;
+        standAt.y = player.position.y;
+
+        Vector3 focus = (standAt + transform.position) * 0.5f;
+        focus.y = standAt.y;
+
+        if (!petter.TryStartPetting(standAt, focus, side < 0f, petDuration, BeginPetted, EndPetted))
+            return false;
+
+        state = State.AwaitingPet;
+        stateTimer = 2f;
+        SetFrames(sitFrames);
+        return true;
+    }
+
+    private void BeginPetted()
+    {
+        state = State.Petted;
+        stateTimer = petDuration + 1f;
+        SetFrames(pettedFrames);
+
+        if (meowClip != null && !meowSource.isPlaying)
+            Meow();
+        meowTimer = Random.Range(meowInterval.x, meowInterval.y);
+    }
+
+    private void EndPetted()
+    {
+        // Content: stays sitting a while before wandering off again
+        if (state == State.AwaitingPet || state == State.Petted)
+            Sit();
     }
 
     private void OnEnable()

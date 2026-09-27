@@ -93,8 +93,17 @@ MonoBehaviour:
   - {fileID: -1215474226491948769, guid: 66d3f7fa1d83cce478ddf17ad43c67b9, type: 3}
   - {fileID: 3291272260663919752, guid: 66d3f7fa1d83cce478ddf17ad43c67b9, type: 3}
   - {fileID: 5115001047623075895, guid: 66d3f7fa1d83cce478ddf17ad43c67b9, type: 3}
+  pettedFrames:
+  - {fileID: 2080471632, guid: 9cead5e007dff1e408daad82176246a3, type: 3}
+  - {fileID: -1298851781, guid: 9cead5e007dff1e408daad82176246a3, type: 3}
+  - {fileID: -542997856, guid: 9cead5e007dff1e408daad82176246a3, type: 3}
+  - {fileID: 486765080, guid: 9cead5e007dff1e408daad82176246a3, type: 3}
   walkFps: 9
   sitFps: 3
+  pettedFps: 5.5
+  petRange: 2.5
+  petStandDistance: 0.95
+  petDuration: 2.2
   walkSpeed: 1.1
   walkDuration: {x: 2, y: 5}
   sitDuration: {x: 3, y: 8}
@@ -108,6 +117,7 @@ MonoBehaviour:
   meowClip: {fileID: 8300000, guid: d23dad2235cfb3d46906ae973100b4d2, type: 3}
   meowRange: 4
   meowInterval: {x: 8, y: 20}
+  meowHearingDistance: 15
 --- !u!114 &4763065312981023306
 MonoBehaviour:
   m_ObjectHideFlags: 0
