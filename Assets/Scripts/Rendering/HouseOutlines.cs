@@ -12,7 +12,7 @@ using UnityEngine;
 /// in, and hides with it. The children are built whenever the component is enabled - in the
 /// editor too, so the Scene view shows them - and are hidden from the Hierarchy and never saved.
 ///
-/// A prop is sorted by its name in the house model (numbered copies like "Drawer A.012" count as
+/// A prop is sorted by its name in the house model (numbered copies like "Drawer A 2" count as
 /// "Drawer A"). Parts of a bigger piece - drawer fronts, cupboard doors, car wheels - sit inside
 /// another piece's bounds and get the thin outline, so furniture doesn't gain heavy inner lines.
 /// </summary>
@@ -26,22 +26,23 @@ public class HouseOutlines : MonoBehaviour
              "A name ending in * matches anything starting with it.")]
     [SerializeField] private string[] furniture =
     {
-        "Bath", "Bed double", "Bunk bed", "Chair*", "Cupboard*", "Desk", "Dishwasher", "Drawer*",
-        "Fridge*", "Medicine Cabinet", "Oven", "Radiator*", "Rounded table*", "Sedan*", "SUV*",
-        "Shelf*", "Shower Door", "Sink", "Sofa*", "Standart Bookshelf", "Table*", "Television*",
-        "Toilet", "Tool Chest", "Wall shelf*", "Washing machine", "box_*",
+        "Bath", "Double Bed", "Bunk Bed", "Chair*", "Cupboard*", "Desk*", "Dishwasher*", "Drawer*",
+        "Fridge A*", "Medicine Cabinet*", "Oven*", "Radiator*", "Round Table*", "Sedan*", "SUV*",
+        "Shelf*", "Shower Door", "Sink", "Sink Cupboard*", "Sofa*", "Bookshelf", "Table*", "Television*",
+        "Toilet", "Tool Chest*", "Wall Shelf*", "Washing Machine*", "Box*",
     };
 
     [Tooltip("Names that get the thin item outline.")]
     [SerializeField] private string[] items =
     {
-        "Alarm clock", "Bin", "Books*", "Broom", "Clock", "coat hanger", "Console*", "Glass", "Globe",
-        "Hoover", "Kettle", "Keyboard", "Kitchen Roll", "Knife Block", "Lamp*", "Laptop", "Microwave",
+        "Alarm Clock", "Bin", "Books*", "Broom", "Clock", "Coat Hanger", "Console*", "Glass", "Globe",
+        "Vacuum Cleaner", "Kettle", "Keyboard", "Kitchen Roll", "Knife Block", "Lamp*", "Laptop", "Microwave",
         "Mirror*", "Monitor", "Pan", "PC", "Phone", "Plant*", "Plate", "Pot", "Socket", "Speaker",
         "Tablet", "Wall Light",
     };
 
-    private static readonly Regex NumberSuffix = new Regex(@"\.\d+$");
+    // Numbered copies: "Bin 2", "Drawer A 3 Drawer 4", or Blender's "Bin.002"
+    private static readonly Regex NumberSuffix = new Regex(@"(\.| )\d+$");
     private const string OUTLINE_NAME = "Outline";
 
     private void OnEnable()

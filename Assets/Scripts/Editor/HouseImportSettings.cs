@@ -154,14 +154,22 @@ public class HouseImportSettings : AssetPostprocessor
         // Blender clamps this one (Extend); the kitchen decal's UVs run past the edge
         if (assetPath.EndsWith("texture walls.png"))
             importer.wrapMode = TextureWrapMode.Clamp;
+
+        // The palette's metallic/smoothness map is data, not colour: keep it linear and leave the
+        // alpha (smoothness) of the matte swatches alone
+        if (assetPath == PALETTE_METALLIC)
+        {
+            importer.sRGBTexture = false;
+            importer.alphaIsTransparency = false;
+        }
     }
 
     // Bump when this postprocessor's output changes, so Unity reimports the house instead of
     // reporting an inconsistent import result. 2 = smoothed outline normals in UV3,
-    // 3 = merged outline meshes (HouseOutlineMesh).
+    // 3 = merged outline meshes (HouseOutlineMesh), 4 = House Palette material.
     public override uint GetVersion()
     {
-        return 3;
+        return 4;
     }
 
     // Run after URP's own FBX material importer, which would otherwise rebuild these as opaque
@@ -183,6 +191,12 @@ public class HouseImportSettings : AssetPostprocessor
         if (assetPath != HOUSE_MODEL)
             return;
 
+        if (description.materialName == PALETTE_MATERIAL)
+        {
+            SetUpPalette(material);
+            return;
+        }
+
         if (System.Array.IndexOf(MATTE_MATERIALS, description.materialName) >= 0 && material.HasProperty("_Smoothness"))
             material.SetFloat("_Smoothness", 0f);
 
@@ -193,5 +207,43 @@ public class HouseImportSettings : AssetPostprocessor
         material.SetFloat("_Cutoff", 0.5f);
         material.EnableKeyword("_ALPHATEST_ON");
         material.renderQueue = (int)RenderQueue.AlphaTest;
+    }
+
+    // Every plain-colour material of the house is one swatch of this material's texture, so a prop
+    // with several colours is still a single draw. Each swatch's smoothness sits in the alpha of the
+    // matching cell of the metallic map. Both textures are made alongside the model (v20 onwards).
+    private const string PALETTE_MATERIAL = "House Palette";
+    private const string PALETTE_TEXTURE = HOUSE_TEXTURES + "HousePalette.png";
+    private const string PALETTE_METALLIC = HOUSE_TEXTURES + "HousePalette_MetallicSmoothness.png";
+
+    private void SetUpPalette(Material material)
+    {
+        // Opaque, no cut-out: every texel of the palette is solid
+        material.SetFloat("_Surface", 0f);
+        material.SetFloat("_AlphaClip", 0f);
+        material.DisableKeyword("_ALPHATEST_ON");
+        material.renderQueue = (int)RenderQueue.Geometry;
+        material.SetColor("_BaseColor", Color.white);
+
+        Texture2D palette = AssetDatabase.LoadAssetAtPath<Texture2D>(PALETTE_TEXTURE);
+        Texture2D metallic = AssetDatabase.LoadAssetAtPath<Texture2D>(PALETTE_METALLIC);
+        if (palette == null || metallic == null)
+        {
+            // Asks for a second pass once the textures have been imported
+            context.DependsOnArtifact(PALETTE_TEXTURE);
+            context.DependsOnArtifact(PALETTE_METALLIC);
+            Debug.LogWarning("House palette textures are not imported yet; the house will reimport once they are.");
+            return;
+        }
+        context.DependsOnArtifact(PALETTE_TEXTURE);
+        context.DependsOnArtifact(PALETTE_METALLIC);
+
+        material.SetTexture("_BaseMap", palette);
+        material.SetTexture("_MainTex", palette);
+        material.SetTexture("_MetallicGlossMap", metallic);
+        material.EnableKeyword("_METALLICSPECGLOSSMAP");
+        material.SetFloat("_SmoothnessTextureChannel", 0f);
+        material.SetFloat("_Smoothness", 1f);
+        material.SetFloat("_Metallic", 0f);
     }
 }

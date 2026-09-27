@@ -22,7 +22,7 @@ public class FloorVisibilityManager : MonoBehaviour
     [SerializeField] private float hysteresis = 0.15f;
 
     // Name of the floor slab inside the 2nd floor group; it lands first so the rest has something to land on.
-    private const string FLOOR_SLAB_NAME = "2nd floor";
+    private const string FLOOR_SLAB_NAME = "Second Floor Slab";
 
     private class Piece
     {
