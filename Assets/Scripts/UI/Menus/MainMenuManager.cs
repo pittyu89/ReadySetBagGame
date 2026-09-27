@@ -25,7 +25,7 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private Button optionsButton;
     [SerializeField] private Button howToPlayMenuButton;
     [SerializeField] private Button aboutButton;
-    [SerializeField] private Button switchButton;       // Customize button
+    [SerializeField] private Button switchButton;       // Opens the Customize panel
     [SerializeField] private Button exitButton;
     [SerializeField] private Button logoutButton;          // Inside Options panel
     [SerializeField] private Button optionsPanelCloseButton;

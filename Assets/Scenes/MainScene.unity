@@ -6962,7 +6962,7 @@ GameObject:
   - component: {fileID: 1013491922}
   - component: {fileID: 1013491921}
   m_Layer: 5
-  m_Name: CustomizeButton
+  m_Name: SwitchButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
