@@ -56,20 +56,20 @@ public class SceneNavigationManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Load MainScene. Prepares the background video first so it plays instantly.
+    /// Load MainScene behind the menu transition. Prepares the background video first so it plays instantly.
     /// </summary>
     public void GoToMainScene()
     {
         PrepareMainMenuVideo();
-        SceneManager.LoadScene("MainScene");
+        MenuTransition.LoadScene("MainScene");
     }
 
     /// <summary>
-    /// Load LoginScene.
+    /// Load LoginScene behind the menu transition.
     /// </summary>
     public void GoToLoginScene()
     {
-        SceneManager.LoadScene("LoginScene");
+        MenuTransition.LoadScene("LoginScene");
     }
 
     /// <summary>

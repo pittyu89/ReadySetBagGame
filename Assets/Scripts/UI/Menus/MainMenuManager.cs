@@ -554,7 +554,7 @@ public class MainMenuManager : MonoBehaviour
     {
         PlayButtonAudio();
         StudentLoginManager.Logout();
-        SceneManager.LoadScene("LoginScene");
+        MenuTransition.LoadScene("LoginScene");
     }
 
     private void SetMainMenuButtonsVisible(bool visible)

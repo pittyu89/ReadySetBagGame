@@ -5,7 +5,8 @@ using UnityEngine.Video;
 
 /// <summary>
 /// Handles the MainScene background video using the persistent VideoManager.
-/// The intro animations and BGM are independent — they start immediately on scene load.
+/// BGM starts on scene load; the intro animation waits for the scene transition to start
+/// uncovering the screen, and the transition waits (briefly) for the video's first frame.
 /// </summary>
 [DefaultExecutionOrder(-100)]
 public class VideoBackgroundIntro : MonoBehaviour
@@ -19,6 +20,8 @@ public class VideoBackgroundIntro : MonoBehaviour
     [Header("Intro")]
     [SerializeField] private MainMenuIntroAnimator introAnimator;
     [SerializeField] private MainMenuManager uiManager;
+
+    private bool blockingReveal;
 
     private void Awake()
     {
@@ -40,19 +43,50 @@ public class VideoBackgroundIntro : MonoBehaviour
 
         // Hide the surface until the video is playing
         SetAlpha(backgroundSurface, 0f);
+
+        // Keep the scene transition covering the screen until the video shows a frame, so the
+        // bands reveal the finished background instead of an empty one
+        if (MenuTransition.IsCovering)
+        {
+            MenuTransition.BlockReveal();
+            blockingReveal = true;
+        }
     }
 
     private void Start()
     {
-        // Start BGM and UI animations immediately — don't wait for the video
+        // Start BGM immediately — don't wait for the video
         if (uiManager != null)
             uiManager.PlayMainMenuBGM();
 
-        if (introAnimator != null)
-            introAnimator.PlayIntro();
+        StartCoroutine(PlayIntroWhenRevealed());
 
         // Start the video in the background
         StartCoroutine(StartVideo());
+    }
+
+    private void OnDestroy()
+    {
+        ReleaseReveal();
+    }
+
+    private IEnumerator PlayIntroWhenRevealed()
+    {
+        // The intro would otherwise play out behind the transition
+        while (MenuTransition.IsCovering)
+            yield return null;
+
+        if (introAnimator != null)
+            introAnimator.PlayIntro();
+    }
+
+    private void ReleaseReveal()
+    {
+        if (!blockingReveal)
+            return;
+
+        blockingReveal = false;
+        MenuTransition.UnblockReveal();
     }
 
     private IEnumerator StartVideo()
@@ -80,6 +114,7 @@ public class VideoBackgroundIntro : MonoBehaviour
         if (vp == null)
         {
             SetAlpha(backgroundSurface, 1f);
+            ReleaseReveal();
             yield break;
         }
 
@@ -89,12 +124,24 @@ public class VideoBackgroundIntro : MonoBehaviour
         while (!vp.isPrepared)
             yield return null;
 
+        // The player can already be past frame 1 from before this scene loaded, so wait for a
+        // frame drawn after Awake cleared the texture rather than trusting vp.frame
+        bool frameDrawn = false;
+        VideoPlayer.FrameReadyEventHandler onFrame = (source, index) => frameDrawn = true;
+        vp.sendFrameReadyEvents = true;
+        vp.frameReady += onFrame;
+
         vp.Play();
 
-        while (vp.frame < 1)
+        // Capped so a stalled player can't leave the background hidden
+        for (float waited = 0f; !frameDrawn && waited < 2f; waited += Time.unscaledDeltaTime)
             yield return null;
 
+        vp.frameReady -= onFrame;
+        vp.sendFrameReadyEvents = false;
+
         SetAlpha(backgroundSurface, 1f);
+        ReleaseReveal();
     }
 
     private static void SetAlpha(RawImage image, float alpha)

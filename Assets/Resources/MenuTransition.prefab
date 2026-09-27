@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7973707378710932269
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1331967867196791408}
+  - component: {fileID: 8403621549717492859}
+  m_Layer: 0
+  m_Name: MenuTransition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1331967867196791408
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7973707378710932269}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8403621549717492859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7973707378710932269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 330bb3a2c062c884597bcfd58547510e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuTransition
+  bagHole: {fileID: 21300000, guid: 8afba2d53d4e37844910676a44a7cfb7, type: 3}
+  flapArea:
+    serializedVersion: 2
+    x: 0.15267175
+    y: 0.6449275
+    width: 0.70229006
+    height: 0.18115944
+  holeInner:
+    serializedVersion: 2
+    x: 0.18775511
+    y: 0.10649353
+    width: 0.6244898
+    height: 0.7246753
+  holeShutHeight: 30
+  irisCloseDuration: 0.5
+  anticipationDuration: 0.1
+  anticipationScale: 0.92
+  zoomDuration: 0.45
+  fadeDuration: 0.15
+  revealDuration: 0.55
+  maxRevealHold: 1.5
