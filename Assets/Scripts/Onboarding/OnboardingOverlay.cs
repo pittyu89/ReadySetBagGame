@@ -38,7 +38,7 @@ public class OnboardingOverlay : MonoBehaviour
     private static readonly Color StepColor = new Color(1f, 1f, 1f, 0.55f);
 
     // Narrow enough to sit beside a target in the middle of the screen
-    private const float CardWidth = 470f;
+    private const float CardWidth = 540f;
     private const float FramePadding = 8f;
     private const float FrameThickness = 4f;
 
@@ -49,7 +49,7 @@ public class OnboardingOverlay : MonoBehaviour
 
     // Kept clear of the screen edges and of the timer and pause button along the top
     private const float EdgeMargin = 16f;
-    private const float TopHudHeight = 80f;
+    private const float TopHudHeight = 100f;
 
     private Canvas canvas;
     private RectTransform root;
@@ -104,7 +104,7 @@ public class OnboardingOverlay : MonoBehaviour
         CanvasScaler scaler = gameObject.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1280f, 720f);
-        scaler.matchWidthOrHeight = 0.5f;
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
 
         gameObject.AddComponent<GraphicRaycaster>();
         root = (RectTransform)transform;
@@ -131,19 +131,19 @@ public class OnboardingOverlay : MonoBehaviour
 
         BuildCard(font, buttonSprite);
 
-        badge = MakeText("Badge", root, font, 20f, StepColor);
+        badge = MakeText("Badge", root, font, 26f, StepColor);
         badge.text = "PRACTICE RUN - NOT TIMED OR SCORED";
         badge.alignment = TextAlignmentOptions.Center;
         RectTransform badgeRect = badge.rectTransform;
         badgeRect.anchorMin = badgeRect.anchorMax = new Vector2(0.5f, 0f);
         badgeRect.pivot = new Vector2(0.5f, 0f);
-        badgeRect.sizeDelta = new Vector2(600f, 28f);
+        badgeRect.sizeDelta = new Vector2(760f, 36f);
         badgeRect.anchoredPosition = new Vector2(0f, 10f);
 
         // Bottom-right is the one corner the HUD leaves free: joystick bottom-left, Journal
         // top-left, timer and pause top-centre, bag button top-right
-        Button skip = MakeButton("Skip", root, font, buttonSprite, "SKIP PRACTICE", 24f,
-                                 new Color(0.18f, 0.18f, 0.18f, 0.92f), new Vector2(200f, 44f));
+        Button skip = MakeButton("Skip", root, font, buttonSprite, "SKIP PRACTICE", 30f,
+                                 new Color(0.18f, 0.18f, 0.18f, 0.92f), new Vector2(250f, 56f));
         skipButton = (RectTransform)skip.transform;
         skipButton.anchorMin = skipButton.anchorMax = new Vector2(1f, 0f);
         skipButton.pivot = new Vector2(1f, 0f);
@@ -181,13 +181,13 @@ public class OnboardingOverlay : MonoBehaviour
         ContentSizeFitter fitter = background.gameObject.AddComponent<ContentSizeFitter>();
         fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-        stepText = MakeText("Step", card, font, 20f, StepColor);
+        stepText = MakeText("Step", card, font, 26f, StepColor);
         stepText.alignment = TextAlignmentOptions.Center;
 
-        titleText = MakeText("Title", card, font, 40f, AccentColor);
+        titleText = MakeText("Title", card, font, 46f, AccentColor);
         titleText.alignment = TextAlignmentOptions.Center;
 
-        bodyText = MakeText("Body", card, font, 27f, Color.white);
+        bodyText = MakeText("Body", card, font, 32f, Color.white);
         bodyText.alignment = TextAlignmentOptions.Center;
         bodyText.lineSpacing = -8f;
 
@@ -199,7 +199,7 @@ public class OnboardingOverlay : MonoBehaviour
         rowLayout.childControlWidth = false;
         rowLayout.childControlHeight = false;
         LayoutElement rowElement = row.AddComponent<LayoutElement>();
-        rowElement.preferredHeight = 62f;
+        rowElement.preferredHeight = 72f;
 
         Image buttonImage = MakeImage("Button", row.transform, ButtonColor);
         if (buttonSprite != null)
@@ -207,7 +207,7 @@ public class OnboardingOverlay : MonoBehaviour
             buttonImage.sprite = buttonSprite;
             buttonImage.type = Image.Type.Sliced;
         }
-        buttonImage.rectTransform.sizeDelta = new Vector2(240f, 56f);
+        buttonImage.rectTransform.sizeDelta = new Vector2(270f, 66f);
         button = buttonImage.gameObject.AddComponent<Button>();
         button.onClick.AddListener(() =>
         {
@@ -216,7 +216,7 @@ public class OnboardingOverlay : MonoBehaviour
             pending?.Invoke();
         });
 
-        buttonLabel = MakeText("Label", buttonImage.transform, font, 34f, Color.white);
+        buttonLabel = MakeText("Label", buttonImage.transform, font, 40f, Color.white);
         buttonLabel.alignment = TextAlignmentOptions.Center;
         Stretch(buttonLabel.rectTransform);
     }
@@ -250,9 +250,9 @@ public class OnboardingOverlay : MonoBehaviour
         layout.childForceExpandHeight = false;
         panel.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-        confirmTitle = MakeText("Title", panelRect, font, 40f, AccentColor);
+        confirmTitle = MakeText("Title", panelRect, font, 46f, AccentColor);
         confirmTitle.alignment = TextAlignmentOptions.Center;
-        confirmBody = MakeText("Body", panelRect, font, 27f, Color.white);
+        confirmBody = MakeText("Body", panelRect, font, 32f, Color.white);
         confirmBody.alignment = TextAlignmentOptions.Center;
         confirmBody.lineSpacing = -8f;
 
@@ -263,13 +263,13 @@ public class OnboardingOverlay : MonoBehaviour
         rowLayout.spacing = 20f;
         rowLayout.childControlWidth = false;
         rowLayout.childControlHeight = false;
-        row.AddComponent<LayoutElement>().preferredHeight = 62f;
+        row.AddComponent<LayoutElement>().preferredHeight = 72f;
 
         // The safe choice is the green one: carrying on with the practice
-        Button no = MakeButton("No", row.transform, font, buttonSprite, "KEEP PRACTICING", 30f,
-                               ButtonColor, new Vector2(250f, 56f));
-        Button yes = MakeButton("Yes", row.transform, font, buttonSprite, "SKIP", 30f,
-                                new Color(0.35f, 0.35f, 0.35f, 1f), new Vector2(160f, 56f));
+        Button no = MakeButton("No", row.transform, font, buttonSprite, "KEEP PRACTICING", 36f,
+                               ButtonColor, new Vector2(310f, 66f));
+        Button yes = MakeButton("Yes", row.transform, font, buttonSprite, "SKIP", 36f,
+                                new Color(0.35f, 0.35f, 0.35f, 1f), new Vector2(180f, 66f));
         no.onClick.AddListener(() => CloseConfirm(onConfirmNo));
         yes.onClick.AddListener(() => CloseConfirm(onConfirmYes));
 

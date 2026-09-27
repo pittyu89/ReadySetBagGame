@@ -204,6 +204,7 @@ public class DoorProximityHandler : MonoBehaviour
             canvas.sortingOrder = 0;
             canvasObj.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             canvasObj.GetComponent<CanvasScaler>().referenceResolution = new Vector2(1920, 1080);
+            canvasObj.GetComponent<CanvasScaler>().screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
             canvasObj.AddComponent<GraphicRaycaster>();
         }
 

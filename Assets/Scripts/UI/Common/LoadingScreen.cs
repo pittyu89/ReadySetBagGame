@@ -28,7 +28,7 @@ public class LoadingScreen : MonoBehaviour
     [SerializeField] private Vector2 fillAreaMin = new Vector2(14f / 64f, 6f / 64f);
     [SerializeField] private Vector2 fillAreaMax = new Vector2(50f / 64f, 46f / 64f);
     [SerializeField] private string loadingText = "Loading";
-    [SerializeField] private float fontSize = 44f;
+    [SerializeField] private float fontSize = 52f;
 
     [Header("Timing")]
     [SerializeField] private float wipeDuration = 1.5f;
@@ -184,7 +184,7 @@ public class LoadingScreen : MonoBehaviour
         CanvasScaler scaler = gameObject.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1280f, 720f);
-        scaler.matchWidthOrHeight = 0.5f;
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
 
         // Swallows taps so nothing underneath can be pressed mid-transition
         gameObject.AddComponent<GraphicRaycaster>();

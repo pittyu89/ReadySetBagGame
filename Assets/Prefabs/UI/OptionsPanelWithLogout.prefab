@@ -93,8 +93,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 33.5
+  m_fontSizeBase: 33.5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -370,7 +370,7 @@ PrefabInstance:
     - target: {fileID: 7947222156940257434, guid: e816f479f30e4b1449d4e402d6c006e3,
         type: 3}
       propertyPath: m_Name
-      value: OptionPanel_WithLogout
+      value: OptionsPanelWithLogout
       objectReference: {fileID: 0}
     - target: {fileID: 8349206900043869820, guid: e816f479f30e4b1449d4e402d6c006e3,
         type: 3}

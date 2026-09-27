@@ -349,7 +349,7 @@ public class InventoryGridDisplay : MonoBehaviour
             Text quantityText = quantityObj.AddComponent<Text>();
             quantityText.text = item.quantity.ToString();
             quantityText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            quantityText.fontSize = 14;
+            quantityText.fontSize = 18;
             quantityText.fontStyle = FontStyle.Bold;
             quantityText.alignment = TextAnchor.LowerRight;
             quantityText.color = Color.white;

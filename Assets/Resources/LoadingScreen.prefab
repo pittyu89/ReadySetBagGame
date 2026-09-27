@@ -58,7 +58,7 @@ MonoBehaviour:
   fillAreaMin: {x: 0.21875, y: 0.09375}
   fillAreaMax: {x: 0.78125, y: 0.71875}
   loadingText: Loading
-  fontSize: 44
+  fontSize: 52
   wipeDuration: 1.5
   wipeSlant: 420
   wipeStripeWidth: 44
