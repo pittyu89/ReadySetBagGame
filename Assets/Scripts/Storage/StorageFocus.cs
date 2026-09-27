@@ -174,13 +174,19 @@ public class StorageFocus : MonoBehaviour
         state = State.Closing;
         focusCamera.Priority = 0;
 
+        // Back in view halfway through the glide out - waiting for it to finish left an empty
+        // room on screen for most of a second, but any sooner the camera is still where the
+        // character stands and they fill the screen. Walking waits until the camera is back
+        // behind them.
+        StartCoroutine(ShowPlayerAfter(blendTime * 0.5f));
+
         yield return MoveParts(false, openTime * 0.7f);
 
         float remaining = blendTime - openTime * 0.7f;
         if (remaining > 0f)
             yield return new WaitForSeconds(remaining);
 
-        ShowPlayer();
+        RestoreMovement();
         furniture = null;
         state = State.Idle;
     }
@@ -457,7 +463,16 @@ public class StorageFocus : MonoBehaviour
         if (hiddenShadow != null)
             hiddenShadow.enabled = true;
         hiddenShadow = null;
+    }
 
+    private IEnumerator ShowPlayerAfter(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        ShowPlayer();
+    }
+
+    private void RestoreMovement()
+    {
         if (movementWasEnabled && playerMovement != null)
             playerMovement.SetMovementEnabled(true);
         playerMovement = null;

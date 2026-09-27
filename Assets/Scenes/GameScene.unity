@@ -170,10 +170,10 @@ MonoBehaviour:
   movingParts:
   - part: {fileID: 253131028}
     motion: 2
-    amount: 0.26
+    amount: 0.4
   - part: {fileID: 253131027}
     motion: 2
-    amount: 0.73
+    amount: 0.5
 --- !u!1 &1940655
 GameObject:
   m_ObjectHideFlags: 0
@@ -13333,11 +13333,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraOrbitController
   pivotHeight: 1.375
-  distance: 4.6
+  distance: 5.4
   startYaw: 0
   startPitch: 14
   minPitch: -5
   maxPitch: 60
+  petDistance: 3
+  petPivotHeight: 1
+  petZoomTime: 0.5
   sensitivity: 220
   invertY: 0
 --- !u!1 &277902600
@@ -45596,10 +45599,10 @@ MonoBehaviour:
   movingParts:
   - part: {fileID: 253131025}
     motion: 2
-    amount: 0.26
+    amount: 0.4
   - part: {fileID: 253131024}
     motion: 2
-    amount: 0.73
+    amount: 0.5
 --- !u!1 &1066258667
 GameObject:
   m_ObjectHideFlags: 0
@@ -86665,10 +86668,10 @@ MonoBehaviour:
   movingParts:
   - part: {fileID: 253131109}
     motion: 2
-    amount: 0.26
+    amount: 0.4
   - part: {fileID: 253131108}
     motion: 2
-    amount: 0.73
+    amount: 0.5
 --- !u!1 &2111691003
 GameObject:
   m_ObjectHideFlags: 0
