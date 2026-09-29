@@ -289,6 +289,227 @@ public class MainMenuManager : MonoBehaviour
         descriptionAnims[description] = null;
     }
 
+    // ---- Game mode card art ----------------------------------------------------------------
+    //
+    // A card's icon and label are sized in the scene as the selected card has them: small, to
+    // leave room for the description underneath. Unselected they are shown bigger - the size
+    // they had before the description needed the room - and centred in the card; picked, they
+    // shrink and rise to sit centred in the space above the description. Either way the icon
+    // sits just above its label, and both cards' labels are level.
+
+    // The pre-description sizes: icons were 176 wide (now 132), labels 40pt (now 32pt)
+    private const float UnselectedIconScale = 176f / 132f;
+    private const float UnselectedLabelScale = 40f / 32f;
+
+    // Selected, a little over the scene's own size: still clear of the description
+    private const float SelectedIconScale = 1.12f;
+    private const float SelectedLabelScale = 1.1f;
+
+    // Between the bottom of the icon's art and the top of the label: sitting just above it, as
+    // the cards had them before the description
+    private const float IconLabelGap = 5f;
+
+    private class CardArt
+    {
+        public RectTransform icon;
+        public RectTransform label;
+        public RectTransform description;
+        public Vector3 iconScene, labelScene;
+        public Vector3 iconSelected, labelSelected;
+        public Vector3 iconUnselected, labelUnselected;
+        public float shown = -1f;           // 1 = selected layout, 0 = unselected, -1 = not placed yet
+        public Coroutine anim;
+    }
+
+    private readonly Dictionary<Button, CardArt> cardArts = new Dictionary<Button, CardArt>();
+
+    private CardArt GetCardArt(Button card)
+    {
+        if (cardArts.Count == 0)
+            PrepareCardArts(teacherSessionPlayButton, offlineModePlayButton);
+
+        CardArt art;
+        return cardArts.TryGetValue(card, out art) ? art : new CardArt();
+    }
+
+    /// <summary>
+    /// Works out both cards' layouts together, so their labels line up: in each layout every
+    /// icon sits just above its label, and the taller of the two icon-and-label stacks is
+    /// centred in the space it has - the whole card unselected, the part above the description
+    /// selected - with the other card's label level with it.
+    /// </summary>
+    private void PrepareCardArts(params Button[] cards)
+    {
+        List<CardArt> arts = new List<CardArt>();
+        List<Rect> icons = new List<Rect>();
+        List<Rect> labels = new List<Rect>();
+        Rect cardRect = default;
+        float descriptionTop = float.MaxValue;
+
+        foreach (Button card in cards)
+        {
+            if (card == null)
+                continue;
+
+            CardArt art = new CardArt
+            {
+                icon = card.transform.Find("Icon") as RectTransform,
+                label = card.transform.Find("Label") as RectTransform,
+                description = card.transform.Find("Description") as RectTransform
+            };
+            cardArts[card] = art;
+            if (art.icon == null || art.label == null)
+                continue;
+
+            // Read before anything has moved them: every layout is worked out from these
+            art.iconScene = art.icon.localPosition;
+            art.labelScene = art.label.localPosition;
+
+            // What shows, in the card's space. The icon sprites carry transparent padding, so
+            // the icon is measured by its visible pixels, or it would sit off-centre.
+            arts.Add(art);
+            icons.Add(VisibleRect(art.icon, art.iconScene, 1f));
+            labels.Add(VisibleRect(art.label, art.labelScene, 1f));
+
+            cardRect = ((RectTransform)card.transform).rect;
+            if (art.description != null)
+                descriptionTop = Mathf.Min(descriptionTop,
+                    art.description.localPosition.y + art.description.rect.yMax);
+        }
+
+        if (descriptionTop == float.MaxValue)
+            descriptionTop = cardRect.yMin;
+
+        LayOutCards(arts, icons, labels, UnselectedIconScale, UnselectedLabelScale,
+                    cardRect.yMax, cardRect.yMin, false);
+        LayOutCards(arts, icons, labels, SelectedIconScale, SelectedLabelScale, cardRect.yMax, descriptionTop, true);
+    }
+
+    /// <summary>One layout for every card: stacks at the given scales, centred between two heights.</summary>
+    private static void LayOutCards(List<CardArt> arts, List<Rect> icons, List<Rect> labels,
+                                    float iconScale, float labelScale, float top, float bottom, bool selected)
+    {
+        float tallest = 0f;
+        for (int i = 0; i < arts.Count; i++)
+            tallest = Mathf.Max(tallest, icons[i].height * iconScale + IconLabelGap + labels[i].height * labelScale);
+
+        // Where every label's bottom goes: the bottom of the tallest stack, centred
+        float labelBottom = (top + bottom) * 0.5f - tallest * 0.5f;
+
+        for (int i = 0; i < arts.Count; i++)
+        {
+            float iconHeight = icons[i].height * iconScale;
+            float labelHeight = labels[i].height * labelScale;
+
+            Vector3 icon = PositionFor(arts[i].icon, arts[i].iconScene, 1f, iconScale,
+                new Vector2(icons[i].center.x, labelBottom + labelHeight + IconLabelGap + iconHeight * 0.5f),
+                icons[i].center);
+            Vector3 label = PositionFor(arts[i].label, arts[i].labelScene, 1f, labelScale,
+                new Vector2(labels[i].center.x, labelBottom + labelHeight * 0.5f),
+                labels[i].center);
+
+            if (selected)
+            {
+                arts[i].iconSelected = icon;
+                arts[i].labelSelected = label;
+            }
+            else
+            {
+                arts[i].iconUnselected = icon;
+                arts[i].labelUnselected = label;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Where an element's visible part sits in its parent's space, at a given position and
+    /// scale. For an Image, the sprite's own tight outline; otherwise the whole rect.
+    /// </summary>
+    private static Rect VisibleRect(RectTransform rect, Vector3 position, float scale)
+    {
+        Rect local = rect.rect;
+        Image image = rect.GetComponent<Image>();
+        if (image != null && image.sprite != null && image.type == Image.Type.Simple && !image.preserveAspect)
+        {
+            Sprite sprite = image.sprite;
+            Vector2 min = new Vector2(float.MaxValue, float.MaxValue);
+            Vector2 max = new Vector2(float.MinValue, float.MinValue);
+            foreach (Vector2 v in sprite.vertices)
+            {
+                min = Vector2.Min(min, v);
+                max = Vector2.Max(max, v);
+            }
+
+            // Sprite units to 0-1 across the sprite, then across the rect it is stretched to
+            Vector2 size = sprite.rect.size / sprite.pixelsPerUnit;
+            Vector2 origin = -sprite.pivot / sprite.pixelsPerUnit;
+            Vector2 from = Vector2.Scale(min - origin, new Vector2(1f / size.x, 1f / size.y));
+            Vector2 to = Vector2.Scale(max - origin, new Vector2(1f / size.x, 1f / size.y));
+            local = Rect.MinMaxRect(local.xMin + from.x * local.width, local.yMin + from.y * local.height,
+                                    local.xMin + to.x * local.width, local.yMin + to.y * local.height);
+        }
+
+        return Rect.MinMaxRect(position.x + local.xMin * scale, position.y + local.yMin * scale,
+                               position.x + local.xMax * scale, position.y + local.yMax * scale);
+    }
+
+    /// <summary>
+    /// The position that puts an element's visible centre at <paramref name="center"/> when it is
+    /// scaled to <paramref name="scale"/>, given where that centre is at <paramref name="baseScale"/>.
+    /// </summary>
+    private static Vector3 PositionFor(RectTransform rect, Vector3 basePosition, float baseScale, float scale,
+                                       Vector2 center, Vector2 baseCenter)
+    {
+        // The visible centre's offset from the pivot grows with the scale
+        Vector2 offset = ((Vector2)baseCenter - (Vector2)basePosition) / baseScale;
+        Vector2 position = center - offset * scale;
+        return new Vector3(position.x, position.y, basePosition.z);
+    }
+
+    private void SetCardArtSelected(Button card, bool selected, bool animate)
+    {
+        CardArt art = GetCardArt(card);
+        if (art.icon == null || art.label == null)
+            return;
+
+        if (art.anim != null)
+            StopCoroutine(art.anim);
+        art.anim = null;
+
+        float target = selected ? 1f : 0f;
+        if (!animate || art.shown < 0f || !isActiveAndEnabled || !card.gameObject.activeInHierarchy)
+        {
+            ApplyCardArt(art, target);
+            return;
+        }
+
+        art.anim = StartCoroutine(AnimateCardArt(art, target));
+    }
+
+    private System.Collections.IEnumerator AnimateCardArt(CardArt art, float target)
+    {
+        float from = art.shown;
+        float progress = 0f;
+        while (progress < 1f)
+        {
+            float step = Mathf.Min(Time.unscaledDeltaTime, 1f / 20f);
+            progress = Mathf.Min(progress + step / DescriptionAnimDuration, 1f);
+            float eased = 1f - Mathf.Pow(1f - progress, 3f);
+            ApplyCardArt(art, Mathf.Lerp(from, target, eased));
+            yield return null;
+        }
+        art.anim = null;
+    }
+
+    private static void ApplyCardArt(CardArt art, float selected)
+    {
+        art.shown = selected;
+        art.icon.localPosition = Vector3.Lerp(art.iconUnselected, art.iconSelected, selected);
+        art.label.localPosition = Vector3.Lerp(art.labelUnselected, art.labelSelected, selected);
+        art.icon.localScale = Vector3.one * Mathf.Lerp(UnselectedIconScale, SelectedIconScale, selected);
+        art.label.localScale = Vector3.one * Mathf.Lerp(UnselectedLabelScale, SelectedLabelScale, selected);
+    }
+
     private void SetGameModeCardSelected(Button card, GameObject description, bool selected, bool animate)
     {
         if (description != null)
@@ -296,6 +517,8 @@ public class MainMenuManager : MonoBehaviour
 
         if (card == null)
             return;
+
+        SetCardArtSelected(card, selected, animate);
 
         // The card's red fill is revealed by its tint: see-through unless selected or pressed
         Color shown = Color.white;
