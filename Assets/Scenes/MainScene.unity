@@ -1081,8 +1081,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 256, y: -348}
-  m_SizeDelta: {x: 480, y: 92}
+  m_AnchoredPosition: {x: 256, y: -304}
+  m_SizeDelta: {x: 480, y: 134}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &179798165
 MonoBehaviour:
@@ -1134,12 +1134,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.5
-  m_fontSizeBase: 24.5
+  m_fontSize: 25.5
+  m_fontSizeBase: 25.5
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 16
-  m_fontSizeMax: 24.5
+  m_fontSizeMin: 18
+  m_fontSizeMax: 25.5
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -1222,7 +1222,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 287, y: 50}
+  m_SizeDelta: {x: 230, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &180641587
 MonoBehaviour:
@@ -1272,8 +1272,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
-  m_fontSizeBase: 40
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 0
@@ -3067,7 +3067,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 285, y: 50}
+  m_SizeDelta: {x: 228, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &522255519
 MonoBehaviour:
@@ -3117,8 +3117,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
-  m_fontSizeBase: 40
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 0
@@ -3324,8 +3324,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 256, y: -348}
-  m_SizeDelta: {x: 480, y: 92}
+  m_AnchoredPosition: {x: 256, y: -304}
+  m_SizeDelta: {x: 480, y: 134}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &549573962
 MonoBehaviour:
@@ -3377,12 +3377,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.5
-  m_fontSizeBase: 24.5
+  m_fontSize: 25.5
+  m_fontSizeBase: 28.5
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 16
-  m_fontSizeMax: 24.5
+  m_fontSizeMin: 18
+  m_fontSizeMax: 25.5
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -5047,8 +5047,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 168.5, y: -22.5}
-  m_SizeDelta: {x: 176, y: 297}
+  m_AnchoredPosition: {x: 190.375, y: -22.5}
+  m_SizeDelta: {x: 132, y: 222.75}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &801235792
 MonoBehaviour:
@@ -9088,7 +9088,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 31
+  m_fontSize: 30
   m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -9555,8 +9555,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 123, y: -286}
-  m_SizeDelta: {x: 285, y: 50}
+  m_AnchoredPosition: {x: 142, y: -254}
+  m_SizeDelta: {x: 228, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1384167338
 MonoBehaviour:
@@ -11225,8 +11225,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 134, y: 42.5}
-  m_SizeDelta: {x: 256, y: 432}
+  m_AnchoredPosition: {x: 164.5, y: 26.25}
+  m_SizeDelta: {x: 192, y: 324}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1799952634
 MonoBehaviour:
@@ -12210,8 +12210,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 113, y: -286}
-  m_SizeDelta: {x: 287, y: 50}
+  m_AnchoredPosition: {x: 141, y: -254}
+  m_SizeDelta: {x: 230, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1917811312
 MonoBehaviour:

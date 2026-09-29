@@ -492,11 +492,13 @@ public class InventoryPanel : MonoBehaviour
         if (inventoryPanel != null)
             inventoryPanel.SetActive(true);
 
-        // GoBagSide takes left half, no storage side or model display
+        // GoBagSide takes whatever the quiz panel leaves on the left. The quiz is authored a
+        // little wider than half: its dialogue box alone fills a half-screen at 16:9.
+        float split = quizPanel != null ? ((RectTransform)quizPanel.transform).anchorMin.x : 0.5f;
         if (goBagSide != null)
         {
             goBagSide.anchorMin = new Vector2(0, 0);
-            goBagSide.anchorMax = new Vector2(0.5f, 1);
+            goBagSide.anchorMax = new Vector2(split, 1);
             goBagSide.offsetMin = Vector2.zero;
             goBagSide.offsetMax = Vector2.zero;
             goBagSide.gameObject.SetActive(true);
