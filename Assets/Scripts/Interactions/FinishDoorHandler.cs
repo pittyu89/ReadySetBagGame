@@ -134,8 +134,38 @@ public class FinishDoorHandler : MonoBehaviour
 
     private void ShowQuizAtTimeUp()
     {
-        if (quizOpened)
+        if (!OpenQuizPanel())
             return;
+
+        // The practice run asks the one question it set up, and scores nothing
+        if (OnboardingManager.IsPracticeRun)
+            quizHandler.OpenPracticeQuiz(OnboardingManager.PracticeAnswerItem);
+        // Every answer comes out of the go-bag, so with nothing in it there is no quiz
+        // to play: straight to the results
+        else if (GoBagIsEmpty())
+            quizHandler.SkipToResults();
+        else
+            quizHandler.OpenQuiz();
+    }
+
+    /// <summary>
+    /// Puts a resumed drill straight back into its quiz, at the question it had reached,
+    /// on the same screen the door opens it on.
+    /// </summary>
+    public void ResumeQuiz(QuizProgress progress)
+    {
+        if (OpenQuizPanel())
+            quizHandler.ResumeQuiz(progress);
+    }
+
+    /// <summary>
+    /// Stops the round clock and lays out the quiz screen: the bag on the left, the quiz on
+    /// the right. False if the quiz has already been opened, or can't be found.
+    /// </summary>
+    private bool OpenQuizPanel()
+    {
+        if (quizOpened)
+            return false;
         quizOpened = true;
 
         // Pause the timer first to prevent any audio updates
@@ -166,19 +196,7 @@ public class FinishDoorHandler : MonoBehaviour
             quizHandler = FindFirstObjectByType<QuizManager>(FindObjectsInactive.Include); // includeInactive = true
         }
 
-        // Open the quiz
-        if (quizHandler != null)
-        {
-            // The practice run asks the one question it set up, and scores nothing
-            if (OnboardingManager.IsPracticeRun)
-                quizHandler.OpenPracticeQuiz(OnboardingManager.PracticeAnswerItem);
-            // Every answer comes out of the go-bag, so with nothing in it there is no quiz
-            // to play: straight to the results
-            else if (GoBagIsEmpty())
-                quizHandler.SkipToResults();
-            else
-                quizHandler.OpenQuiz();
-        }
+        return quizHandler != null;
     }
 
     private static bool GoBagIsEmpty()

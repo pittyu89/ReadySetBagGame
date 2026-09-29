@@ -22,6 +22,35 @@ public struct QuestionData
 }
 
 /// <summary>
+/// Where a drill's quiz stands, so it can carry on after the game was left or closed, or after
+/// the practice was replayed from its pause menu. Kept at the question the player is on:
+/// once an answer is scored, it points at the next question. If that answer's minigame was
+/// cut off, it is played again from the start on the way back, with only the time it had
+/// left, so leaving mid-minigame gains nothing.
+/// </summary>
+[System.Serializable]
+public class QuizProgress
+{
+    // Indices into the question pool, in the order this round asks them
+    public List<int> questionOrder = new List<int>();
+    public int nextQuestion;
+    public int correctCount;
+    public int tasksCompleted;
+    // Seconds left to answer nextQuestion
+    public float questionTimeLeft;
+
+    // The answered question whose minigame hasn't been seen through yet, or -1, and the
+    // seconds that minigame had left
+    public int pendingMinigame = -1;
+    public float minigameTimeLeft;
+
+    // What the bag held when the quiz opened, which the score is taken from
+    public List<string> packedNames = new List<string>();
+    public List<float> packedWeights = new List<float>();
+    public float weightLimitAtOpen;
+}
+
+/// <summary>
 /// Drives the quiz as a dialogue sequence.
 /// - every question in the list, one at a time, shuffled each run
 /// - The question types into the dialogue box, then a single answer box accepts an item
@@ -343,6 +372,19 @@ public class QuizManager : MonoBehaviour
     // Set by the onboarding once the player has read the practice question's feedback
     private bool practiceFeedbackRead = false;
 
+    // Where the round can be resumed from (see QuizProgress). Moved on only at the points
+    // where the round's state is settled: a question put up, an answer scored.
+    private int savedQuestion;
+    private int savedCorrect;
+    private int savedTasks;
+    private float questionTimeLeft;
+    private int savedPendingMinigame = -1;
+    private float minigameTimeLeft;
+    private bool finished;
+
+    // A resumed question's countdown starts from here instead of the full limit
+    private float resumeQuestionTime = -1f;
+
     /// <summary>Raised when an answer lands (or the question times out), with the verdict.</summary>
     public event System.Action<bool> AnswerResolved;
     /// <summary>
@@ -356,6 +398,12 @@ public class QuizManager : MonoBehaviour
     public event System.Action MinigameFinished;
     /// <summary>Raised instead of the results screen when the practice quiz is over.</summary>
     public event System.Action PracticeQuizFinished;
+
+    /// <summary>
+    /// True once the drill's quiz has begun, even if it went straight to the results. Packing
+    /// is over from then on: a resumed drill comes back into the quiz (<see cref="CaptureProgress"/>).
+    /// </summary>
+    public bool HasStarted { get; private set; }
 
     /// <summary>The pieces of the quiz the onboarding points at.</summary>
     public GameObject DialogueBox => dialogueBox;
@@ -551,6 +599,8 @@ public class QuizManager : MonoBehaviour
     /// </summary>
     public void OpenQuiz()
     {
+        HasStarted = true;
+        finished = false;
         practiceQuiz = false;
         currentQuestionIndex = 0;
         correctCount = 0;
@@ -585,6 +635,7 @@ public class QuizManager : MonoBehaviour
     /// </summary>
     public void SkipToResults()
     {
+        HasStarted = true;
         practiceQuiz = false;
         currentQuestionIndex = 0;
         correctCount = 0;
@@ -594,6 +645,152 @@ public class QuizManager : MonoBehaviour
         CaptureBagSnapshot();
         RandomizeQuestions();
         FinishQuiz();
+    }
+
+    /// <summary>
+    /// Where this drill's quiz stands, or null when there is nothing to resume: it hasn't
+    /// begun, it is the practice's, or it has already reached the results.
+    /// </summary>
+    public QuizProgress CaptureProgress()
+    {
+        if (!HasStarted || practiceQuiz || finished)
+            return null;
+
+        QuizProgress progress = new QuizProgress
+        {
+            nextQuestion = savedQuestion,
+            correctCount = savedCorrect,
+            tasksCompleted = savedTasks,
+            questionTimeLeft = questionTimeLeft,
+            pendingMinigame = savedPendingMinigame,
+            minigameTimeLeft = minigameTimeLeft,
+            weightLimitAtOpen = weightLimitAtOpen
+        };
+
+        foreach (QuestionData question in randomizedQuestions)
+            progress.questionOrder.Add(System.Array.FindIndex(allQuestions, q => q.questionText == question.questionText));
+
+        foreach (DrillScore.PackedItem packed in packedAtOpen)
+        {
+            progress.packedNames.Add(packed.Name);
+            progress.packedWeights.Add(packed.WeightKg);
+        }
+
+        return progress;
+    }
+
+    /// <summary>
+    /// Carries a saved quiz on at the question it had reached, with that question's time left.
+    /// The panel must already be up, as <see cref="FinishDoorHandler"/> puts it up for
+    /// <see cref="OpenQuiz"/>; the bag must already hold what it held.
+    /// </summary>
+    public void ResumeQuiz(QuizProgress progress)
+    {
+        HasStarted = true;
+        finished = false;
+        practiceQuiz = false;
+        isResolvingAnswer = false;
+        correctCount = progress.correctCount;
+        tasksCompleted = progress.tasksCompleted;
+
+        randomizedQuestions.Clear();
+        foreach (int index in progress.questionOrder)
+        {
+            if (index >= 0 && index < allQuestions.Length)
+                randomizedQuestions.Add(allQuestions[index]);
+        }
+
+        // The bag as it was packed: what the score is taken from, not what is left in it now
+        packedAtOpen.Clear();
+        Dictionary<string, SupplyItem> supplies = new Dictionary<string, SupplyItem>(System.StringComparer.OrdinalIgnoreCase);
+        foreach (SupplyItem supply in Resources.LoadAll<SupplyItem>("ItemData"))
+        {
+            if (supply != null && !string.IsNullOrEmpty(supply.ItemName))
+                supplies[supply.ItemName] = supply;
+        }
+        for (int i = 0; i < progress.packedNames.Count; i++)
+        {
+            SupplyItem supply;
+            float weight = i < progress.packedWeights.Count ? progress.packedWeights[i] : 0f;
+            packedAtOpen.Add(supplies.TryGetValue(progress.packedNames[i], out supply)
+                ? new DrillScore.PackedItem(supply)
+                : new DrillScore.PackedItem(progress.packedNames[i], ItemImportance.Nuisance, weight));
+        }
+        weightLimitAtOpen = progress.weightLimitAtOpen;
+        essentialTargetAtOpen = DrillScore.CountEssentialTarget(Resources.LoadAll<SupplyItem>("ItemData"));
+
+        if (dialogueBox != null)
+            dialogueBox.SetActive(true);
+
+        if (characterPortrait != null)
+            characterPortrait.gameObject.SetActive(true);
+
+        if (feedbackBanner != null)
+            feedbackBanner.Hide();
+
+        if (questionTimerText != null)
+            questionTimerText.gameObject.SetActive(true);
+
+        // Cut off in a minigame: play it again first, then carry on
+        if (progress.pendingMinigame >= 0 && progress.pendingMinigame < randomizedQuestions.Count)
+        {
+            StartCoroutine(ResumeAtMinigame(progress));
+            return;
+        }
+
+        ContinueFrom(progress.nextQuestion, progress.questionTimeLeft);
+    }
+
+    /// <summary>
+    /// Plays a minigame that leaving cut off, from its start, with the time it had left - it
+    /// counts if seen through, as it would have - then moves on to the next question.
+    /// </summary>
+    private IEnumerator ResumeAtMinigame(QuizProgress progress)
+    {
+        int question = progress.pendingMinigame;
+
+        // Held where it was saved while the minigame replays
+        savedQuestion = progress.nextQuestion;
+        savedCorrect = correctCount;
+        savedTasks = tasksCompleted;
+        questionTimeLeft = questionTimeLimit;
+        savedPendingMinigame = question;
+        minigameTimeLeft = progress.minigameTimeLeft;
+
+        // The answer box refuses drops until the next question is up
+        isResolvingAnswer = true;
+        currentQuestionIndex = progress.nextQuestion;
+
+        if (questionText != null && question < randomizedQuestions.Count)
+        {
+            questionText.text = randomizedQuestions[question].questionText.Trim();
+            questionText.maxVisibleCharacters = int.MaxValue;
+        }
+
+        if (questionTimerBar != null)
+            questionTimerBar.Hide();
+
+        minigameTimedOut = false;
+        yield return StartCoroutine(PlayMinigamesFor(question, progress.minigameTimeLeft));
+
+        if (!minigameTimedOut)
+            tasksCompleted++;
+
+        ContinueFrom(progress.nextQuestion, -1f);
+        isResolvingAnswer = false;
+    }
+
+    /// <summary>Puts up the given question, or the results if the round is done.</summary>
+    private void ContinueFrom(int question, float timeLeft)
+    {
+        if (question >= TotalQuestions)
+        {
+            FinishQuiz();
+            return;
+        }
+
+        resumeQuestionTime = timeLeft;
+        ShowQuestion(question);
     }
 
     /// <summary>Lets the practice quiz move on from the feedback it is holding on.</summary>
@@ -672,14 +869,9 @@ public class QuizManager : MonoBehaviour
             return;
 #endif
 
-        for (int i = randomizedQuestions.Count - 1; i > 0; i--)
-        {
-            int randomIndex = Random.Range(0, i + 1);
-
-            QuestionData temp = randomizedQuestions[i];
-            randomizedQuestions[i] = randomizedQuestions[randomIndex];
-            randomizedQuestions[randomIndex] = temp;
-        }
+        // GameRandom, not UnityEngine.Random: the shared generator was giving every run the
+        // same order
+        GameRandom.Shuffle(randomizedQuestions);
 
         // The round is as long as the difficulty asks for: with a larger pool, the shuffle
         // above decides which questions make the cut and the rest sit this run out.
@@ -744,6 +936,14 @@ public class QuizManager : MonoBehaviour
     {
         currentQuestionIndex = index;
 
+        // The round is settled here: resuming from this point asks this question next
+        savedQuestion = index;
+        savedCorrect = correctCount;
+        savedTasks = tasksCompleted;
+        savedPendingMinigame = -1;
+        questionTimeLeft = resumeQuestionTime > 0f ? Mathf.Min(resumeQuestionTime, questionTimeLimit) : questionTimeLimit;
+        resumeQuestionTime = -1f;
+
         if (answerBox != null)
             answerBox.PrepareForQuestion(index);
 
@@ -763,7 +963,7 @@ public class QuizManager : MonoBehaviour
         if (questionTimerBar != null && questionTimeLimit > 0f)
             questionTimerBar.Begin();
 
-        UpdateQuestionTimerDisplay(questionTimeLimit);
+        UpdateQuestionTimerDisplay(questionTimeLeft);
 
         typewriterRoutine = StartCoroutine(TypeQuestion(text, true));
     }
@@ -799,7 +999,8 @@ public class QuizManager : MonoBehaviour
     /// </summary>
     private IEnumerator RunQuestionTimer()
     {
-        float remaining = questionTimeLimit;
+        // A resumed question picks its countdown up where it was left
+        float remaining = questionTimeLeft;
         UpdateQuestionTimerDisplay(remaining);
 
         while (remaining > 0f)
@@ -814,6 +1015,7 @@ public class QuizManager : MonoBehaviour
             }
 
             remaining -= Time.deltaTime;
+            questionTimeLeft = Mathf.Max(0.05f, remaining);
             UpdateQuestionTimerDisplay(remaining);
         }
 
@@ -875,7 +1077,7 @@ public class QuizManager : MonoBehaviour
     /// is ticked, and whatever the minigame has left to play out, it plays out untimed.
     /// </summary>
     private IEnumerator PlayTimedMinigame(IEnumerator play, System.Action forceClose,
-                                          MonoBehaviour minigame)
+                                          MonoBehaviour minigame, float timeLimit)
     {
         minigameRunning = true;
         Coroutine routine = StartCoroutine(WatchMinigame(play));
@@ -890,7 +1092,8 @@ public class QuizManager : MonoBehaviour
             ? minigame.GetComponentInChildren<MinigameObjective>(true)
             : null;
 
-        float remaining = minigameTimeLimit;
+        // A minigame played again after a resumed drill starts with only the time it had left
+        float remaining = Mathf.Min(timeLimit, minigameTimeLimit);
 
         // The practice quiz shows the clock, full, but never runs it down
         bool shown = minigameTimeLimit > 0f;
@@ -927,6 +1130,14 @@ public class QuizManager : MonoBehaviour
                 timed = false;
                 HideMinigameClock();
 
+                // Seen through: credited from here, whatever happens to the rest of it
+                if (savedPendingMinigame >= 0)
+                {
+                    savedPendingMinigame = -1;
+                    savedTasks++;
+                    OnboardingManager.SaveSessionDrill(now: true);
+                }
+
                 if (minigameResultBanner != null)
                 {
                     GameObject ownBanner = objective.CompletedBanner;
@@ -941,6 +1152,7 @@ public class QuizManager : MonoBehaviour
                 continue;
 
             remaining -= Time.deltaTime;
+            minigameTimeLeft = Mathf.Max(0.05f, remaining);
             UpdateTimerLabel(minigameTimerText, remaining);
             UpdateMinigameTicking(remaining);
 
@@ -955,6 +1167,9 @@ public class QuizManager : MonoBehaviour
                 minigameRunning = false;
                 minigameTimedOut = true;
                 HideMinigameClock();
+
+                // Timed out: settled, and not credited
+                savedPendingMinigame = -1;
 
                 if (objective != null)
                     objective.SetFailed();
@@ -1122,6 +1337,19 @@ public class QuizManager : MonoBehaviour
             answerBox.ConsumeItem();
         }
 
+        // The answer is scored and its item gone: resuming from here moves on to the next
+        // question. Its minigame is only credited once it has been played through, below;
+        // leaving before then plays it again from the start on the way back, with the time
+        // it had left.
+        bool hasMinigame = QuestionHasMinigame(answerBoxIndex);
+        savedQuestion = answerBoxIndex + 1;
+        savedCorrect = correctCount;
+        savedTasks = tasksCompleted + (hasMinigame ? 0 : 1);
+        questionTimeLeft = questionTimeLimit;
+        savedPendingMinigame = hasMinigame ? answerBoxIndex : -1;
+        minigameTimeLeft = minigameTimeLimit;
+        OnboardingManager.SaveSessionDrill(now: true);
+
         yield return new WaitForSecondsRealtime(preFeedbackDelay);
 
         // Freeze the quiz into a blurred still so the verdict is the only thing in focus.
@@ -1177,65 +1405,7 @@ public class QuizManager : MonoBehaviour
         // Runs on the question itself, not the answer — right or wrong, the player still
         // pours the water and still blows the whistle. Uses the index of the question just
         // answered, since currentQuestionIndex has already moved on.
-        if (waterMinigame != null && QuestionOwnsMinigame(answerBoxIndex, waterMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(waterMinigame.Play(), waterMinigame.ForceClose, waterMinigame));
-
-        if (whistleMinigame != null && QuestionOwnsMinigame(answerBoxIndex, whistleMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(whistleMinigame.Play(), whistleMinigame.ForceClose, whistleMinigame));
-
-        if (flashlightMinigame != null && QuestionOwnsMinigame(answerBoxIndex, flashlightMinigameItemNames))
-            yield return StartCoroutine(PlayTimedMinigame(flashlightMinigame.Play(), flashlightMinigame.ForceClose, flashlightMinigame));
-
-        if (glowstickMinigame != null && QuestionOwnsMinigame(answerBoxIndex, glowstickMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(glowstickMinigame.Play(), glowstickMinigame.ForceClose, glowstickMinigame));
-
-        if (dustMaskMinigame != null && QuestionOwnsMinigame(answerBoxIndex, dustMaskMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(dustMaskMinigame.Play(), dustMaskMinigame.ForceClose, dustMaskMinigame));
-
-        if (firstAidMinigame != null && QuestionOwnsMinigame(answerBoxIndex, firstAidMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(firstAidMinigame.Play(), firstAidMinigame.ForceClose, firstAidMinigame));
-
-        if (pocketKnifeMinigame != null && QuestionOwnsMinigame(answerBoxIndex, pocketKnifeMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(pocketKnifeMinigame.Play(), pocketKnifeMinigame.ForceClose, pocketKnifeMinigame));
-
-        if (ropeKnotMinigame != null && QuestionOwnsMinigame(answerBoxIndex, ropeKnotMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(ropeKnotMinigame.Play(), ropeKnotMinigame.ForceClose, ropeKnotMinigame));
-
-        if (medicationMinigame != null && QuestionOwnsMinigame(answerBoxIndex, medicationMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(medicationMinigame.Play(), medicationMinigame.ForceClose, medicationMinigame));
-
-        if (ziplockMinigame != null && QuestionOwnsMinigame(answerBoxIndex, ziplockMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(ziplockMinigame.Play(), ziplockMinigame.ForceClose, ziplockMinigame));
-
-        if (thermalBlanketMinigame != null && QuestionOwnsMinigame(answerBoxIndex, thermalBlanketMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(thermalBlanketMinigame.Play(), thermalBlanketMinigame.ForceClose, thermalBlanketMinigame));
-
-        if (radioMinigame != null && QuestionOwnsMinigame(answerBoxIndex, radioMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(radioMinigame.Play(), radioMinigame.ForceClose, radioMinigame));
-
-        if (contactCardMinigame != null && QuestionOwnsMinigame(answerBoxIndex, contactCardMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(contactCardMinigame.Play(), contactCardMinigame.ForceClose, contactCardMinigame));
-
-        if (cannedFoodMinigame != null && QuestionOwnsMinigame(answerBoxIndex, cannedFoodMinigameItemNames))
-            yield return StartCoroutine(PlayTimedMinigame(cannedFoodMinigame.Play(), cannedFoodMinigame.ForceClose, cannedFoodMinigame));
-
-        if (penAndPaperMinigame != null && QuestionOwnsMinigame(answerBoxIndex, penAndPaperMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(penAndPaperMinigame.Play(), penAndPaperMinigame.ForceClose, penAndPaperMinigame));
-
-        if (importantDocumentsMinigame != null && QuestionOwnsMinigame(answerBoxIndex, importantDocumentsMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(importantDocumentsMinigame.Play(), importantDocumentsMinigame.ForceClose, importantDocumentsMinigame));
-
-        if (batteriesMinigame != null && QuestionOwnsMinigame(answerBoxIndex, batteriesMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(batteriesMinigame.Play(), batteriesMinigame.ForceClose, batteriesMinigame));
-
-        if (clothesMinigame != null && QuestionOwnsMinigame(answerBoxIndex, clothesMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(clothesMinigame.Play(), clothesMinigame.ForceClose, clothesMinigame));
-
-        if (glovesMinigame != null && QuestionOwnsMinigame(answerBoxIndex, glovesMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(glovesMinigame.Play(), glovesMinigame.ForceClose, glovesMinigame));
-
-        if (toiletriesMinigame != null && QuestionOwnsMinigame(answerBoxIndex, toiletriesMinigameItemName))
-            yield return StartCoroutine(PlayTimedMinigame(toiletriesMinigame.Play(), toiletriesMinigame.ForceClose, toiletriesMinigame));
+        yield return StartCoroutine(PlayMinigamesFor(answerBoxIndex, minigameTimeLimit));
 
         // The practical half of this question is done — either its minigame has just played
         // through, or it never had one. Counted for right and wrong answers alike, but not
@@ -1251,6 +1421,74 @@ public class QuizManager : MonoBehaviour
 
         ShowQuestion(currentQuestionIndex);
         isResolvingAnswer = false;
+    }
+
+    /// <summary>
+    /// Plays the minigame that belongs to the question at <paramref name="questionIndex"/>, if
+    /// it has one, against <paramref name="timeLimit"/> seconds: the full limit after an
+    /// answer, or what was left of it when a resumed drill plays one again.
+    /// </summary>
+    private IEnumerator PlayMinigamesFor(int questionIndex, float timeLimit)
+    {
+        if (waterMinigame != null && QuestionOwnsMinigame(questionIndex, waterMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(waterMinigame.Play(), waterMinigame.ForceClose, waterMinigame, timeLimit));
+
+        if (whistleMinigame != null && QuestionOwnsMinigame(questionIndex, whistleMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(whistleMinigame.Play(), whistleMinigame.ForceClose, whistleMinigame, timeLimit));
+
+        if (flashlightMinigame != null && QuestionOwnsMinigame(questionIndex, flashlightMinigameItemNames))
+            yield return StartCoroutine(PlayTimedMinigame(flashlightMinigame.Play(), flashlightMinigame.ForceClose, flashlightMinigame, timeLimit));
+
+        if (glowstickMinigame != null && QuestionOwnsMinigame(questionIndex, glowstickMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(glowstickMinigame.Play(), glowstickMinigame.ForceClose, glowstickMinigame, timeLimit));
+
+        if (dustMaskMinigame != null && QuestionOwnsMinigame(questionIndex, dustMaskMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(dustMaskMinigame.Play(), dustMaskMinigame.ForceClose, dustMaskMinigame, timeLimit));
+
+        if (firstAidMinigame != null && QuestionOwnsMinigame(questionIndex, firstAidMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(firstAidMinigame.Play(), firstAidMinigame.ForceClose, firstAidMinigame, timeLimit));
+
+        if (pocketKnifeMinigame != null && QuestionOwnsMinigame(questionIndex, pocketKnifeMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(pocketKnifeMinigame.Play(), pocketKnifeMinigame.ForceClose, pocketKnifeMinigame, timeLimit));
+
+        if (ropeKnotMinigame != null && QuestionOwnsMinigame(questionIndex, ropeKnotMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(ropeKnotMinigame.Play(), ropeKnotMinigame.ForceClose, ropeKnotMinigame, timeLimit));
+
+        if (medicationMinigame != null && QuestionOwnsMinigame(questionIndex, medicationMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(medicationMinigame.Play(), medicationMinigame.ForceClose, medicationMinigame, timeLimit));
+
+        if (ziplockMinigame != null && QuestionOwnsMinigame(questionIndex, ziplockMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(ziplockMinigame.Play(), ziplockMinigame.ForceClose, ziplockMinigame, timeLimit));
+
+        if (thermalBlanketMinigame != null && QuestionOwnsMinigame(questionIndex, thermalBlanketMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(thermalBlanketMinigame.Play(), thermalBlanketMinigame.ForceClose, thermalBlanketMinigame, timeLimit));
+
+        if (radioMinigame != null && QuestionOwnsMinigame(questionIndex, radioMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(radioMinigame.Play(), radioMinigame.ForceClose, radioMinigame, timeLimit));
+
+        if (contactCardMinigame != null && QuestionOwnsMinigame(questionIndex, contactCardMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(contactCardMinigame.Play(), contactCardMinigame.ForceClose, contactCardMinigame, timeLimit));
+
+        if (cannedFoodMinigame != null && QuestionOwnsMinigame(questionIndex, cannedFoodMinigameItemNames))
+            yield return StartCoroutine(PlayTimedMinigame(cannedFoodMinigame.Play(), cannedFoodMinigame.ForceClose, cannedFoodMinigame, timeLimit));
+
+        if (penAndPaperMinigame != null && QuestionOwnsMinigame(questionIndex, penAndPaperMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(penAndPaperMinigame.Play(), penAndPaperMinigame.ForceClose, penAndPaperMinigame, timeLimit));
+
+        if (importantDocumentsMinigame != null && QuestionOwnsMinigame(questionIndex, importantDocumentsMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(importantDocumentsMinigame.Play(), importantDocumentsMinigame.ForceClose, importantDocumentsMinigame, timeLimit));
+
+        if (batteriesMinigame != null && QuestionOwnsMinigame(questionIndex, batteriesMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(batteriesMinigame.Play(), batteriesMinigame.ForceClose, batteriesMinigame, timeLimit));
+
+        if (clothesMinigame != null && QuestionOwnsMinigame(questionIndex, clothesMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(clothesMinigame.Play(), clothesMinigame.ForceClose, clothesMinigame, timeLimit));
+
+        if (glovesMinigame != null && QuestionOwnsMinigame(questionIndex, glovesMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(glovesMinigame.Play(), glovesMinigame.ForceClose, glovesMinigame, timeLimit));
+
+        if (toiletriesMinigame != null && QuestionOwnsMinigame(questionIndex, toiletriesMinigameItemName))
+            yield return StartCoroutine(PlayTimedMinigame(toiletriesMinigame.Play(), toiletriesMinigame.ForceClose, toiletriesMinigame, timeLimit));
     }
 
     /// <summary>
@@ -1306,8 +1544,36 @@ public class QuizManager : MonoBehaviour
         return false;
     }
 
+    /// <summary>Whether the question at <paramref name="questionIndex"/> is followed by a minigame.</summary>
+    private bool QuestionHasMinigame(int questionIndex)
+    {
+        return (waterMinigame != null && QuestionOwnsMinigame(questionIndex, waterMinigameItemName))
+            || (whistleMinigame != null && QuestionOwnsMinigame(questionIndex, whistleMinigameItemName))
+            || (flashlightMinigame != null && QuestionOwnsMinigame(questionIndex, flashlightMinigameItemNames))
+            || (glowstickMinigame != null && QuestionOwnsMinigame(questionIndex, glowstickMinigameItemName))
+            || (dustMaskMinigame != null && QuestionOwnsMinigame(questionIndex, dustMaskMinigameItemName))
+            || (firstAidMinigame != null && QuestionOwnsMinigame(questionIndex, firstAidMinigameItemName))
+            || (pocketKnifeMinigame != null && QuestionOwnsMinigame(questionIndex, pocketKnifeMinigameItemName))
+            || (ropeKnotMinigame != null && QuestionOwnsMinigame(questionIndex, ropeKnotMinigameItemName))
+            || (medicationMinigame != null && QuestionOwnsMinigame(questionIndex, medicationMinigameItemName))
+            || (ziplockMinigame != null && QuestionOwnsMinigame(questionIndex, ziplockMinigameItemName))
+            || (thermalBlanketMinigame != null && QuestionOwnsMinigame(questionIndex, thermalBlanketMinigameItemName))
+            || (radioMinigame != null && QuestionOwnsMinigame(questionIndex, radioMinigameItemName))
+            || (contactCardMinigame != null && QuestionOwnsMinigame(questionIndex, contactCardMinigameItemName))
+            || (cannedFoodMinigame != null && QuestionOwnsMinigame(questionIndex, cannedFoodMinigameItemNames))
+            || (penAndPaperMinigame != null && QuestionOwnsMinigame(questionIndex, penAndPaperMinigameItemName))
+            || (importantDocumentsMinigame != null && QuestionOwnsMinigame(questionIndex, importantDocumentsMinigameItemName))
+            || (batteriesMinigame != null && QuestionOwnsMinigame(questionIndex, batteriesMinigameItemName))
+            || (clothesMinigame != null && QuestionOwnsMinigame(questionIndex, clothesMinigameItemName))
+            || (glovesMinigame != null && QuestionOwnsMinigame(questionIndex, glovesMinigameItemName))
+            || (toiletriesMinigame != null && QuestionOwnsMinigame(questionIndex, toiletriesMinigameItemName));
+    }
+
     private void FinishQuiz()
     {
+        if (!practiceQuiz)
+            finished = true;
+
         StopQuestionTimer();
 
         if (questionTimerText != null)
@@ -1370,7 +1636,9 @@ public class QuizManager : MonoBehaviour
         // NEXT DIFFICULTY button already knows.
         DifficultyProgress.RecordScore(difficulty, drill.FinalScore);
 
-        // Teacher sessions report the run to the dashboard (offline practice does nothing here)
+        // Teacher sessions report the run to the dashboard (offline practice does nothing here).
+        // It also marks the student's one drill of the session done: nothing to resume, no
+        // second go.
         SessionResultUploader.Submit(drill, score, TotalQuestions, remainingTime, totalTime, difficulty);
 
         // Show results panel

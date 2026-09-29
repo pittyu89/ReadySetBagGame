@@ -189,6 +189,25 @@ public class InventoryGrid
     }
 
     /// <summary>
+    /// Every item in the grid with the slot its top-left corner sits in, so the grid can be
+    /// rebuilt exactly with <see cref="PlaceItem"/>.
+    /// </summary>
+    public System.Collections.Generic.List<(InventoryItem item, int x, int y)> GetPlacements()
+    {
+        var placements = new System.Collections.Generic.List<(InventoryItem, int, int)>();
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                InventorySlot slot = slots[x, y];
+                if (slot.isOccupied && slot.item != null && slot.itemGridX == 0 && slot.itemGridY == 0)
+                    placements.Add((slot.item, x, y));
+            }
+        }
+        return placements;
+    }
+
+    /// <summary>
     /// Clears all items from the grid.
     /// </summary>
     public void Clear()

@@ -23,12 +23,19 @@ using TMPro;
 /// question the practice set up, and nothing reaches the Journal or the teacher dashboard.
 /// When it is over the scene reloads into a normal drill and the player is marked as done, per
 /// player profile, so it plays once. It can be skipped (SKIP PRACTICE, with a confirmation)
-/// and played again from the How-to-Play panel (<see cref="ReplayPractice"/>).
+/// and played again from the How-to-Play panel (<see cref="ReplayPractice"/>). A replay never
+/// starts a drill of its own: finished or skipped, it goes back to where it was opened from -
+/// the main menu, or the drill it was opened from mid-game (<see cref="DrillSnapshot"/>),
+/// restored with its pause menu up, packing or at the quiz question it had reached.
 ///
 /// THE NORMAL ROUND
 ///
 /// Opens with the READY-SET-BAG splash and starts the clock when it clears. This used to hang
 /// off the start-of-round tutorial slideshow, which now only lives behind How-to-Play.
+///
+/// In a teacher session the drill is kept saved on the device while the student packs
+/// (<see cref="SessionDrillStore"/>), and a student who rejoins carries on from it, less the
+/// time they were away, instead of starting over.
 ///
 /// Other scripts ask the static gates here (<see cref="StorageAllowed"/>, <see cref="DragAllowed"/>,
 /// <see cref="FinishDoorAllowed"/>, <see cref="IsPracticeRun"/>); outside a practice run every
@@ -59,10 +66,18 @@ public class OnboardingManager : MonoBehaviour
 
     private const string DONE_SUFFIX = "_OnboardingDone";
     private const int TOTAL_STEPS = 32;
+    private const string GAME_SCENE = "GameScene";
 
     private static OnboardingManager active;
+    private static bool replayRequested;
+    // The drill a replay was opened from, waiting for the replay to end
+    private static DrillSnapshot pendingResume;
 
     private bool practice;
+    // Replayed from How-to-Play rather than a first game: it never ends in a new drill
+    private bool replay;
+    // This round is a drill coming back after a replay
+    private DrillSnapshot resume;
 
     // Gates read by the rest of the game through the static accessors below
     private StorageFurniture targetFurniture;
@@ -139,21 +154,114 @@ public class OnboardingManager : MonoBehaviour
     /// </summary>
     public static bool CanReplayPractice => string.IsNullOrEmpty(PlayerPrefs.GetString("SessionCode", ""));
 
+    /// <summary>A drill coming back after a replayed practice, or null. Read by the spawner.</summary>
+    public static DrillSnapshot ResumeSnapshot => active != null ? active.resume : null;
+
     /// <summary>
-    /// Starts the practice run over from the beginning, from the main menu or mid-game: the
-    /// player is marked as not having done it and the game scene is loaded fresh.
+    /// Starts the practice run over from the beginning, from the main menu or mid-game, by
+    /// loading the game scene fresh. A replay is a refresher, not the way into a drill: finishing
+    /// or skipping it goes back to the main menu, or to the drill it was opened from.
     /// </summary>
     public static void ReplayPractice()
     {
         if (!CanReplayPractice)
             return;
 
-        PlayerPrefs.DeleteKey(PlayerKey());
-        PlayerPrefs.Save();
+        // During a first practice, just start that practice over
+        if (active != null && active.practice && !active.replay)
+        {
+            Time.timeScale = 1f;
+            LoadingScreen.LoadScene(GAME_SCENE);
+            return;
+        }
+
+        // From a drill: save it to come back to. Replaying from a replay keeps the drill it has.
+        if (active != null && !active.practice)
+        {
+            DrillSnapshot snapshot = DrillSnapshot.Capture();
+            if (snapshot == null)
+            {
+                active.ConfirmReplayLosingDrill();
+                return;
+            }
+            pendingResume = snapshot;
+        }
+
+        BeginReplay();
+    }
+
+    private static void BeginReplay()
+    {
+        // Lasts through reloads of the game scene (Restart from the pause menu), and is dropped
+        // as soon as any other scene loads, so leaving mid-replay leaves no practice queued up
+        if (!replayRequested)
+            SceneManager.sceneLoaded += DropReplayOutsideGame;
+        replayRequested = true;
 
         // The pause menu stops time; the new scene must not start frozen
         Time.timeScale = 1f;
-        LoadingScreen.LoadScene("GameScene");
+        LoadingScreen.LoadScene(GAME_SCENE);
+    }
+
+    /// <summary>
+    /// The drill has reached its results, so there is nothing to come back to: say so before it goes.
+    /// A replay from here ends at the main menu.
+    /// </summary>
+    private void ConfirmReplayLosingDrill()
+    {
+        Confirm("REPLAY PRACTICE?",
+            "Your drill has finished, so it <color=#FF4343>can't be continued</color> after " +
+            "the practice. The practice will finish at the main menu.",
+            "REPLAY", "STAY",
+            () =>
+            {
+                pendingResume = null;
+                BeginReplay();
+            });
+    }
+
+    /// <summary>
+    /// A yes / no question in the coach cards' style, over whatever is on screen in the game
+    /// scene. <paramref name="onYes"/> runs if the player agrees; saying no just closes it.
+    /// </summary>
+    public static void Confirm(string title, string body, string yesLabel, string noLabel, Action onYes)
+    {
+        TMP_FontAsset confirmFont = active != null ? active.font : null;
+        Sprite sprite = active != null ? active.buttonSprite : null;
+
+        // The same font the practice cards fall back to: the game canvas's
+        GameTimer timer = FindFirstObjectByType<GameTimer>(FindObjectsInactive.Include);
+        if (confirmFont == null && timer != null)
+        {
+            Canvas gameCanvas = timer.GetComponentInParent<Canvas>(true);
+            TextMeshProUGUI anyText = gameCanvas != null ? gameCanvas.GetComponentInChildren<TextMeshProUGUI>(true) : null;
+            confirmFont = anyText != null ? anyText.font : null;
+        }
+
+        OnboardingOverlay confirm = OnboardingOverlay.CreateConfirmOnly(confirmFont, sprite);
+        confirm.ShowConfirm(title, body,
+            () =>
+            {
+                Destroy(confirm.gameObject);
+                onYes?.Invoke();
+            },
+            () => Destroy(confirm.gameObject),
+            yesLabel, noLabel);
+    }
+
+    private static void DropReplayOutsideGame(Scene scene, LoadSceneMode mode)
+    {
+        if (mode == LoadSceneMode.Single && scene.name != GAME_SCENE)
+        {
+            EndReplay();
+            pendingResume = null;
+        }
+    }
+
+    private static void EndReplay()
+    {
+        replayRequested = false;
+        SceneManager.sceneLoaded -= DropReplayOutsideGame;
     }
 
     /// <summary>Per player, the same way the character choice is remembered.</summary>
@@ -171,7 +279,22 @@ public class OnboardingManager : MonoBehaviour
     private void Awake()
     {
         active = this;
-        practice = !HasCompletedOnboarding();
+        replay = replayRequested;
+
+        // Taken on the load after the replay, so a restart of the drill starts fresh
+        if (!replay && pendingResume != null)
+        {
+            resume = pendingResume;
+            pendingResume = null;
+        }
+        // A teacher-session student back in a drill they left, or that closed on them. The
+        // join found it, on the server, and has already taken off the time they were away.
+        else if (!replay && SessionResultUploader.IsTeacherSession)
+        {
+            resume = SessionDrillStore.TakePrepared();
+        }
+
+        practice = replay || (resume == null && !HasCompletedOnboarding());
     }
 
     private void OnDestroy()
@@ -193,8 +316,126 @@ public class OnboardingManager : MonoBehaviour
     {
         if (practice)
             StartCoroutine(RunPractice());
+        else if (resume != null)
+            StartCoroutine(ResumeDrill());
         else
             StartCoroutine(StartNormalRound());
+    }
+
+    // ----------------------------------------------------------------- resumed drill
+
+    /// <summary>
+    /// The drill the practice was replayed from, put back as it was and handed over with its
+    /// pause menu up, so Continue picks up exactly where the player paused.
+    /// </summary>
+    private IEnumerator ResumeDrill()
+    {
+        // Every Start has run: the house, the bag and the clock are set up and won't reset it
+        yield return null;
+        resume.RestoreScene();
+        StartSessionSaving();
+
+        // Past packing: straight back into the quiz, at the question it had reached. The
+        // round clock stays stopped, as the finish door left it.
+        if (resume.InQuiz)
+        {
+            // Once the loading screen is away, so the question's clock isn't running behind it
+            while (LoadingScreen.IsLoading)
+                yield return null;
+            yield return null;
+
+            FinishDoorHandler door = FindFirstObjectByType<FinishDoorHandler>(FindObjectsInactive.Include);
+            if (door != null)
+                door.ResumeQuiz(resume.Quiz);
+
+            // Offline, back to the pause menu the practice was replayed from, like packing -
+            // unless it resumed into a minigame, whose screen sits over the pause menu
+            if (!SessionResultUploader.IsTeacherSession && resume.Quiz.pendingMinigame < 0)
+            {
+                PauseManager quizPause = FindFirstObjectByType<PauseManager>();
+                if (quizPause != null)
+                    quizPause.OpenPauseMenu();
+            }
+            yield break;
+        }
+
+        // Left before the round began: begin it the normal way, from the splash
+        if (!resume.TimerWasRunning)
+        {
+            yield return StartNormalRound();
+            yield break;
+        }
+
+        while (LoadingScreen.IsLoading)
+            yield return null;
+        yield return null;
+
+        StartRoundTimer();
+
+        // In a teacher session the clock doesn't stop for the pause menu, so there is no
+        // reason to hold the student in it: they carry straight on
+        if (SessionResultUploader.IsTeacherSession)
+            yield break;
+
+        PauseManager pauseMenu = FindFirstObjectByType<PauseManager>();
+        if (pauseMenu != null)
+            pauseMenu.OpenPauseMenu();
+    }
+
+    // ----------------------------------------------------------------- teacher session
+
+    private const float SESSION_SAVE_INTERVAL = 5f;
+    private bool sessionSaving;
+
+    /// <summary>
+    /// Keeps a teacher-session drill saved while the student plays, on the device and the
+    /// server (<see cref="SessionDrillStore"/>), so leaving, or the game closing, doesn't hand
+    /// them a fresh start when they rejoin.
+    /// </summary>
+    private void StartSessionSaving()
+    {
+        if (practice || sessionSaving || !SessionResultUploader.IsTeacherSession)
+            return;
+
+        sessionSaving = true;
+        StartCoroutine(SaveSessionDrillRegularly());
+    }
+
+    private IEnumerator SaveSessionDrillRegularly()
+    {
+        // Once the results are up Capture returns null and the store is marked over, so later
+        // rounds of this save nothing
+        while (true)
+        {
+            SaveSessionDrill();
+            yield return new WaitForSecondsRealtime(SESSION_SAVE_INTERVAL);
+        }
+    }
+
+    /// <summary>
+    /// Saves the teacher-session drill as it stands now. <paramref name="now"/> sends it to the
+    /// server straight away rather than on the store's own schedule: the pause menu's Exit
+    /// does, on the way out before it forgets the session, and so does the quiz as each
+    /// answer is scored.
+    /// </summary>
+    public static void SaveSessionDrill(bool now = false)
+    {
+        if (active == null || !active.sessionSaving || !SessionResultUploader.IsTeacherSession)
+            return;
+
+        SessionDrillStore.Save(DrillSnapshot.Capture(), now);
+    }
+
+    // Phones close apps from the background without warning; save on the way there
+    private void OnApplicationPause(bool paused)
+    {
+        if (paused)
+            SaveSessionDrill(now: true);
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveSessionDrill(now: true);
     }
 
     // ----------------------------------------------------------------- normal round
@@ -203,6 +444,9 @@ public class OnboardingManager : MonoBehaviour
     {
         // One frame in, so the splash's blurred snapshot has the spawned house behind it
         yield return null;
+
+        // The player and bag are placed by now, so the first save already holds this drill
+        StartSessionSaving();
 
         // The loading screen is still sliding away when the scene starts. Wait it out, or the
         // splash freezes it into its blurred backdrop.
@@ -257,8 +501,8 @@ public class OnboardingManager : MonoBehaviour
 
         // --- Welcome ---------------------------------------------------------------------
         yield return Info("WELCOME!",
-            "Before your first drill, let's practice. We'll go through every part of the game " +
-            "one step at a time.\n\nNothing here is timed or scored.",
+            (replay ? "Let's practice again. " : "Before your first drill, let's practice. ") +
+            "We'll go through every part of the game one step at a time.\n\nNothing here is timed or scored.",
             "LET'S GO", null, OnboardingOverlay.CardPlace.Center);
 
         yield return Info("YOUR MISSION",
@@ -507,12 +751,24 @@ public class OnboardingManager : MonoBehaviour
         yield return new WaitUntil(() => quizFinished);
 
         // --- Done ------------------------------------------------------------------------
-        yield return Info("PRACTICE COMPLETE!",
-            "You're ready for the real drill. This time the <color=#FF4343>timer runs</color>, your " +
-            "bag and starting spot are random, and your score counts: what you pack, your answers, " +
-            "the minigames and the time you have left.\n\nWant a refresher later? Replay this " +
-            "practice from <color=#FF8B43>How to Play</color>. Good luck!",
-            "START DRILL", null, OnboardingOverlay.CardPlace.Center);
+        if (replay)
+        {
+            yield return Info("PRACTICE COMPLETE!",
+                "Remember: in a real drill the <color=#FF4343>timer runs</color>, your bag and " +
+                "starting spot are random, and your score counts: what you pack, your answers, " +
+                "the minigames and the time you have left.\n\n" +
+                (ReturnsToDrill ? "Your drill is waiting where you paused it. Good luck!" : "Good luck!"),
+                ReturnsToDrill ? "BACK TO DRILL" : "MAIN MENU", null, OnboardingOverlay.CardPlace.Center);
+        }
+        else
+        {
+            yield return Info("PRACTICE COMPLETE!",
+                "You're ready for the real drill. This time the <color=#FF4343>timer runs</color>, your " +
+                "bag and starting spot are random, and your score counts: what you pack, your answers, " +
+                "the minigames and the time you have left.\n\nWant a refresher later? Replay this " +
+                "practice from <color=#FF8B43>How to Play</color>. Good luck!",
+                "START DRILL", null, OnboardingOverlay.CardPlace.Center);
+        }
 
         if (step != TOTAL_STEPS)
             Debug.LogWarning($"Onboarding counted {step} steps but shows {TOTAL_STEPS} as the total.", this);
@@ -522,7 +778,7 @@ public class OnboardingManager : MonoBehaviour
 
     /// <summary>
     /// SKIP PRACTICE: the game holds still while it asks, then either carries on where it
-    /// was or goes straight to the real drill, counting the practice as done.
+    /// was or ends the practice as if it were finished.
     /// </summary>
     private void OnSkipRequested()
     {
@@ -532,21 +788,55 @@ public class OnboardingManager : MonoBehaviour
         float timeScale = Time.timeScale;
         Time.timeScale = 0f;
 
-        overlay.ShowConfirm("SKIP PRACTICE?",
-            "You'll go straight to the real drill, where the <color=#FF4343>timer runs</color> " +
-            "and your score counts.\n\nYou can play the practice again any time from " +
-            "<color=#FF8B43>How to Play</color>.",
-            CompletePractice,
-            () => Time.timeScale = timeScale);
+        string body = replay
+            ? (ReturnsToDrill ? "You'll go back to your drill, where you paused it." : "You'll go back to the main menu.") +
+              "\n\nYou can play the practice again any time from <color=#FF8B43>How to Play</color>."
+            : "You'll go straight to the real drill, where the <color=#FF4343>timer runs</color> " +
+              "and your score counts.\n\nYou can play the practice again any time from " +
+              "<color=#FF8B43>How to Play</color>.";
+
+        overlay.ShowConfirm("SKIP PRACTICE?", body, CompletePractice, () => Time.timeScale = timeScale);
     }
 
+    /// <summary>A replay opened from a drill, which it hands back to when it ends.</summary>
+    private bool ReturnsToDrill => replay && pendingResume != null;
+
+    /// <summary>
+    /// A first practice goes straight on into the real drill; a replay goes back to the drill
+    /// it was opened from, or else to the main menu, so looking something up never commits the
+    /// player to a new round.
+    /// </summary>
     private void CompletePractice()
     {
         PlayerPrefs.SetInt(PlayerKey(), 1);
         PlayerPrefs.Save();
 
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        if (!replay)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            return;
+        }
+
+        bool toDrill = ReturnsToDrill;
+        EndReplay();
+
+        // The next load takes the saved drill
+        if (toDrill)
+        {
+            LoadingScreen.LoadScene(GAME_SCENE);
+            return;
+        }
+
+        // As the pause menu's Exit does
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.StopMusic();
+
+        if (SceneNavigationManager.Instance != null)
+            SceneNavigationManager.Instance.GoToMainScene();
+        else
+            MenuTransition.LoadScene("MainScene");
     }
 
     // ----------------------------------------------------------------- step runners

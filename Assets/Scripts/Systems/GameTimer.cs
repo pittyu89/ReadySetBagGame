@@ -235,6 +235,20 @@ public class GameTimer : MonoBehaviour
         UpdateDisplay();
     }
 
+    /// <summary>
+    /// Puts the clock back to a drill's saved time, after the practice run was replayed from
+    /// its pause menu. The orange half-time pulse has already been seen, so it is not replayed;
+    /// the red last-tenth pulse restarts on its own once the clock runs again.
+    /// </summary>
+    public void RestoreTimeRemaining(float remaining)
+    {
+        timeRemaining = Mathf.Clamp(remaining, 0f, totalTime);
+        orange50PercentPulsed = timeRemaining <= totalTime * 0.5f;
+        red90PercentPulsed = false;
+        lastDisplayedSeconds = -1;
+        UpdateDisplay();
+    }
+
     // Public method to get remaining time
     public float GetTimeRemaining()
     {

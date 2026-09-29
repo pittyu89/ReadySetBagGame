@@ -73,6 +73,17 @@ public class CameraOrbitController : MonoBehaviour
         ApplyOffset();
     }
 
+    public float Yaw => yaw;
+    public float Pitch => pitch;
+
+    /// <summary>Turns the camera to a saved angle, for resuming a drill.</summary>
+    public void SetAngles(float newYaw, float newPitch)
+    {
+        yaw = Mathf.Repeat(newYaw, 360f);
+        pitch = Mathf.Clamp(newPitch, minPitch, maxPitch);
+        ApplyOffset();
+    }
+
     void Update()
     {
         UpdatePetZoom();

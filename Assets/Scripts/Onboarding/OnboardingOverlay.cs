@@ -73,6 +73,8 @@ public class OnboardingOverlay : MonoBehaviour
     private GameObject confirm;
     private TextMeshProUGUI confirmTitle;
     private TextMeshProUGUI confirmBody;
+    private TextMeshProUGUI confirmYesLabel;
+    private TextMeshProUGUI confirmNoLabel;
     private Action onConfirmYes;
     private Action onConfirmNo;
 
@@ -94,20 +96,22 @@ public class OnboardingOverlay : MonoBehaviour
         return overlay;
     }
 
+    /// <summary>
+    /// Just the yes / no question, with no coach marks, for asking something outside a practice
+    /// run. Destroy it once answered.
+    /// </summary>
+    public static OnboardingOverlay CreateConfirmOnly(TMP_FontAsset font, Sprite buttonSprite)
+    {
+        GameObject go = new GameObject("OnboardingConfirm", typeof(RectTransform));
+        OnboardingOverlay overlay = go.AddComponent<OnboardingOverlay>();
+        overlay.BuildCanvas();
+        overlay.BuildConfirm(font, buttonSprite);
+        return overlay;
+    }
+
     private void Build(TMP_FontAsset font, Sprite buttonSprite)
     {
-        canvas = gameObject.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 100;
-
-        // Same scaling as the game's canvas, so sizes here read the same as the HUD's
-        CanvasScaler scaler = gameObject.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1280f, 720f);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
-
-        gameObject.AddComponent<GraphicRaycaster>();
-        root = (RectTransform)transform;
+        BuildCanvas();
 
         // Swallows every tap while a card needs reading. Invisible: the dims do the darkening.
         catcher = MakeImage("Catcher", root, new Color(0f, 0f, 0f, 0f));
@@ -156,6 +160,22 @@ public class OnboardingOverlay : MonoBehaviour
         SetTargets();
         SetWorldTarget(null);
         SetBlock(Block.None);
+    }
+
+    private void BuildCanvas()
+    {
+        canvas = gameObject.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 100;
+
+        // Same scaling as the game's canvas, so sizes here read the same as the HUD's
+        CanvasScaler scaler = gameObject.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1280f, 720f);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
+
+        gameObject.AddComponent<GraphicRaycaster>();
+        root = (RectTransform)transform;
     }
 
     private void BuildCard(TMP_FontAsset font, Sprite buttonSprite)
@@ -272,6 +292,8 @@ public class OnboardingOverlay : MonoBehaviour
                                 new Color(0.35f, 0.35f, 0.35f, 1f), new Vector2(180f, 66f));
         no.onClick.AddListener(() => CloseConfirm(onConfirmNo));
         yes.onClick.AddListener(() => CloseConfirm(onConfirmYes));
+        confirmNoLabel = no.GetComponentInChildren<TextMeshProUGUI>();
+        confirmYesLabel = yes.GetComponentInChildren<TextMeshProUGUI>();
 
         confirm.SetActive(false);
     }
@@ -305,11 +327,17 @@ public class OnboardingOverlay : MonoBehaviour
 
     // ----------------------------------------------------------------- public API
 
-    /// <summary>Asks a yes / no question over everything, and reports the answer.</summary>
-    public void ShowConfirm(string title, string body, Action onYes, Action onNo)
+    /// <summary>
+    /// Asks a yes / no question over everything, and reports the answer. The buttons read
+    /// SKIP and KEEP PRACTICING unless given other words.
+    /// </summary>
+    public void ShowConfirm(string title, string body, Action onYes, Action onNo,
+                            string yesLabel = "SKIP", string noLabel = "KEEP PRACTICING")
     {
         confirmTitle.text = title;
         confirmBody.text = body;
+        confirmYesLabel.text = yesLabel;
+        confirmNoLabel.text = noLabel;
         onConfirmYes = onYes;
         onConfirmNo = onNo;
 
@@ -418,7 +446,8 @@ public class OnboardingOverlay : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (hidden)
+        // A confirm-only overlay has no coach marks to keep lined up
+        if (hidden || card == null)
             return;
 
         Rect hole;

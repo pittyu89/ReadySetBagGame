@@ -34,6 +34,15 @@ public class PauseManager : MonoBehaviour
     // must not set it going again.
     private bool timerWasRunning = false;
 
+    /// <summary>Whether Continue will set the round clock going again.</summary>
+    public bool TimerWasRunning => timerWasRunning;
+
+    /// <summary>
+    /// Opens the pause menu as if the pause button were tapped. A drill resumed after a
+    /// replayed practice comes back here, where the player left it.
+    /// </summary>
+    public void OpenPauseMenu() => OnPauseClicked();
+
     private void Start()
     {
         // Find the Timer script
@@ -153,6 +162,31 @@ public class PauseManager : MonoBehaviour
 
     private void OnExitClicked()
     {
+        // A teacher session is one drill per student: say what leaving does before it happens
+        if (IsTeacherSession())
+        {
+            QuizManager quiz = FindFirstObjectByType<QuizManager>(FindObjectsInactive.Include);
+            bool quizStarted = quiz != null && quiz.HasStarted;
+
+            OnboardingManager.Confirm("LEAVE THE DRILL?",
+                quizStarted
+                    ? "You can rejoin with the same code and carry on at this question, but " +
+                      "<color=#FF4343>its timer keeps running</color> while you're away. A " +
+                      "minigame you leave starts over with only the time it had left."
+                    : "You can rejoin with the same code and carry on where you left off, but " +
+                      "<color=#FF4343>the timer keeps running</color> while you're away.",
+                "LEAVE", "STAY", ExitToMenu);
+            return;
+        }
+
+        ExitToMenu();
+    }
+
+    private void ExitToMenu()
+    {
+        // Saved while the session is still known; clearing it below forgets which one it was
+        OnboardingManager.SaveSessionDrill(now: true);
+
         // Stop music before exiting
         if (SoundManager.Instance != null)
         {

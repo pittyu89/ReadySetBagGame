@@ -129,8 +129,19 @@ public class JoinSessionPanel : MonoBehaviour
                 return;
             }
 
-            // Add student to session
-            await AddPlayerToSession(currentSessionId);
+            // One drill per student: rejoining carries on a drill left unfinished - found on the
+            // server, so from any device - but not one that has reached its results
+            if (await SessionDrillStore.PrepareAsync(currentSessionId) == SessionDrillStore.JoinState.Over)
+            {
+                joinButton.interactable = true;
+                SetStatusText("You've already played this session's drill.");
+                return;
+            }
+
+            // Add student to session, unless a rejoin finds them already on the list: every
+            // join used to add another entry, so the teacher saw the same student twice
+            if (!IsAlreadyListed(sessionData))
+                await AddPlayerToSession(currentSessionId);
 
             // Play join session audio
             SoundManager.Sfx(joinSessionAudio);
@@ -192,6 +203,23 @@ public class JoinSessionPanel : MonoBehaviour
             waitingForTeacherText.text = message;
             waitingForTeacherText.gameObject.SetActive(true);
         }
+    }
+
+    /// <summary>Whether this student is already in the session's player list.</summary>
+    private bool IsAlreadyListed(Dictionary<string, object> sessionData)
+    {
+        object players;
+        if (!sessionData.TryGetValue("playersList", out players) || !(players is List<object> list))
+            return false;
+
+        foreach (object entry in list)
+        {
+            if (entry is Dictionary<string, object> player
+                && player.TryGetValue("studentId", out object id)
+                && id != null && id.ToString() == studentId)
+                return true;
+        }
+        return false;
     }
 
     private async System.Threading.Tasks.Task AddPlayerToSession(string sessionId)

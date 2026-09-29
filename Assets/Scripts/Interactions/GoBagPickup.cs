@@ -231,16 +231,46 @@ public class GoBagPickup : MonoBehaviour
             shadow.enabled = false;
     }
 
+    /// <summary>Where the bag floats around before it is picked up, lifted clear of the floor.</summary>
+    public Vector3 RestPosition => startPosition;
+
+    /// <summary>
+    /// Puts a resumed drill's bag straight into the player's hands, with no pose and no sound:
+    /// it was picked up before the practice was replayed. The timer is left to the resume.
+    /// </summary>
+    public void RestorePickedUp(PlayerController player)
+    {
+        if (picked)
+            return;
+
+        picked = true;
+        HideBag();
+
+        Animator playerAnimator = player != null ? player.GetComponentInChildren<Animator>() : null;
+        ApplyCarrying(playerAnimator, GetPlayerGender() == "Male");
+
+        InventoryPanel handler = FindFirstObjectByType<InventoryPanel>();
+        if (handler != null)
+            handler.ShowBagButton();
+
+        gameObject.SetActive(false);
+    }
+
+    private void ApplyCarrying(Animator playerAnimator, bool isMale)
+    {
+        if (playerAnimator == null)
+            return;
+
+        RuntimeAnimatorController controller = GetCarryingController(isMale);
+        if (controller != null)
+            playerAnimator.runtimeAnimatorController = controller;
+    }
+
     /// <summary>Hands control back after the pose: carrying animations, the timer and the bag button.</summary>
     private void FinishPickup(Animator playerAnimator, bool isMale, PlayerController movement)
     {
         // Change player animator controller based on gender and chosen bag
-        if (playerAnimator != null)
-        {
-            RuntimeAnimatorController controller = GetCarryingController(isMale);
-            if (controller != null)
-                playerAnimator.runtimeAnimatorController = controller;
-        }
+        ApplyCarrying(playerAnimator, isMale);
 
         if (movement != null)
             movement.SetMovementEnabled(true);

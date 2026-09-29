@@ -129,12 +129,10 @@ public static class HouseStorage
             Debug.LogWarning($"{item.itemName} doesn't fit in {furniture.name}'s compartments, so it is left out of this drill.", furniture);
     }
 
+    // GameRandom, like the quiz's question order: the shared UnityEngine.Random can repeat
+    // the same draw run after run, which would hide items in the same places every time
     private static void Shuffle<T>(IList<T> list)
     {
-        for (int i = list.Count - 1; i > 0; i--)
-        {
-            int j = Random.Range(0, i + 1);
-            (list[i], list[j]) = (list[j], list[i]);
-        }
+        GameRandom.Shuffle(list);
     }
 }

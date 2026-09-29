@@ -49,6 +49,14 @@ public class HouseSpawnRandomizer : MonoBehaviour
 
     private void Start()
     {
+        // A drill coming back from a replayed practice keeps the spots it already had
+        DrillSnapshot resume = OnboardingManager.ResumeSnapshot;
+        if (resume != null)
+        {
+            PlaceResumed(resume);
+            return;
+        }
+
         if (!randomizeSpawns)
             return;
 
@@ -184,6 +192,24 @@ public class HouseSpawnRandomizer : MonoBehaviour
                 : PickPointAwayFrom(playerPoint, minSeparation);
             goBag.transform.position = bagPoint + Vector3.up * (BaseOffset(goBag) + groundClearance);
         }
+    }
+
+    private void PlaceResumed(DrillSnapshot resume)
+    {
+        if (player != null)
+        {
+            CharacterController controller = player.GetComponent<CharacterController>();
+            bool controllerWasOn = controller != null && controller.enabled;
+            if (controller != null) controller.enabled = false;
+
+            // PlayerSpawner puts the chosen character exactly where this one stands
+            player.transform.position = resume.PlayerPosition;
+
+            if (controller != null) controller.enabled = controllerWasOn;
+        }
+
+        if (goBag != null && !resume.BagPickedUp)
+            goBag.transform.position = resume.BagRestPosition;
     }
 
     /// <summary>

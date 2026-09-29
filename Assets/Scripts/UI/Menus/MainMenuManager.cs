@@ -65,6 +65,9 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
     {
+        // A session result the last game didn't get through, if any, goes out now
+        SessionResultUploader.ResendPending();
+
         // Hide all panels initially
         HideAllPanels();
 
