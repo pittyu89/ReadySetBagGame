@@ -73787,9 +73787,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScreenPulseEffect
   screenOverlay: {fileID: 48321290}
-  orangePulseDuration: 0.3
-  redPulseDuration: 0.4
-  pulseAlpha: 0.4
+  edgeReach: 0.22
+  halfTimeColor: {r: 1, g: 0.62, b: 0.12, a: 1}
+  halfTimeDuration: 1.4
+  halfTimeStrength: 0.45
+  runningOutColor: {r: 0.92, g: 0.1, b: 0.06, a: 1}
+  slowestBeat: 1.3
+  fastestBeat: 0.55
+  weakestStrength: 0.35
+  strongestStrength: 0.65
+  runningOutShare: 0.1
+  stopFadeDuration: 0.3
 --- !u!4 &1805779896
 Transform:
   m_ObjectHideFlags: 0
