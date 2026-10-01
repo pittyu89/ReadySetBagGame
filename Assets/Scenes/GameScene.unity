@@ -1292,6 +1292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7295aac935c7b5245ab4daaf7931b2ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SafeAreaOffset
+  applyHorizontalInset: 0
 --- !u!1 &31708664
 GameObject:
   m_ObjectHideFlags: 0
@@ -84116,6 +84117,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7295aac935c7b5245ab4daaf7931b2ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SafeAreaOffset
+  applyHorizontalInset: 0
 --- !u!64 &2031967130
 MeshCollider:
   m_ObjectHideFlags: 0

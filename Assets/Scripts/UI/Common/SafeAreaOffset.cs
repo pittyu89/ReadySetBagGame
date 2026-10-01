@@ -10,6 +10,10 @@ using UnityEngine;
 [RequireComponent(typeof(RectTransform))]
 public class SafeAreaOffset : MonoBehaviour
 {
+    // In landscape the notch sits mid-edge, so top/bottom corner pieces are already clear of it
+    // and only end up with a gap if pushed in by the full side inset
+    [SerializeField] private bool applyHorizontalInset = true;
+
     private RectTransform rect;
     private Canvas canvas;
     private Vector2 basePosition;
@@ -56,8 +60,11 @@ public class SafeAreaOffset : MonoBehaviour
         float top = (screen.y - safe.yMax) / scale;
 
         Vector2 offset = Vector2.zero;
-        if (rect.anchorMax.x <= 0f) offset.x += left;
-        else if (rect.anchorMin.x >= 1f) offset.x -= right;
+        if (applyHorizontalInset)
+        {
+            if (rect.anchorMax.x <= 0f) offset.x += left;
+            else if (rect.anchorMin.x >= 1f) offset.x -= right;
+        }
         if (rect.anchorMax.y <= 0f) offset.y += bottom;
         else if (rect.anchorMin.y >= 1f) offset.y -= top;
 
