@@ -41,3 +41,6 @@ crashlytics-build.properties
 ExportedObj/
 *.unitypackage
 .gradle/
+
+# Written by Unity's Performance Testing package; Resources would ship them in the build
+/Assets/Resources/PerformanceTestRun*.json*
