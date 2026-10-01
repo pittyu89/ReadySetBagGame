@@ -140,14 +140,21 @@ public partial class InventoryItemDragHandler
         staticDescriptionPanel.transform.SetSiblingIndex(panelHomeSiblingIndex);
     }
 
-    // Public static method to force hide the description panel
-    public static void ForceHideDescriptionPanel()
+    /// <summary>
+    /// Closes the description panel outright. <paramref name="restoreHome"/> false leaves it
+    /// where it is: an item's OnDisable can run while Unity is deactivating the bag around it,
+    /// and moving a transform in the middle of that is refused with an error. The panel is
+    /// hidden either way, and the next close that can move it - CloseInventory's own, or the
+    /// next hide - puts it back.
+    /// </summary>
+    public static void ForceHideDescriptionPanel(bool restoreHome = true)
     {
         // Closing outright ends any ownership claim, whoever held it.
         panelOwner = null;
 
         ResolveDescriptionPanel();
-        RestorePanelHome();
+        if (restoreHome)
+            RestorePanelHome();
 
         // Deactivate and reset the panel immediately
         if (staticDescriptionPanel != null)

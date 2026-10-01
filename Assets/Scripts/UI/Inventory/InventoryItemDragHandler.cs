@@ -132,8 +132,10 @@ public partial class InventoryItemDragHandler : MonoBehaviour, IPointerClickHand
         // doing this is what left the description on screen after letting go of an item:
         // OnEndDrag starts a 0.3s fade, then RefreshDisplay destroys this object and the
         // coroutine dies before it can deactivate the panel. ForceHide clears panelOwner.
+        // Not moved home from here: this can run while the bag is being deactivated, when
+        // Unity refuses any reparenting (closing the bag with a description open did that).
         if (panelOwner == this)
-            ForceHideDescriptionPanel();
+            ForceHideDescriptionPanel(restoreHome: false);
     }
 
     /// <summary>
