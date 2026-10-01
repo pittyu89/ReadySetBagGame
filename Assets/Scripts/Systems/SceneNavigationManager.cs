@@ -31,8 +31,9 @@ public class SceneNavigationManager : MonoBehaviour
     /// <summary>
     /// Navigate to the appropriate scene based on login status and internet connectivity.
     /// If logged in and has internet (or is guest), goes to MainScene. If not, goes to LoginScene.
+    /// <paramref name="transition"/> off cuts straight to it, as the title screen does.
     /// </summary>
-    public void NavigateToGameScene()
+    public void NavigateToGameScene(bool transition = true)
     {
         if (StudentLoginManager.IsLoggedIn())
         {
@@ -42,34 +43,42 @@ public class SceneNavigationManager : MonoBehaviour
             if (!hasInternet && !isGuest)
             {
                 StudentLoginManager.Logout();
-                GoToLoginScene();
+                GoToLoginScene(transition);
             }
             else
             {
-                GoToMainScene();
+                GoToMainScene(transition);
             }
         }
         else
         {
-            GoToLoginScene();
+            GoToLoginScene(transition);
         }
     }
 
     /// <summary>
-    /// Load MainScene behind the menu transition. Prepares the background video first so it plays instantly.
+    /// Load MainScene behind the menu transition, or with a plain cut. Prepares the background video first so it plays instantly.
     /// </summary>
-    public void GoToMainScene()
+    public void GoToMainScene(bool transition = true)
     {
         PrepareMainMenuVideo();
-        MenuTransition.LoadScene("MainScene");
+        LoadMenu("MainScene", transition);
     }
 
     /// <summary>
-    /// Load LoginScene behind the menu transition.
+    /// Load LoginScene behind the menu transition, or with a plain cut.
     /// </summary>
-    public void GoToLoginScene()
+    public void GoToLoginScene(bool transition = true)
     {
-        MenuTransition.LoadScene("LoginScene");
+        LoadMenu("LoginScene", transition);
+    }
+
+    private static void LoadMenu(string sceneName, bool transition)
+    {
+        if (transition)
+            MenuTransition.LoadScene(sceneName);
+        else
+            SceneManager.LoadScene(sceneName);
     }
 
     /// <summary>
