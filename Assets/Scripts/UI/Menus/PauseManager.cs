@@ -100,7 +100,9 @@ public class PauseManager : MonoBehaviour
 
     private void OnPauseClicked()
     {
-        if (isPaused)
+        // The bag pickup pose freezes the game for a moment and unfreezes it when it ends; a
+        // pause taken during it would be undone then, leaving the clock running behind the menu
+        if (isPaused || BagPickupPose.IsPlaying)
             return;
 
         isPaused = true;
