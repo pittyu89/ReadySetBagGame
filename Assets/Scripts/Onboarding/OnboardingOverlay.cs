@@ -136,7 +136,7 @@ public class OnboardingOverlay : MonoBehaviour
         BuildCard(font, buttonSprite);
 
         badge = MakeText("Badge", root, font, 26f, StepColor);
-        badge.text = "PRACTICE RUN - NOT TIMED OR SCORED";
+        badge.text = "TUTORIAL - NOT TIMED OR SCORED";
         badge.alignment = TextAlignmentOptions.Center;
         RectTransform badgeRect = badge.rectTransform;
         badgeRect.anchorMin = badgeRect.anchorMax = new Vector2(0.5f, 0f);
@@ -146,7 +146,7 @@ public class OnboardingOverlay : MonoBehaviour
 
         // Bottom-right is the one corner the HUD leaves free: joystick bottom-left, Journal
         // top-left, timer and pause top-centre, bag button top-right
-        Button skip = MakeButton("Skip", root, font, buttonSprite, "SKIP PRACTICE", 30f,
+        Button skip = MakeButton("Skip", root, font, buttonSprite, "SKIP TUTORIAL", 30f,
                                  new Color(0.18f, 0.18f, 0.18f, 0.92f), new Vector2(250f, 56f));
         skipButton = (RectTransform)skip.transform;
         skipButton.anchorMin = skipButton.anchorMax = new Vector2(1f, 0f);
@@ -678,7 +678,7 @@ public class OnboardingOverlay : MonoBehaviour
         float halfH = cardSize.y * 0.5f;
 
         float top = size.y - TopHudHeight - halfH;
-        float bottom = EdgeMargin + 28f + halfH;   // above the PRACTICE RUN badge
+        float bottom = EdgeMargin + 28f + halfH;   // above the TUTORIAL badge
         float middle = size.y * 0.5f;
         float left = EdgeMargin + halfW;
         float right = size.x - EdgeMargin - halfW;
