@@ -194,6 +194,22 @@ public class JoinSessionPanel : MonoBehaviour
 
         if (maleWaitingCharacter != null)
             maleWaitingCharacter.SetActive(isMale);
+
+        StartWalking(isMale ? maleWaitingCharacter : femaleWaitingCharacter);
+    }
+
+    // The chibi walks towards the camera on the spot while it waits. Its controller is shared
+    // with the other menu chibis, which stay idle, so the walk is switched on here rather than
+    // made the default. Kept through the panel closing and reopening, since an animator
+    // otherwise resets its parameters - and drops back to idle - each time it is re-enabled.
+    private static void StartWalking(GameObject character)
+    {
+        Animator animator = character != null ? character.GetComponent<Animator>() : null;
+        if (animator == null)
+            return;
+
+        animator.keepAnimatorStateOnDisable = true;
+        animator.SetBool("isWalking", true);
     }
 
     private void SetStatusText(string message)
