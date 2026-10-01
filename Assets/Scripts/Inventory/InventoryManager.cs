@@ -319,7 +319,9 @@ public class InventoryManager : MonoBehaviour
         float currentGoBagWeight = GetGoBagTotalWeight();
         float itemWeight = item.weightKg * item.quantity;
 
-        return (currentGoBagWeight + itemWeight) <= globalGoBagWeightLimit;
+        // A hair of tolerance: the weights are decimals summed in float, so a bag that comes to
+        // exactly the limit on paper (4.85 + 0.15) can land a rounding error over it
+        return (currentGoBagWeight + itemWeight) <= globalGoBagWeightLimit + InventoryGrid.WEIGHT_TOLERANCE_KG;
     }
 
     /// <summary>

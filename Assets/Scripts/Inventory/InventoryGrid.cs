@@ -6,6 +6,13 @@ using UnityEngine;
 /// </summary>
 public class InventoryGrid
 {
+    /// <summary>
+    /// Slack allowed over a weight limit. Item weights are decimals summed in float, so a load
+    /// that exactly meets the limit on paper can come out a rounding error over it. The same
+    /// allowance DrillScore gives its over-weight check.
+    /// </summary>
+    public const float WEIGHT_TOLERANCE_KG = 0.0001f;
+
     public int gridWidth;
     public int gridHeight;
     public float maxWeightKg;  // Weight limit for this grid (0 = unlimited)
@@ -276,7 +283,7 @@ public class InventoryGrid
 
         float currentWeight = GetTotalWeight();
         float itemWeight = item.weightKg * item.quantity;
-        
-        return (currentWeight + itemWeight) <= maxWeightKg;
+
+        return (currentWeight + itemWeight) <= maxWeightKg + WEIGHT_TOLERANCE_KG;
     }
 }
