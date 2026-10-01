@@ -398,6 +398,7 @@ public class MainMenuIntroAnimator : MonoBehaviour
     /// </summary>
     private static float Step()
     {
+        FrameRateManager.KeepSmooth();
         return Mathf.Min(Time.unscaledDeltaTime, MaxStep);
     }
 

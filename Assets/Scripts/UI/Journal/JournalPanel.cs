@@ -159,6 +159,7 @@ public class JournalPanel : MonoBehaviour
         }
 
         overlay.SetActive(true);
+        FrameRateManager.SetStillScreen(this, true);
         StartCoroutine(OpenRoutine());
     }
 
@@ -211,6 +212,7 @@ public class JournalPanel : MonoBehaviour
         yield return PlayBookFrames(closeFrames);
 
         overlay.SetActive(false);
+        FrameRateManager.SetStillScreen(this, false);
         isBusy = false;
     }
 

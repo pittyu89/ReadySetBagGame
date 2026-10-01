@@ -127,6 +127,9 @@ public class ResultsPanel : MonoBehaviour
     {
         bool isTeacherSession = !string.IsNullOrEmpty(PlayerPrefs.GetString("SessionCode", ""));
 
+        // The results stay up until the scene changes, which drops this screen with it
+        FrameRateManager.SetStillScreen(this, true);
+
         difficultyKey = (difficulty ?? "").ToLowerInvariant();
         this.totalTime = totalTime;
 

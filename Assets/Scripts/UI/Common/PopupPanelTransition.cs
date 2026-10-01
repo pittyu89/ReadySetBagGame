@@ -267,8 +267,13 @@ public class PopupPanelTransition : MonoBehaviour
             dim.alpha = alpha;
     }
 
-    // Capped like the other menu animations so a hitch doesn't skip the motion
-    private static float Step() => Mathf.Min(Time.unscaledDeltaTime, 1f / 20f);
+    // Capped like the other menu animations so a hitch doesn't skip the motion. Holds full
+    // frame rate while it runs.
+    private static float Step()
+    {
+        FrameRateManager.KeepSmooth();
+        return Mathf.Min(Time.unscaledDeltaTime, 1f / 20f);
+    }
 
     // Starts at 40% speed and ends at 160%: quick off the mark, but still accelerating into the wall
     private static float EaseInMild(float t) => t * (0.4f + 0.6f * t);

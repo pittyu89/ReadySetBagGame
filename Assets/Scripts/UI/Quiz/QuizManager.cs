@@ -593,6 +593,18 @@ public class QuizManager : MonoBehaviour
             minigameTimerBar.Hide();
     }
 
+    // The questions hold still, so they can run at the lower frame rate; the minigames can't
+    void Update()
+    {
+        bool asking = dialogueBox != null && dialogueBox.activeSelf && !minigameRunning;
+        FrameRateManager.SetStillScreen(this, asking);
+    }
+
+    void OnDisable()
+    {
+        FrameRateManager.SetStillScreen(this, false);
+    }
+
     /// <summary>
     /// Called when Yes button is clicked in FinishDoorHandler.
     /// Shuffles the questions and starts the dialogue at question 1.

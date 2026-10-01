@@ -109,6 +109,8 @@ public class PauseManager : MonoBehaviour
         if (pausePanel != null)
             pausePanel.SetActive(true);
 
+        FrameRateManager.SetStillScreen(this, true);
+
         // Only pause time in offline mode
         if (!IsTeacherSession())
         {
@@ -122,6 +124,25 @@ public class PauseManager : MonoBehaviour
         }
     }
 
+    // A notification or a switch to another app sends the game to the background mid-round.
+    // Coming back to the clock already counting is unfair, so it comes back paused instead -
+    // offline only, where pausing actually stops the clock. Only while the round clock is
+    // running and the pause button is on offer: the quiz, minigames, the splash and anything
+    // else that has frozen the game already handle their own state.
+    private void OnApplicationPause(bool paused)
+    {
+        if (!paused || isPaused || IsTeacherSession())
+            return;
+
+        if (timerScript == null || !timerScript.IsRunning || Time.timeScale == 0f)
+            return;
+
+        if (pauseButton == null || !pauseButton.isActiveAndEnabled || !pauseButton.interactable)
+            return;
+
+        OnPauseClicked();
+    }
+
     private void OnContinueClicked()
     {
         if (!isPaused)
@@ -132,6 +153,8 @@ public class PauseManager : MonoBehaviour
         // Hide pause panel
         if (pausePanel != null)
             pausePanel.SetActive(false);
+
+        FrameRateManager.SetStillScreen(this, false);
 
         // Only resume time in offline mode
         if (!IsTeacherSession())

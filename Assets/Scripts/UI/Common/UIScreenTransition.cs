@@ -144,6 +144,7 @@ public class UIScreenTransition : MonoBehaviour
             yield return null;
             // Capped like the main menu intro so a hitch doesn't skip the motion
             float step = Mathf.Min(Time.unscaledDeltaTime, 1f / 20f);
+            FrameRateManager.KeepSmooth();
             time = reverse ? Mathf.Max(time - step, 0f) : Mathf.Min(time + step, length);
             Apply(time);
         }

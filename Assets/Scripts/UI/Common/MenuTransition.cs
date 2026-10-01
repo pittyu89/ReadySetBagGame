@@ -256,8 +256,13 @@ public class MenuTransition : MonoBehaviour
         return (RectTransform)go.transform;
     }
 
-    // Capped like the other menu animations so a loading hitch doesn't skip the motion
-    private static float Step() => Mathf.Min(Time.unscaledDeltaTime, 1f / 20f);
+    // Capped like the other menu animations so a loading hitch doesn't skip the motion. Holds
+    // full frame rate while it runs.
+    private static float Step()
+    {
+        FrameRateManager.KeepSmooth();
+        return Mathf.Min(Time.unscaledDeltaTime, 1f / 20f);
+    }
 
     private static float EaseInOutQuad(float t) => t < 0.5f ? 2f * t * t : 1f - Mathf.Pow(-2f * t + 2f, 2f) / 2f;
 }
