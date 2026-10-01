@@ -12,6 +12,9 @@ public class AudioSettingsPanel : MonoBehaviour
     [SerializeField] private Slider masterVolumeSlider;
     [SerializeField] private Toggle muteToggle;
 
+    [Header("Vibration (Optional)")]
+    [SerializeField] private Toggle vibrationToggle;
+
     // This UI is built with TextMeshPro, so these are TMP rather than legacy Text.
     [Header("Volume Labels (Optional)")]
     [SerializeField] private TextMeshProUGUI musicVolumeLabel;
@@ -37,6 +40,12 @@ public class AudioSettingsPanel : MonoBehaviour
         if (masterVolumeSlider != null)
             masterVolumeSlider.onValueChanged.AddListener(OnMasterSliderChanged);
 
+        if (vibrationToggle != null)
+        {
+            vibrationToggle.SetIsOnWithoutNotify(Haptics.Enabled);
+            vibrationToggle.onValueChanged.AddListener(OnVibrationToggled);
+        }
+
         UpdateVolumeLabels();
     }
 
@@ -48,6 +57,8 @@ public class AudioSettingsPanel : MonoBehaviour
             sfxVolumeSlider.onValueChanged.RemoveListener(OnSFXSliderChanged);
         if (masterVolumeSlider != null)
             masterVolumeSlider.onValueChanged.RemoveListener(OnMasterSliderChanged);
+        if (vibrationToggle != null)
+            vibrationToggle.onValueChanged.RemoveListener(OnVibrationToggled);
 
         if (SoundManager.Instance != null)
         {
@@ -70,6 +81,15 @@ public class AudioSettingsPanel : MonoBehaviour
     private void OnMasterSliderChanged(float value)
     {
         SetLabel(masterVolumeLabel, value);
+    }
+
+    private void OnVibrationToggled(bool on)
+    {
+        Haptics.Enabled = on;
+
+        // Turning it on is felt straight away, so the player knows what it does
+        if (on)
+            Haptics.Tap();
     }
 
     private void UpdateVolumeLabels()

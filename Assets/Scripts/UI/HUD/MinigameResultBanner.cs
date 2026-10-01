@@ -100,6 +100,7 @@ public class MinigameResultBanner : MonoBehaviour
     public void ShowComplete(CanvasGroup follow)
     {
         Begin(completeText, completeColor, follow);
+        Haptics.Success();
         routine = StartCoroutine(CompleteRoutine());
     }
 
@@ -110,6 +111,7 @@ public class MinigameResultBanner : MonoBehaviour
     public IEnumerator PlayTimesUp()
     {
         Begin(timesUpText, timesUpColor, null);
+        Haptics.Fail();
         yield return routine = StartCoroutine(TimesUpRoutine());
         routine = null;
     }

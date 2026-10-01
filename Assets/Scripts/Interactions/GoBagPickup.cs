@@ -185,6 +185,7 @@ public class GoBagPickup : MonoBehaviour
             // The bag is in the character's hands now - hide it, but keep this object alive
             // until the pose is over so it can finish the pickup
             HideBag();
+            Haptics.Success();
 
             Sprite pose = isMale ? malePickupSprite : femalePickupSprite;
             if (playerAnimator == null || pose == null)

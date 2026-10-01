@@ -1073,6 +1073,7 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
     private void OnItemPlaced()
     {
         PlayItemPlacedSFX();
+        Haptics.Tap();
 
         // Progress bars and the like listen for this
         if (InventoryManager.Instance != null)
@@ -1102,6 +1103,8 @@ public class InventoryItemDragHandler : MonoBehaviour, IPointerClickHandler, IBe
         bool canAdd = manager.CanAddItemToGoBag(item);
         if (!canAdd)
         {
+            Haptics.Fail();
+
             // Determine if it's a weight issue or go bag at capacity issue
             float currentWeight = manager.GetGoBagTotalWeight();
             float weightLimit = manager.GetGoBagWeightLimit();

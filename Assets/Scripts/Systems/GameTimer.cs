@@ -150,6 +150,10 @@ public class GameTimer : MonoBehaviour
 
         lastDisplayedSeconds = totalSeconds;
 
+        // A tick for each of the last five seconds, alongside the ticking sound
+        if (isRunning && totalSeconds > 0 && totalSeconds <= 5)
+            Haptics.Tick();
+
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
         string timeText = string.Format("{0:00}:{1:00}", minutes, seconds);
@@ -165,7 +169,8 @@ public class GameTimer : MonoBehaviour
     {
         isRunning = false;
         StopTickingAudio();
-        
+        Haptics.Fail();
+
         // Stop red pulsing when game ends
         if (screenPulseEffect != null)
         {

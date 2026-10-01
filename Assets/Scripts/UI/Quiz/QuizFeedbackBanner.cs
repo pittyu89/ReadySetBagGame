@@ -70,6 +70,11 @@ public class QuizFeedbackBanner : MonoBehaviour
     /// </summary>
     public IEnumerator Play(bool isCorrect)
     {
+        if (isCorrect)
+            Haptics.Success();
+        else
+            Haptics.Fail();
+
         if (label == null)
         {
             yield return new WaitForSecondsRealtime(popInDuration + holdDuration + popOutDuration);
