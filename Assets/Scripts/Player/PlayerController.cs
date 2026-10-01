@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
-    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float moveSpeed = 6f;
     [SerializeField] private float runSpeedMultiplier = 1.5f;
     [SerializeField] private float minSpeedMultiplier = 0.5f;  // Minimum speed at 100% bag capacity (0.5 = half speed)
 
