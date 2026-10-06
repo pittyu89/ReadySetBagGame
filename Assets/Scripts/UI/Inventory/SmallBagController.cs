@@ -4,15 +4,14 @@ using UnityEngine.UI;
 
 /// <summary>
 /// The Small Bag (blue, shown to players as the Roll-Top Waterproof Pack) in the inventory panel: a single slot that shows one packed item at a
-/// time. This handles opening and closing the bag; the slot, arrows, shuffling and drag-and-drop
-/// are the BagItemCarousel's job. The contents are shuffled every time the bag is opened and
-/// whenever a storage is opened next to it.
+/// time. This handles opening and closing the bag, its one pouch for the BagPouchNavigator; the
+/// slot, arrows, shuffling and drag-and-drop are the BagItemCarousel's job. The contents are
+/// shuffled every time the bag is opened and whenever a storage is opened next to it.
 /// </summary>
-public class SmallBagController : MonoBehaviour
+public class SmallBagController : MonoBehaviour, IBagPouches
 {
     [Header("Bag")]
     [SerializeField] private Image bagImage;
-    [SerializeField] private Button openButton;
     [Tooltip("Closed bag to gray slot, in order.")]
     [SerializeField] private Sprite[] openFrames = new Sprite[] { };
     [Tooltip("Gray slot back to closed bag, in order.")]
@@ -21,7 +20,10 @@ public class SmallBagController : MonoBehaviour
 
     [Header("Contents")]
     [SerializeField] private BagItemCarousel carousel;
-    [SerializeField] private Button closeButton;
+    [Tooltip("Where the slot is on the bag art: what the view zooms in on.")]
+    [SerializeField] private RectTransform pouchArea;
+    [Tooltip("Holds the slot and its arrows, outside the zoom, placed over the pouch when it opens.")]
+    [SerializeField] private RectTransform compartment;
 
     [Header("Audio")]
     [SerializeField] private AudioClip openAudio;
@@ -29,19 +31,13 @@ public class SmallBagController : MonoBehaviour
 
     private enum State { Closed, Opening, Open, Closing }
     private State state = State.Closed;
-    private Coroutine animating;
 
     /// <summary>True once the bag has finished opening and items can be dropped in.</summary>
     public bool IsOpen => state == State.Open;
 
-    void Awake()
-    {
-        if (openButton != null)
-            openButton.onClick.AddListener(Open);
+    public int PouchCount => 1;
 
-        if (closeButton != null)
-            closeButton.onClick.AddListener(Close);
-    }
+    public string GetPouchName(int pouch) => "Main Pocket";
 
     void OnEnable()
     {
@@ -51,47 +47,50 @@ public class SmallBagController : MonoBehaviour
 
     void OnDisable()
     {
-        animating = null;
         state = State.Closed;
     }
 
     /// <summary>Snaps the bag shut with no animation.</summary>
     public void ResetClosed()
     {
-        if (animating != null)
-        {
-            StopCoroutine(animating);
-            animating = null;
-        }
-
         state = State.Closed;
 
         if (carousel != null)
             carousel.Hide();
-        if (closeButton != null)
-            closeButton.gameObject.SetActive(false);
 
         if (bagImage != null && openFrames.Length > 0)
             bagImage.sprite = openFrames[0];
-
-        if (openButton != null)
-            openButton.interactable = true;
     }
 
-    public void Open()
-    {
-        if (state != State.Closed || !isActiveAndEnabled)
-            return;
+    public RectTransform GetPouchArea(int pouch) => pouchArea;
 
-        PlaySFX(openAudio);
-        animating = StartCoroutine(PlayFrames(openFrames, State.Opening, () =>
-        {
-            state = State.Open;
-            if (carousel != null)
-                carousel.Show(shuffle: true);
-            if (closeButton != null)
-                closeButton.gameObject.SetActive(true);
-        }));
+    public RectTransform GetPouchGrid(int pouch) => compartment;
+
+    public IEnumerator OpenPouch(int pouch, int from)
+    {
+        if (state != State.Closed)
+            yield break;
+
+        SoundManager.Sfx(openAudio);
+        yield return PlayFrames(openFrames, State.Opening);
+
+        state = State.Open;
+        if (carousel != null)
+            carousel.Show(shuffle: true);
+    }
+
+    public IEnumerator ClosePouch(int pouch, int to)
+    {
+        if (state != State.Open)
+            yield break;
+
+        SoundManager.Sfx(closeAudio);
+        if (carousel != null)
+            carousel.Hide();
+        InventoryItemDragHandler.ForceHideDescriptionPanel();
+
+        yield return PlayFrames(closeFrames, State.Closing);
+        state = State.Closed;
     }
 
     /// <summary>
@@ -104,32 +103,9 @@ public class SmallBagController : MonoBehaviour
             carousel.Reshuffle();
     }
 
-    public void Close()
-    {
-        if (state != State.Open || !isActiveAndEnabled)
-            return;
-
-        PlaySFX(closeAudio);
-        if (carousel != null)
-            carousel.Hide();
-        if (closeButton != null)
-            closeButton.gameObject.SetActive(false);
-        InventoryItemDragHandler.ForceHideDescriptionPanel();
-
-        animating = StartCoroutine(PlayFrames(closeFrames, State.Closing, () =>
-        {
-            state = State.Closed;
-            if (openButton != null)
-                openButton.interactable = true;
-        }));
-    }
-
-    private IEnumerator PlayFrames(Sprite[] frames, State playingState, System.Action onDone)
+    private IEnumerator PlayFrames(Sprite[] frames, State playingState)
     {
         state = playingState;
-        if (openButton != null)
-            openButton.interactable = false;
-
         float frameTime = framesPerSecond > 0f ? 1f / framesPerSecond : 0f;
 
         foreach (Sprite frame in frames)
@@ -140,13 +116,5 @@ public class SmallBagController : MonoBehaviour
             if (frameTime > 0f)
                 yield return new WaitForSecondsRealtime(frameTime);
         }
-
-        animating = null;
-        onDone?.Invoke();
-    }
-
-    private static void PlaySFX(AudioClip clip)
-    {
-        SoundManager.Sfx(clip);
     }
 }

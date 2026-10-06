@@ -348,6 +348,13 @@ public class OnboardingOverlay : MonoBehaviour
 
     public bool IsConfirmOpen => confirm.activeSelf;
 
+    /// <summary>Shows or hides SKIP TUTORIAL. A player's first practice run can't be skipped.</summary>
+    public void SetSkipAvailable(bool available)
+    {
+        if (skipButton != null)
+            skipButton.gameObject.SetActive(available);
+    }
+
     /// <summary>
     /// Puts up the card. With a <paramref name="buttonText"/> it waits for a tap on that button;
     /// without one it is an instruction, and the step ends when the player does the thing.

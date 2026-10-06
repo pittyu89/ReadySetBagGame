@@ -8,7 +8,7 @@ using TMPro;
 
 /// <summary>
 /// The tutorial itself: the scripted run of steps a first-time player is walked through, and
-/// skipping or finishing it.
+/// finishing it - or skipping it, which only a replay allows.
 /// </summary>
 public partial class OnboardingManager
 {
@@ -21,7 +21,11 @@ public partial class OnboardingManager
         ResolveScene();
 
         overlay = OnboardingOverlay.Create(font, buttonSprite);
-        overlay.SkipRequested += OnSkipRequested;
+
+        // The first run has to be played through; only a replay can be skipped
+        overlay.SetSkipAvailable(replay);
+        if (replay)
+            overlay.SkipRequested += OnSkipRequested;
         overlay.KeepClearOf(() => InventoryItemDragHandler.OpenDescriptionPanel);
         StartCoroutine(FollowPause());
 
@@ -43,7 +47,7 @@ public partial class OnboardingManager
 
         // --- Moving ----------------------------------------------------------------------
         yield return Do("WALK AROUND",
-            "Use the <color=#FF8B43>joystick</color> to walk.\n(On a keyboard: WASD or the arrow keys.)",
+            "Use the <color=#FF8B43>joystick</color> to walk.",
             WalkedFar(walkDistance), OnboardingOverlay.Block.None, OnboardingOverlay.CardPlace.Top,
             Find("Joystick"));
 
@@ -79,10 +83,31 @@ public partial class OnboardingManager
             () => inventory != null && inventory.IsOpen,
             OnboardingOverlay.Block.OutsideTargets, OnboardingOverlay.CardPlace.Auto, bagButton);
 
+        // The bag zooms in on a pocket and opens it by itself; point at it once it's open
+        BagPouchNavigator pouches = inventory.PouchNavigator;
+        bool severalPockets = pouches != null && pouches.PouchCount > 1;
+        while (pouches != null && inventory.IsOpen && pouches.CurrentPouch < 0)
+            yield return null;
+
         yield return Info("YOUR GO-BAG",
-            "This is your go-bag. It has <color=#FF8B43>pockets</color> you'll open to pack " +
-            "supplies. It's empty for now - let's go find something to put in it.",
-            "NEXT", inventory != null ? inventory.BagArt : null);
+            "This is your go-bag, open at one of the <color=#FF8B43>pockets</color> you pack " +
+            "supplies into. It's empty for now - let's go find something to put in it.",
+            "NEXT", inventory.OpenPocket);
+
+        // A bag with several pockets has the player move to another one
+        if (severalPockets)
+        {
+            int startPouch = pouches.CurrentPouch;
+            yield return Do("SWITCH POCKETS",
+                "Tap the <color=#FF8B43>arrows</color> above your bag to move to another pocket. " +
+                "The name of the pocket you're in is between them.",
+                () => pouches.CurrentPouch >= 0 && pouches.CurrentPouch != startPouch,
+                OnboardingOverlay.Block.OutsideTargets, OnboardingOverlay.CardPlace.Auto, pouches.Controls);
+        }
+        else
+        {
+            step++;
+        }
 
         yield return Do("CLOSE THE BAG",
             "Tap the <color=#FF8B43>X</color> to close your bag.",
@@ -106,7 +131,8 @@ public partial class OnboardingManager
 
         yield return Info("SEARCHING",
             "This is inside the " + furnitureName + ". Its supplies sit in its " +
-            "<color=#FF8B43>compartments</color>. Your go-bag is on the left.",
+            "<color=#FF8B43>compartments</color>. Your go-bag is on the left, open at the " +
+            "pocket you were last in.",
             "NEXT", inventory.StoragePicture);
 
         yield return DoTracking("READ AN ITEM",
@@ -122,11 +148,6 @@ public partial class OnboardingManager
             OnboardingOverlay.Block.None, OnboardingOverlay.CardPlace.Auto, null,
             () => InventoryItemDragHandler.OpenDescriptionPanel);
 
-        yield return Do("OPEN A POCKET",
-            "Tap one of your bag's <color=#FF8B43>pockets</color> to open it.",
-            () => inventory.IsBagPocketOpen,
-            OnboardingOverlay.Block.OutsideTargets, OnboardingOverlay.CardPlace.Top, inventory.BagArt);
-
         // --- Packing ---------------------------------------------------------------------
         dragRule = DragRule.Only;
         dragOnly = practiceItem;
@@ -135,7 +156,7 @@ public partial class OnboardingManager
             "Drag the <color=#FF8B43>" + practiceItemName + "</color> into the open pocket.",
             () => InBag(practiceItem),
             OnboardingOverlay.Block.None, OnboardingOverlay.CardPlace.Top,
-            () => inventory.IsBagPocketOpen ? null : "Your pocket is closed - <color=#FF8B43>tap a pocket</color> to open it first.",
+            () => inventory.IsBagPocketOpen ? null : "Wait for the pocket to open.",
             () => ItemRect(practiceItem), () => inventory.OpenPocket);
 
         dragOnly = extraItem;
@@ -144,7 +165,7 @@ public partial class OnboardingManager
             "Now drag the <color=#FF8B43>" + extraItemName + "</color> into your bag too.",
             () => InBag(extraItem),
             OnboardingOverlay.Block.None, OnboardingOverlay.CardPlace.Top,
-            () => inventory.IsBagPocketOpen ? null : "Your pocket is closed - <color=#FF8B43>tap a pocket</color> to open it first.",
+            () => inventory.IsBagPocketOpen ? null : "Wait for the pocket to open.",
             () => ItemRect(extraItem), () => inventory.OpenPocket);
 
         dragRule = DragRule.None;
@@ -167,7 +188,7 @@ public partial class OnboardingManager
             OnboardingOverlay.Block.None, OnboardingOverlay.CardPlace.Top,
             () => inventory.IsBagPocketOpen || InventoryItemDragHandler.IsAnyItemBeingDragged
                 ? null
-                : "Open the pocket the " + extraItemName + " is in first.",
+                : "Use the <color=#FF8B43>arrows</color> to go to the pocket the " + extraItemName + " is in.",
             () => ItemRect(extraItem), () => inventory.StoragePicture);
 
         dragRule = DragRule.None;
@@ -236,7 +257,7 @@ public partial class OnboardingManager
         dragRule = DragRule.All;
 
         yield return DoTracking("ANSWER IT",
-            "Open a pocket and drag the <color=#FF8B43>" + practiceItemName + "</color> into the answer box.",
+            "Find the pocket holding the <color=#FF8B43>" + practiceItemName + "</color> and drag it into the answer box.",
             () => answerResolved,
             OnboardingOverlay.Block.None, OnboardingOverlay.CardPlace.Top, null,
             () => quiz.AnswerBox != null ? (RectTransform)quiz.AnswerBox.transform : null,
@@ -308,23 +329,19 @@ public partial class OnboardingManager
     }
 
     /// <summary>
-    /// SKIP TUTORIAL: the game holds still while it asks, then either carries on where it
-    /// was or ends the practice as if it were finished.
+    /// SKIP TUTORIAL, offered on a replay only: the game holds still while it asks, then either
+    /// carries on where it was or ends the replay as if it were finished.
     /// </summary>
     private void OnSkipRequested()
     {
-        if (overlay.IsConfirmOpen)
+        if (!replay || overlay.IsConfirmOpen)
             return;
 
         float timeScale = Time.timeScale;
         Time.timeScale = 0f;
 
-        string body = replay
-            ? (ReturnsToDrill ? "You'll go back to your drill, where you paused it." : "You'll go back to the main menu.") +
-              "\n\nYou can play the tutorial again any time from <color=#FF8B43>How to Play</color>."
-            : "You'll go straight to the real drill, where the <color=#FF4343>timer runs</color> " +
-              "and your score counts.\n\nYou can play the tutorial again any time from " +
-              "<color=#FF8B43>How to Play</color>.";
+        string body = (ReturnsToDrill ? "You'll go back to your drill, where you paused it." : "You'll go back to the main menu.") +
+                      "\n\nYou can play the tutorial again any time from <color=#FF8B43>How to Play</color>.";
 
         overlay.ShowConfirm("SKIP TUTORIAL?", body, CompletePractice, () => Time.timeScale = timeScale);
     }

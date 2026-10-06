@@ -13,8 +13,9 @@ using TMPro;
 ///
 /// A strict, step-by-step walkthrough of everything the drill asks of the player, played in the
 /// real house with the real systems: walking, turning the camera, the timer and pause button,
-/// finding and picking up the go-bag, the bag button, opening furniture, reading an item,
-/// opening a pocket, packing, the weight limit, unpacking, the weight meter, the Journal, the
+/// finding and picking up the go-bag, the bag button, moving between its pockets, opening
+/// furniture, reading an item,
+/// packing, the weight limit, unpacking, the weight meter, the Journal, the
 /// exit door, a quiz question and its minigame. Each step waits until the player has actually
 /// done it, and only what the step is teaching can be used - other items will not drag, other
 /// furniture will not open, the door stays shut and the HUD buttons stay locked until their turn.
@@ -22,8 +23,10 @@ using TMPro;
 /// Nothing in it is timed or scored: the round clock never starts, the quiz asks the one
 /// question the practice set up, and nothing reaches the Journal or the teacher dashboard.
 /// When it is over the scene reloads into a normal drill and the player is marked as done, per
-/// player profile, so it plays once. It can be skipped (SKIP TUTORIAL, with a confirmation)
-/// and played again from the How-to-Play panel (<see cref="ReplayPractice"/>). A replay never
+/// player profile, so it plays once. The first run can't be skipped: a player who leaves it
+/// gets it again on their next game. It can be played again from the How-to-Play panel
+/// (<see cref="ReplayPractice"/>), and a replay can be skipped (SKIP TUTORIAL, with a
+/// confirmation). A replay never
 /// starts a drill of its own: finished or skipped, it goes back to where it was opened from -
 /// the main menu, or the drill it was opened from mid-game (<see cref="DrillSnapshot"/>),
 /// restored with its pause menu up, packing or at the quiz question it had reached.
