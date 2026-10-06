@@ -22,6 +22,10 @@ using UnityEngine.UI;
 /// but over the open bag simply goes back to where it was lying, so nothing is ever lost off
 /// the edge of the table.
 ///
+/// Once the bag is unzipped, faint outlines of the things that belong appear on the plastic,
+/// one per slot - a hint at what to pack without spelling it out. Each item drops onto its own
+/// outline, which goes once the item is in.
+///
 /// An item dropped in is taken behind the bag graphic rather than left on top of it. The
 /// sprite's interior is translucent white, so it reads as being inside the plastic instead of
 /// resting in front of it, and it is shrunk into one of the slots so a full bag looks packed
@@ -84,6 +88,13 @@ public class ZiplockMinigame : MonoBehaviour
     [Tooltip("How long that wobble lasts.")]
     [SerializeField] private float rejectShakeDuration = 0.25f;
 
+    [Header("Clue")]
+    [Tooltip("Faint outlines of the things that belong, on the plastic once the bag is open: " +
+             "a hint at what to pack without spelling it out. Each item drops onto its own " +
+             "outline, and an outline goes once its item is in. Clear alpha turns it off.")]
+    [SerializeField] private Color outlineColor = new Color(0f, 0f, 0f, 0.2f);
+    [SerializeField] private float outlineFadeDuration = 0.5f;
+
     [Header("Timing")]
     [SerializeField] private float panelFadeDuration = 0.25f;
     [SerializeField] private float instructionFadeDuration = 0.3f;
@@ -124,6 +135,18 @@ public class ZiplockMinigame : MonoBehaviour
 
     /// <summary>Which item is in each slot inside the bag, or null for a free one.</summary>
     private ZiplockItem[] slots;
+
+    /// <summary>The slot each item that belongs is outlined in, and drops into.</summary>
+    private readonly Dictionary<ZiplockItem, int> outlinedSlot = new Dictionary<ZiplockItem, int>();
+
+    /// <summary>The outline drawn in each slot, or null for a slot nothing is meant for.</summary>
+    private Image[] outlines = new Image[0];
+
+    // Over the bag but under the loose items: the plastic is too frosted to see through
+    private RectTransform outlineLayer;
+
+    // How far the outlines have faded in, 0 while the bag is shut
+    private float outlineAlpha;
 
     /// <summary>The inside of the bag, in board space — what an item has to be dropped over.</summary>
     private Rect interior;
@@ -209,6 +232,9 @@ public class ZiplockMinigame : MonoBehaviour
         foreach (ZiplockItem item in items)
             item.SetArmed(true);
 
+        // Now that it's open, the outlines of what goes in show through the plastic
+        StartCoroutine(FadeOutlinesIn());
+
         // Waits on the bag itself rather than a running tally, so pulling something back out
         // un-counts it exactly the way putting it in counted it.
         while (PackedCount() < BelongingCount())
@@ -244,6 +270,7 @@ public class ZiplockMinigame : MonoBehaviour
 
         item.IsPacked = false;
         item.Slot = -1;
+        RefreshOutlines();
 
         StopSettling(item);
 
@@ -275,7 +302,10 @@ public class ZiplockMinigame : MonoBehaviour
             return;
         }
 
-        int slot = NearestFreeSlot(item.Rect.anchoredPosition);
+        // Into its own outline when it has one, else wherever is nearest
+        int slot = outlinedSlot.TryGetValue(item, out int outlined) && slots[outlined] == null
+            ? outlined
+            : NearestFreeSlot(item.Rect.anchoredPosition);
         if (slot < 0)
         {
             // Every slot taken and this one is not in any of them. Nothing sensible to do but
@@ -286,10 +316,116 @@ public class ZiplockMinigame : MonoBehaviour
 
         slots[slot] = item;
         item.Slot = slot;
+        RefreshOutlines();
         SoundManager.Sfx(packSFX);
 
         item.Rect.SetParent(insideLayer, false);
         StartSettling(item, PackInto(item, slot));
+    }
+
+    /// <summary>
+    /// Gives each item that belongs a slot of its own and draws its outline there, faintly on
+    /// the plastic like a packing guide: its own picture, flat, at the size and tilt it will be
+    /// packed at.
+    /// </summary>
+    private void BuildOutlines()
+    {
+        outlinedSlot.Clear();
+
+        if (outlineLayer == null)
+        {
+            GameObject layer = new GameObject("OutlineLayer", typeof(RectTransform));
+            outlineLayer = (RectTransform)layer.transform;
+            outlineLayer.SetParent(itemLayer.parent, false);
+            outlineLayer.anchorMin = itemLayer.anchorMin;
+            outlineLayer.anchorMax = itemLayer.anchorMax;
+            outlineLayer.pivot = itemLayer.pivot;
+            outlineLayer.anchoredPosition = itemLayer.anchoredPosition;
+            outlineLayer.sizeDelta = itemLayer.sizeDelta;
+        }
+
+        // Just under the loose items, so one carried over the bag passes in front of it
+        outlineLayer.SetSiblingIndex(itemLayer.GetSiblingIndex());
+
+        if (outlines.Length != slots.Length)
+        {
+            foreach (Image old in outlines)
+                if (old != null)
+                    Destroy(old.gameObject);
+            outlines = new Image[slots.Length];
+        }
+
+        int next = 0;
+        foreach (ZiplockItem item in items)
+        {
+            if (item == null || !item.BelongsInBag || next >= slots.Length)
+                continue;
+
+            Image art = item.GetComponent<Image>();
+            if (art == null || art.sprite == null)
+                continue;
+
+            int slot = next++;
+            outlinedSlot[item] = slot;
+
+            Image outline = outlines[slot];
+            if (outline == null)
+            {
+                GameObject go = new GameObject("Outline", typeof(RectTransform));
+                go.transform.SetParent(outlineLayer, false);
+                outline = go.AddComponent<Image>();
+                outline.raycastTarget = false;
+                outlines[slot] = outline;
+            }
+
+            outline.sprite = art.sprite;
+
+            RectTransform rect = outline.rectTransform;
+            rect.anchorMin = item.Rect.anchorMin;
+            rect.anchorMax = item.Rect.anchorMax;
+            rect.pivot = item.Rect.pivot;
+            rect.anchoredPosition = SlotCentre(slot);
+            rect.sizeDelta = PackedSize(item);
+            rect.localRotation = Quaternion.Euler(0f, 0f, packTilt * ((slot % 2 == 0) ? 1f : -1f));
+        }
+
+        // Slots no item is meant for keep no outline
+        for (int i = next; i < outlines.Length; i++)
+            if (outlines[i] != null)
+                outlines[i].sprite = null;
+
+        outlineAlpha = 0f;
+        RefreshOutlines();
+    }
+
+    private IEnumerator FadeOutlinesIn()
+    {
+        for (float t = 0f; t < outlineFadeDuration; t += Time.unscaledDeltaTime)
+        {
+            outlineAlpha = t / outlineFadeDuration;
+            RefreshOutlines();
+            yield return null;
+        }
+
+        outlineAlpha = 1f;
+        RefreshOutlines();
+    }
+
+    /// <summary>An outline shows while its slot is empty, and goes once its item is in.</summary>
+    private void RefreshOutlines()
+    {
+        for (int i = 0; i < outlines.Length; i++)
+        {
+            Image outline = outlines[i];
+            if (outline == null)
+                continue;
+
+            bool free = slots != null && i < slots.Length && slots[i] == null;
+            bool show = outline.sprite != null && free && outlineAlpha > 0f;
+            outline.enabled = show;
+            if (show)
+                outline.color = new Color(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a * outlineAlpha);
+        }
     }
 
     /// <summary>How many things are lying inside the bag.</summary>
@@ -584,6 +720,7 @@ public class ZiplockMinigame : MonoBehaviour
         BuildGeometry();
 
         ResetBoard();
+        BuildOutlines();
     }
 
     /// <summary>Puts every item back on the table and shuts the bag.</summary>
@@ -608,6 +745,10 @@ public class ZiplockMinigame : MonoBehaviour
             zipper.SetArmed(false);
             zipper.ResetZipper();
         }
+
+        // Hidden again until the bag is next unzipped
+        outlineAlpha = 0f;
+        RefreshOutlines();
     }
 
     private void Close()
