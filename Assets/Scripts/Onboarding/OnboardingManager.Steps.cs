@@ -298,6 +298,19 @@ public partial class OnboardingManager
         return null;
     }
 
+    /// <summary>
+    /// The item's tile, or while it is in a pocket that isn't open, the pocket arrows that get
+    /// to it.
+    /// </summary>
+    private RectTransform ItemOrPocketArrows(InventoryItem item)
+    {
+        RectTransform tile = ItemRect(item);
+        if (tile != null)
+            return tile;
+
+        return inventory != null && inventory.PouchNavigator != null ? inventory.PouchNavigator.Controls : null;
+    }
+
     private Vector3 FurnitureTop()
     {
         if (targetFurniture == null)

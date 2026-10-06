@@ -47,6 +47,14 @@ public class OnboardingOverlay : MonoBehaviour
     private const float ArrowSize = 72f;
     private const float ArrowTipY = 0.16f;
 
+    // How far the arrow bobs toward its target. The card keeps off the whole swing, not just
+    // where the arrow is this frame, or it would hop back and forth as the arrow moves.
+    private const float ArrowBob = 12f;
+
+    // How much more of the card may be covered before it gives up its spot for a better one.
+    // Keeps it still while targets drift, like the bag zooming in.
+    private const float CardStayTolerance = 0.01f;
+
     // Kept clear of the screen edges and of the timer and pause button along the top
     private const float EdgeMargin = 16f;
     private const float TopHudHeight = 100f;
@@ -67,7 +75,16 @@ public class OnboardingOverlay : MonoBehaviour
     private CardPlace place = CardPlace.Auto;
 
     private RectTransform arrow;
+    // This frame's bob, and the full swing it moves along
+    private Vector2 arrowBobOffset;
+    private Vector2 arrowBobReach;
     private TextMeshProUGUI badge;
+
+    // Where the current card was put; it stays there while that is still about as good. Only
+    // for the screen size it was placed on: the canvas settles its size over the first frames.
+    private bool cardPlaced;
+    private Vector2 cardCentre;
+    private Vector2 cardScreenSize;
 
     private RectTransform skipButton;
     private GameObject confirm;
@@ -366,6 +383,7 @@ public class OnboardingOverlay : MonoBehaviour
         titleText.text = title;
         bodyText.text = body;
         place = cardPlace;
+        cardPlaced = false;
 
         bool hasButton = !string.IsNullOrEmpty(buttonText);
         button.transform.parent.gameObject.SetActive(hasButton);
@@ -547,7 +565,7 @@ public class OnboardingOverlay : MonoBehaviour
 
     private void UpdateArrow(bool hasHole)
     {
-        float bob = Mathf.Abs(Mathf.Sin(Time.unscaledTime * 4f)) * 12f;
+        float bob = Mathf.Abs(Mathf.Sin(Time.unscaledTime * 4f)) * ArrowBob;
         Vector2 size = root.rect.size;
 
         // A HUD target takes precedence: the arrow hangs over the first one
@@ -560,12 +578,14 @@ public class OnboardingOverlay : MonoBehaviour
             bool fromBelow = first.yMax + ArrowSize + 30f > size.y;
             if (fromBelow)
             {
-                arrow.anchoredPosition = new Vector2(first.center.x, first.yMin - FramePadding - 6f - bob);
+                SetArrowBob(Vector2.down, bob);
+                arrow.anchoredPosition = new Vector2(first.center.x, first.yMin - FramePadding - 6f) + arrowBobOffset;
                 arrow.localEulerAngles = new Vector3(0f, 0f, 180f);
             }
             else
             {
-                arrow.anchoredPosition = new Vector2(first.center.x, first.yMax + FramePadding + 6f + bob);
+                SetArrowBob(Vector2.up, bob);
+                arrow.anchoredPosition = new Vector2(first.center.x, first.yMax + FramePadding + 6f) + arrowBobOffset;
                 arrow.localEulerAngles = Vector3.zero;
             }
             return;
@@ -590,7 +610,8 @@ public class OnboardingOverlay : MonoBehaviour
 
         if (onScreen)
         {
-            arrow.anchoredPosition = new Vector2(local.x, local.y + bob);
+            SetArrowBob(Vector2.up, bob);
+            arrow.anchoredPosition = local + arrowBobOffset;
             arrow.localEulerAngles = Vector3.zero;
             return;
         }
@@ -610,7 +631,14 @@ public class OnboardingOverlay : MonoBehaviour
         // The sprite points down (-Y); turn it to face the target
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90f;
         arrow.localEulerAngles = new Vector3(0f, 0f, angle);
-        arrow.anchoredPosition = edge - direction * bob;
+        SetArrowBob(-direction, bob);
+        arrow.anchoredPosition = edge + arrowBobOffset;
+    }
+
+    private void SetArrowBob(Vector2 direction, float bob)
+    {
+        arrowBobOffset = direction * bob;
+        arrowBobReach = direction * ArrowBob;
     }
 
     /// <summary>
@@ -656,10 +684,7 @@ public class OnboardingOverlay : MonoBehaviour
         foreach (Vector2 centre in CandidateCentres(size, cardSize))
         {
             Rect rect = new Rect(centre - cardSize * 0.5f, cardSize);
-
-            float overlap = 0f;
-            foreach (Rect other in avoid)
-                overlap += OverlapArea(rect, other);
+            float overlap = Overlap(rect, avoid);
 
             // Candidates come in order of preference, so a tie keeps the earlier one
             if (overlap < bestOverlap - 0.5f)
@@ -671,8 +696,30 @@ public class OnboardingOverlay : MonoBehaviour
             }
         }
 
+        // Stay put unless the move is clearly better, so the card doesn't jump between two
+        // spots that are nearly as good while targets move around
+        if (cardPlaced && cardScreenSize == size)
+        {
+            Rect current = new Rect(cardCentre - cardSize * 0.5f, cardSize);
+            bool onScreen = current.xMin >= 0f && current.yMin >= 0f && current.xMax <= size.x && current.yMax <= size.y;
+            float tolerance = cardSize.x * cardSize.y * CardStayTolerance;
+            if (onScreen && Overlap(current, avoid) <= bestOverlap + tolerance)
+                best = current;
+        }
+
+        cardPlaced = true;
+        cardCentre = best.center;
+        cardScreenSize = size;
         card.anchorMin = card.anchorMax = Vector2.zero;
         card.anchoredPosition = best.center;
+    }
+
+    private static float Overlap(Rect rect, List<Rect> avoid)
+    {
+        float overlap = 0f;
+        foreach (Rect other in avoid)
+            overlap += OverlapArea(rect, other);
+        return overlap;
     }
 
     /// <summary>
@@ -709,18 +756,20 @@ public class OnboardingOverlay : MonoBehaviour
         yield return new Vector2(centre, middle);
     }
 
+    /// <summary>Everywhere the arrow reaches over its whole bob, so the card can keep off it steadily.</summary>
     private Rect ArrowRect()
     {
         // The arrow is drawn around its tip, rotated to face its target
+        Vector2 rest = arrow.anchoredPosition - arrowBobOffset;
         Vector3[] corners = new Vector3[4];
         arrow.GetLocalCorners(corners);
         Vector2 min = new Vector2(float.MaxValue, float.MaxValue);
         Vector2 max = new Vector2(float.MinValue, float.MinValue);
         foreach (Vector3 corner in corners)
         {
-            Vector2 p = (Vector2)(arrow.localRotation * corner) + arrow.anchoredPosition;
-            min = Vector2.Min(min, p);
-            max = Vector2.Max(max, p);
+            Vector2 p = (Vector2)(arrow.localRotation * corner) + rest;
+            min = Vector2.Min(min, Vector2.Min(p, p + arrowBobReach));
+            max = Vector2.Max(max, Vector2.Max(p, p + arrowBobReach));
         }
         return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
     }
@@ -805,6 +854,11 @@ public class OnboardingOverlay : MonoBehaviour
             edges[i] = MakeImage("FrameEdge", root, AccentColor);
             edges[i].raycastTarget = false;
             SetCornerAnchored(edges[i].rectTransform);
+
+            // A dark edge, so the orange frame still shows against orange, like the bag
+            Outline outline = edges[i].gameObject.AddComponent<Outline>();
+            outline.effectColor = new Color(0f, 0f, 0f, 0.75f);
+            outline.effectDistance = new Vector2(2f, -2f);
         }
 
         // Frames draw over the dims but under the arrow and the card

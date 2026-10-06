@@ -26,7 +26,11 @@ public partial class OnboardingManager
         overlay.SetSkipAvailable(replay);
         if (replay)
             overlay.SkipRequested += OnSkipRequested;
-        overlay.KeepClearOf(() => InventoryItemDragHandler.OpenDescriptionPanel);
+        overlay.KeepClearOf(() => HighlightBounds.For(InventoryItemDragHandler.OpenDescriptionPanel));
+        // The pocket arrows are how the bag is used, so cards never hide them
+        overlay.KeepClearOf(() => inventory != null && inventory.PouchNavigator != null ? inventory.PouchNavigator.Controls : null);
+        // The question being answered stays readable; the minigame after it covers it anyway
+        overlay.KeepClearOf(() => startedMinigame == null ? QuizBoxRect() : null);
         StartCoroutine(FollowPause());
 
         SetLocked(inventory != null ? inventory.BagButtonGroup : null, true);
@@ -69,7 +73,7 @@ public partial class OnboardingManager
         // --- The go-bag ------------------------------------------------------------------
         yield return Do("FIND YOUR GO-BAG",
             "Follow the arrow to your <color=#FF8B43>go-bag</color> and walk into it to pick it up.\n" +
-            "In a real drill, the bag and your starting spot are different every time.",
+            "The bag and your starting spot are different every time you play.",
             () => GoBagPickup.IsBagPickedUp() && !BagPickupPose.IsPlaying,
             OnboardingOverlay.Block.None, OnboardingOverlay.CardPlace.Top, null,
             () => goBag != null ? goBag.transform.position + Vector3.up * 1.2f : Vector3.zero);
@@ -86,6 +90,10 @@ public partial class OnboardingManager
         // The bag zooms in on a pocket and opens it by itself; point at it once it's open
         BagPouchNavigator pouches = inventory.PouchNavigator;
         bool severalPockets = pouches != null && pouches.PouchCount > 1;
+
+        // Nothing can be tapped meanwhile: closing the bag now would leave the pocket steps
+        // pointing at arrows that are gone
+        overlay.SetBlock(OnboardingOverlay.Block.Everything);
         while (pouches != null && inventory.IsOpen && pouches.CurrentPouch < 0)
             yield return null;
 
@@ -146,7 +154,7 @@ public partial class OnboardingManager
             "<color=#FF8B43>tap anywhere</color> to close it.",
             () => !InventoryItemDragHandler.IsDescriptionOpen,
             OnboardingOverlay.Block.None, OnboardingOverlay.CardPlace.Auto, null,
-            () => InventoryItemDragHandler.OpenDescriptionPanel);
+            () => HighlightBounds.For(InventoryItemDragHandler.OpenDescriptionPanel));
 
         // --- Packing ---------------------------------------------------------------------
         dragRule = DragRule.Only;
@@ -186,10 +194,10 @@ public partial class OnboardingManager
             "Drag the <color=#FF8B43>" + extraItemName + "</color> out of your bag and back into the " + furnitureName + ".",
             () => !InBag(extraItem),
             OnboardingOverlay.Block.None, OnboardingOverlay.CardPlace.Top,
-            () => inventory.IsBagPocketOpen || InventoryItemDragHandler.IsAnyItemBeingDragged
+            () => ItemRect(extraItem) != null
                 ? null
                 : "Use the <color=#FF8B43>arrows</color> to go to the pocket the " + extraItemName + " is in.",
-            () => ItemRect(extraItem), () => inventory.StoragePicture);
+            () => ItemOrPocketArrows(extraItem), () => inventory.StoragePicture);
 
         dragRule = DragRule.None;
         inventory.ShowCloseButton();
@@ -259,9 +267,12 @@ public partial class OnboardingManager
         yield return DoTracking("ANSWER IT",
             "Find the pocket holding the <color=#FF8B43>" + practiceItemName + "</color> and drag it into the answer box.",
             () => answerResolved,
-            OnboardingOverlay.Block.None, OnboardingOverlay.CardPlace.Top, null,
+            OnboardingOverlay.Block.None, OnboardingOverlay.CardPlace.Top,
+            () => ItemRect(practiceItem) != null
+                ? null
+                : "Use the <color=#FF8B43>arrows</color> above your bag to find the pocket holding the " + practiceItemName + ".",
             () => quiz.AnswerBox != null ? (RectTransform)quiz.AnswerBox.transform : null,
-            () => inventory.OpenPocket);
+            () => ItemOrPocketArrows(practiceItem));
 
         // The verdict banner plays on its own, then the quiz holds on the explanation for us
         overlay.Clear();
@@ -289,7 +300,7 @@ public partial class OnboardingManager
                 "Every question is followed by a quick minigame. Your task is written on the " +
                 "<color=#FF8B43>objective card</color> - do it to earn points!\n" +
                 "In a real drill, the bar at the top <color=#FF4343>counts down</color>.",
-                "GO!", objective != null ? (RectTransform)objective.transform : null,
+                "GO!", objective != null ? HighlightBounds.For((RectTransform)objective.transform) : null,
                 OnboardingOverlay.CardPlace.Center);
 
             overlay.Clear();
@@ -306,8 +317,8 @@ public partial class OnboardingManager
         if (replay)
         {
             yield return Info("TUTORIAL COMPLETE!",
-                "Remember: in a real drill the <color=#FF4343>timer runs</color>, your bag and " +
-                "starting spot are random, and your score counts: what you pack, your answers, " +
+                "Remember: in a real drill the <color=#FF4343>timer runs</color> and your score " +
+                "counts: what you pack, your answers, " +
                 "the minigames and the time you have left.\n\n" +
                 (ReturnsToDrill ? "Your drill is waiting where you paused it. Good luck!" : "Good luck!"),
                 ReturnsToDrill ? "BACK TO DRILL" : "MAIN MENU", null, OnboardingOverlay.CardPlace.Center);
@@ -315,8 +326,8 @@ public partial class OnboardingManager
         else
         {
             yield return Info("TUTORIAL COMPLETE!",
-                "You're ready for the real drill. This time the <color=#FF4343>timer runs</color>, your " +
-                "bag and starting spot are random, and your score counts: what you pack, your answers, " +
+                "You're ready for the real drill. This time the <color=#FF4343>timer runs</color> and " +
+                "your score counts: what you pack, your answers, " +
                 "the minigames and the time you have left.\n\nWant a refresher later? Replay this " +
                 "tutorial from <color=#FF8B43>How to Play</color>. Good luck!",
                 "START DRILL", null, OnboardingOverlay.CardPlace.Center);

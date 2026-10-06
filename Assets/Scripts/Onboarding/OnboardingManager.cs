@@ -277,8 +277,9 @@ public partial class OnboardingManager : MonoBehaviour
 
     // ----------------------------------------------------------------- lifecycle
 
-    // Awake, so every other script's Start already sees the right answer from IsPracticeRun -
-    // HouseSpawnRandomizer places the bag by it before anything else has run.
+    // Awake, so every other script's Start already sees the right answer from IsPracticeRun and
+    // ResumeSnapshot - HouseSpawnRandomizer places the player and bag by the snapshot before
+    // anything else has run.
     private void Awake()
     {
         active = this;
