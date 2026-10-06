@@ -80,6 +80,13 @@ public class QuizManager : MonoBehaviour
              "clock reads the same whichever half of the round the player is in. Optional; " +
              "the limit still applies without one.")]
     [SerializeField] private CountdownBar questionTimerBar;
+    [Tooltip("Lets the player give up on a question once this much of its time has gone. " +
+             "Scored the same as running out of time.")]
+    [SerializeField] private Button skipQuestionButton;
+    [Range(0f, 1f)]
+    [SerializeField] private float skipAfterFraction = 0.5f;
+    [Tooltip("Seconds the skip button takes to fade in once it is offered.")]
+    [SerializeField] private float skipFadeSeconds = 0.3f;
 
     [Header("Minigame Timer")]
     [Tooltip("Seconds the player gets to finish a minigame. When it runs out the minigame " +
@@ -426,6 +433,12 @@ public class QuizManager : MonoBehaviour
 
         if (questionTimerBar != null)
             questionTimerBar.Hide();
+
+        if (skipQuestionButton != null)
+        {
+            skipQuestionButton.onClick.AddListener(SkipQuestion);
+            skipQuestionButton.gameObject.SetActive(false);
+        }
 
         if (minigameTimerText != null)
             minigameTimerText.gameObject.SetActive(false);
@@ -844,6 +857,43 @@ public class QuizManager : MonoBehaviour
             StopCoroutine(questionTimerRoutine);
             questionTimerRoutine = null;
         }
+
+        SetSkipVisible(false);
+    }
+
+    /// <summary>Shows the skip button, faded in by <paramref name="opacity"/>, or hides it.</summary>
+    private void SetSkipVisible(bool visible, float opacity = 1f)
+    {
+        if (skipQuestionButton == null)
+            return;
+
+        if (skipQuestionButton.gameObject.activeSelf != visible)
+            skipQuestionButton.gameObject.SetActive(visible);
+
+        if (!visible)
+            return;
+
+        CanvasGroup group = skipQuestionButton.GetComponent<CanvasGroup>();
+        if (group == null)
+            group = skipQuestionButton.gameObject.AddComponent<CanvasGroup>();
+        group.alpha = opacity;
+
+        // Not tappable until it has mostly faded in, so it can't be hit by accident as it appears
+        group.interactable = group.blocksRaycasts = opacity > 0.5f;
+    }
+
+    /// <summary>
+    /// Gives up on the question: scored as if its time had run out, with an empty box behind
+    /// the verdict. Only offered once half the time has gone, so it can't skip past reading.
+    /// </summary>
+    private void SkipQuestion()
+    {
+        if (isResolvingAnswer || questionTimerRoutine == null || InventoryItemDragHandler.IsAnyItemBeingDragged)
+            return;
+
+        isResolvingAnswer = true;
+        StopQuestionTimer();
+        StartCoroutine(ResolveAnswer(currentQuestionIndex, null));
     }
 
     /// <summary>
@@ -864,16 +914,22 @@ public class QuizManager : MonoBehaviour
             if (isResolvingAnswer)
             {
                 questionTimerRoutine = null;
+                SetSkipVisible(false);
                 yield break;
             }
 
             remaining -= Time.deltaTime;
             questionTimeLeft = Mathf.Max(0.05f, remaining);
             UpdateQuestionTimerDisplay(remaining);
+
+            float skipFrom = questionTimeLimit * (1f - skipAfterFraction);
+            float shownFor = skipFrom - remaining;
+            SetSkipVisible(shownFor >= 0f, skipFadeSeconds > 0f ? Mathf.Clamp01(shownFor / skipFadeSeconds) : 1f);
         }
 
         UpdateQuestionTimerDisplay(0f);
         questionTimerRoutine = null;
+        SetSkipVisible(false);
 
         // Out of time counts as a wrong answer, with an empty box behind the banner
         isResolvingAnswer = true;
