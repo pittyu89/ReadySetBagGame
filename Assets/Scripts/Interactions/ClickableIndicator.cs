@@ -120,7 +120,6 @@ public class ClickableIndicator : MonoBehaviour
 
         foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
         {
-            if (r is ParticleSystemRenderer) continue;
             if (!any) { bounds = r.bounds; any = true; }
             else bounds.Encapsulate(r.bounds);
         }
