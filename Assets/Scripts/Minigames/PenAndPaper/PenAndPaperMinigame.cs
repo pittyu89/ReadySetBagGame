@@ -47,7 +47,7 @@ public class PenAndPaperMinigame : MonoBehaviour
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
     [SerializeField, TextArea] private string instructionText =
-        "Draw a path on the paper to the evacuation area in the green field";
+        "Draw a path from your home to the evacuation center";
 
     [Header("Map")]
     [Tooltip("The map. Its pixels are what say where the roads, the field and the house are, " +
@@ -60,6 +60,14 @@ public class PenAndPaperMinigame : MonoBehaviour
     [SerializeField] private UILine routeLine;
     [Tooltip("Marks the road outside the house — where the route has to start. Optional.")]
     [SerializeField] private Image startMarker;
+    [Tooltip("Names the start (Home). Anchored to the middle of the map rect and placed beside " +
+             "the start once the map has been read. Optional.")]
+    [SerializeField] private RectTransform homeLabel;
+    [Tooltip("Where the Home label sits from the start, in map units.")]
+    [SerializeField] private Vector2 homeLabelOffset = new Vector2(0f, 40f);
+    [Tooltip("Names the green field (Evacuation Center). Anchored to the middle of the map rect " +
+             "and centred on the field once the map has been read. Optional.")]
+    [SerializeField] private RectTransform evacuationLabel;
 
     [Header("Route")]
     [Tooltip("Where the route sets off from — the street at the foot of the marked house, as " +
@@ -378,7 +386,34 @@ public class PenAndPaperMinigame : MonoBehaviour
             startMarker.color = startMarkerColor;
         }
 
+        // Point A and point B: named where the map says they are
+        if (homeLabel != null)
+            homeLabel.anchoredPosition = startPoint + homeLabelOffset;
+
+        if (evacuationLabel != null && TryFieldCentre(out Vector2 fieldCentre))
+            evacuationLabel.anchoredPosition = fieldCentre;
+
         mapBuilt = true;
+    }
+
+    /// <summary>The middle of the green field, in the map rect's space. False if there is none.</summary>
+    private bool TryFieldCentre(out Vector2 centre)
+    {
+        int minX = int.MaxValue, minY = int.MaxValue, maxX = -1, maxY = -1;
+
+        for (int i = 0; i < field.Length; i++)
+        {
+            if (!field[i])
+                continue;
+
+            int x = i % mapWidth;
+            int y = i / mapWidth;
+            minX = Mathf.Min(minX, x); maxX = Mathf.Max(maxX, x);
+            minY = Mathf.Min(minY, y); maxY = Mathf.Max(maxY, y);
+        }
+
+        centre = maxX < 0 ? Vector2.zero : PixelToLocal(new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f));
+        return maxX >= 0;
     }
 
     private static bool IsRoadInk(Color32 c)
