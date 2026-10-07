@@ -6845,8 +6845,8 @@ MonoBehaviour:
   backdrop: {fileID: 1824007281}
   instructionCard: {fileID: 1887213179}
   instructionLabel: {fileID: 1153720093}
-  peelInstruction: Open the canned food
-  tapInstruction: Tap the can to shake the food out
+  peelInstruction: Pull the ring of the can
+  tapInstruction: Continue tapping the ring to pull-open the can
   canImage: {fileID: 824301131}
   frames:
   - {fileID: 1544078498908747049, guid: ddbf461bddbda824794b63b661066dea, type: 3}
@@ -48476,7 +48476,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Open the canned food
+  m_text: Pull the ring of the can
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cb9e1039b0a3b8246bd89a8ec45dc46c, type: 2}
   m_sharedMaterial: {fileID: 7669671442221834601, guid: cb9e1039b0a3b8246bd89a8ec45dc46c,

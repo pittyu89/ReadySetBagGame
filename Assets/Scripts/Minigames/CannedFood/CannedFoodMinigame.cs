@@ -46,10 +46,10 @@ public class CannedFoodMinigame : MonoBehaviour
     [SerializeField] private CanvasGroup instructionCard;
     [SerializeField] private TextMeshProUGUI instructionLabel;
     [SerializeField, TextArea] private string peelInstruction =
-        "Open the canned food";
+        "Pull the ring of the can";
     [Tooltip("Swapped in for the second half, once the lid is off.")]
     [SerializeField, TextArea] private string tapInstruction =
-        "Tap the can to shake the food out";
+        "Continue tapping the ring to pull-open the can";
 
     [Header("Can")]
     [Tooltip("The tin. Only its sprite is stepped through the stages; the rect never changes, " +
