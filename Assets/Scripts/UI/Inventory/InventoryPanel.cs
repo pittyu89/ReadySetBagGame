@@ -43,6 +43,13 @@ public class InventoryPanel : MonoBehaviour
     [Header("Bag Button Progress")]
     private BagButtonProgressBar bagButtonProgressBar;
 
+    [Header("Storage Size")]
+    [Tooltip("Kept clear around the furniture picture when it is scaled to match the bag's grid cells.")]
+    [SerializeField] private float storagePadding = 16f;
+
+    // The pouches of every bag with a grid, which shrink (frame and all) when the furniture can't grow to match them
+    private InventoryGridDisplay[] goBagGrids;
+
     [Header("Go Bag Full Message")]
     [SerializeField] private TextMeshProUGUI goBagFullMessage;
     private Coroutine goBagFullMessageCoroutine;
@@ -286,6 +293,80 @@ public class InventoryPanel : MonoBehaviour
         {
             modelDisplayImage.gameObject.SetActive(false);
         }
+    }
+
+    void LateUpdate()
+    {
+        MatchStorageToBag();
+    }
+
+    /// <summary>
+    /// Scales the furniture picture, compartments and all, so its grid cells come out the same
+    /// size on screen as the bag's. The bag scales itself to fit its side of the screen, so this
+    /// keeps up with it. Where the furniture can't grow that much and still fit, it fills its
+    /// side and the bag's pouches shrink to its cells instead. Bags without a grid (the Small Bag)
+    /// leave the furniture at its normal size.
+    /// </summary>
+    private void MatchStorageToBag()
+    {
+        if (goBagGrids == null && goBagSide != null)
+            goBagGrids = System.Array.FindAll(goBagSide.GetComponentsInChildren<InventoryGridDisplay>(true), d => d.IsGoBagGrid);
+
+        float bagGridScale = 1f;
+        InventoryGridDisplay bagGrid = ActiveBagGrid();
+
+        if (IsStorageOpen && openLayout != null && modelDisplayImage != null)
+        {
+            RectTransform picture = modelDisplayImage.rectTransform;
+            InventoryGridDisplay storageGrid = null;
+            foreach (var compartment in openLayout.Compartments)
+            {
+                if (compartment.display != null)
+                {
+                    storageGrid = compartment.display;
+                    break;
+                }
+            }
+
+            float scale = 1f;
+            if (bagGrid != null && storageGrid != null && picture.parent != null)
+            {
+                float storageCell = storageGrid.GetCellSize() * picture.parent.lossyScale.x;
+                float match = storageCell > 0f ? bagGrid.WorldCellSize() / storageCell : 1f;
+
+                Vector2 room = storageSide.rect.size - Vector2.one * (storagePadding * 2f);
+                Vector2 size = picture.rect.size;
+                float fit = size.x > 0f && size.y > 0f ? Mathf.Min(room.x / size.x, room.y / size.y) : match;
+
+                scale = Mathf.Max(Mathf.Min(match, fit), 0.1f);
+                if (match > 0f)
+                    bagGridScale = Mathf.Min(scale / match, 1f);
+            }
+
+            if (!Mathf.Approximately(picture.localScale.x, scale))
+                picture.localScale = new Vector3(scale, scale, 1f);
+        }
+
+        if (goBagGrids != null)
+            foreach (InventoryGridDisplay grid in goBagGrids)
+                grid.SetGridScale(bagGridScale);
+    }
+
+    /// <summary>A pouch grid of the bag in use, or null for a bag without one.</summary>
+    private InventoryGridDisplay ActiveBagGrid()
+    {
+        IBagPouches bag = ActiveBag;
+        if (bag == null)
+            return null;
+
+        for (int i = 0; i < bag.PouchCount; i++)
+        {
+            RectTransform pouch = bag.GetPouchGrid(i);
+            InventoryGridDisplay grid = pouch != null ? pouch.GetComponentInChildren<InventoryGridDisplay>(true) : null;
+            if (grid != null && grid.IsGoBagGrid)
+                return grid;
+        }
+        return null;
     }
 
     /// <summary>

@@ -477,6 +477,10 @@ MonoBehaviour:
     offset: {x: 0, y: -30}
     fade: 1
     delay: 0.16
+  - target: {fileID: 1378292099}
+    offset: {x: 0, y: -30}
+    fade: 1
+    delay: 0.16
   duration: 0.45
   playOnEnable: 1
 --- !u!1 &114309754

@@ -14,6 +14,8 @@ public class InventoryGridDisplay : MonoBehaviour
     [SerializeField] private float spacing = 1f;
     [Tooltip("On for furniture compartments, which are given their grid when the furniture is opened.")]
     [SerializeField] private bool useStorageGrid = false;
+    [Tooltip("A go bag pouch's grid (not a carousel slot's hidden one): the storage grids are sized to match its cells.")]
+    [SerializeField] private bool goBagGrid = false;
 
     private int gridWidth;
     private int gridHeight;
@@ -106,6 +108,30 @@ public class InventoryGridDisplay : MonoBehaviour
     public float GetCellSize()
     {
         return cellSize;
+    }
+
+    /// <summary>A go bag pouch's grid, whose cells the storage grids are sized to match.</summary>
+    public bool IsGoBagGrid => goBagGrid;
+
+    /// <summary>
+    /// How big a cell comes out in world space, before <see cref="SetGridScale"/>: the bag scales
+    /// itself to fit its side of the screen, so this follows that.
+    /// </summary>
+    public float WorldCellSize()
+    {
+        Transform cells = gridContainer != null ? gridContainer : transform;
+        float own = transform.localScale.x;
+        return own > 0f ? cellSize * cells.lossyScale.x / own : 0f;
+    }
+
+    /// <summary>
+    /// Shrinks the pocket, frame and cells together (1 is its normal size), when the furniture
+    /// beside the bag can't grow enough to match its cells.
+    /// </summary>
+    public void SetGridScale(float scale)
+    {
+        if (!Mathf.Approximately(transform.localScale.x, scale))
+            transform.localScale = new Vector3(scale, scale, 1f);
     }
 
     /// <summary>

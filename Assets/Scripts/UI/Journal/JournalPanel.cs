@@ -99,15 +99,19 @@ public class JournalPanel : MonoBehaviour
             overlay.SetActive(false);
 
         if (openButtonGroup != null)
-            openButtonGroup.SetActive(GoBagPickup.IsBagPickedUp());
+            openButtonGroup.SetActive(HasBag());
     }
 
     void Update()
     {
         // The Journal only becomes available once the player has picked up the go bag
-        if (openButtonGroup != null && !openButtonGroup.activeSelf && GoBagPickup.IsBagPickedUp())
+        if (openButtonGroup != null && !openButtonGroup.activeSelf && HasBag())
             openButtonGroup.SetActive(true);
     }
+
+    // The bag counts as picked up the moment it is touched, but the bag button only appears
+    // once the pickup pose is over; the Journal waits for that too, so the two come up together
+    private static bool HasBag() => GoBagPickup.IsBagPickedUp() && !BagPickupPose.IsPlaying;
 
     /// <summary>
     /// Every SupplyItem, most important first. Within a tier, the drill's essentials come
@@ -141,7 +145,7 @@ public class JournalPanel : MonoBehaviour
 
     public void Open()
     {
-        if (isBusy || overlay == null || overlay.activeSelf || !GoBagPickup.IsBagPickedUp())
+        if (isBusy || overlay == null || overlay.activeSelf || !HasBag())
             return;
 
         unlocked = JournalProgress.GetUnlocked();

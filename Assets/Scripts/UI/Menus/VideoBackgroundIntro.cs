@@ -68,6 +68,23 @@ public class VideoBackgroundIntro : MonoBehaviour
     private void OnDestroy()
     {
         ReleaseReveal();
+
+        // The player outlives the scene. Left running it decodes for nothing during the game,
+        // and on Android it can lose its decoder to the game's own videos and stay frozen on
+        // the way back, so it is stopped here and started fresh by the next visit.
+        if (VideoManager.Instance != null)
+            VideoManager.Instance.StopVideo(VIDEO_KEY);
+    }
+
+    // Android can pause the decoder while the app is in the background
+    private void OnApplicationPause(bool paused)
+    {
+        if (paused || VideoManager.Instance == null)
+            return;
+
+        VideoPlayer vp = VideoManager.Instance.GetPlayer(VIDEO_KEY);
+        if (vp != null && !vp.isPlaying)
+            vp.Play();
     }
 
     private IEnumerator PlayIntroWhenRevealed()
@@ -121,7 +138,11 @@ public class VideoBackgroundIntro : MonoBehaviour
         if (targetRT != null)
             vp.targetTexture = targetRT;
 
-        while (!vp.isPrepared)
+        // Stopped when the menu was last left, so it usually needs preparing again. Capped so a
+        // player that never gets ready can't keep the transition covering the screen.
+        if (!vp.isPrepared)
+            vp.Prepare();
+        for (float waited = 0f; !vp.isPrepared && waited < 5f; waited += Time.unscaledDeltaTime)
             yield return null;
 
         // The player can already be past frame 1 from before this scene loaded, so wait for a
@@ -142,6 +163,13 @@ public class VideoBackgroundIntro : MonoBehaviour
 
         SetAlpha(backgroundSurface, 1f);
         ReleaseReveal();
+
+        // Nothing came through: start the player over rather than leave a still background
+        if (!frameDrawn)
+        {
+            vp.Stop();
+            vp.Play();
+        }
     }
 
     private static void SetAlpha(RawImage image, float alpha)

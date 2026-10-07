@@ -299,7 +299,10 @@ public partial class InventoryItemDragHandler : MonoBehaviour, IPointerClickHand
     {
         // The item may be parented to the root canvas mid-drag, so go through world space
         Vector3 itemWorldPos = rectTransform.parent.TransformPoint(rectTransform.localPosition);
-        Vector3 itemLocalPos = gridDisplay.GetGridContainer().parent.InverseTransformPoint(itemWorldPos);
+        // Measured in the grid container itself, which the go bag grids scale, from the centre
+        // of its rect that the cells are laid out around
+        RectTransform container = gridDisplay.GetGridContainer();
+        Vector3 itemLocalPos = container.InverseTransformPoint(itemWorldPos) - (Vector3)container.rect.center;
 
         float cellSize = gridDisplay.GetCellSize();
         float spacing = gridDisplay.GetSpacing();

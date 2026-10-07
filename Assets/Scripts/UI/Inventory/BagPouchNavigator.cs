@@ -27,6 +27,9 @@ public class BagPouchNavigator : MonoBehaviour
     [SerializeField] private float maxZoom = 4f;
     [Tooltip("Kept clear around the view's edge, in reference units.")]
     [SerializeField] private float padding = 16f;
+    [Tooltip("The share of the screen's width the bag gets beside the storage or quiz. With the whole screen it zooms no further than it would there, so an open pouch isn't blown up far past its grid.")]
+    [Range(0.1f, 1f)]
+    [SerializeField] private float splitShare = 0.5f;
     [Tooltip("Clips the zoomed bag, fading it out at its softness. Its sides are moved off-screen where they meet the screen edge, so the fade only shows where the bag meets the storage or quiz.")]
     [SerializeField] private RectMask2D viewportClip;
     [SerializeField] private float zoomDuration = 0.4f;
@@ -315,6 +318,7 @@ public class BagPouchNavigator : MonoBehaviour
     private float FitZoom(Rect view)
     {
         float zoom = maxZoom;
+        float width = view.width - FullScreenExtraWidth();
 
         for (int i = 0; i < bag.PouchCount; i++)
         {
@@ -324,12 +328,28 @@ public class BagPouchNavigator : MonoBehaviour
 
             Rect r = BoundsIn(zoomRoot, area);
             if (r.width > 0f)
-                zoom = Mathf.Min(zoom, view.width * pouchFill / r.width);
+                zoom = Mathf.Min(zoom, width * pouchFill / r.width);
             if (r.height > 0f)
                 zoom = Mathf.Min(zoom, view.height * pouchFill / r.height);
         }
 
         return Mathf.Max(zoom, 0.1f);
+    }
+
+    /// <summary>
+    /// How much wider this side is than it is beside the storage or quiz, in zoomRoot's parent
+    /// space; 0 when it already has only that share.
+    /// </summary>
+    private float FullScreenExtraWidth()
+    {
+        RectTransform self = (RectTransform)transform;
+        RectTransform screen = self.parent as RectTransform;
+        Transform space = zoomRoot != null ? zoomRoot.parent : self;
+        if (screen == null || space.lossyScale.x <= 0f)
+            return 0f;
+
+        float extra = self.rect.width - screen.rect.width * splitShare;
+        return extra > 1f ? extra * self.lossyScale.x / space.lossyScale.x : 0f;
     }
 
     /// <summary>The middle of the pouch on the bag art, in zoomRoot space (the same at any zoom).</summary>

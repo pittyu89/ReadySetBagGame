@@ -2524,6 +2524,7 @@ MonoBehaviour:
   cellSize: 36
   spacing: 1
   useStorageGrid: 0
+  goBagGrid: 1
   gridContainer: {fileID: 1842161765}
 --- !u!222 &63247557
 CanvasRenderer:
@@ -16708,6 +16709,7 @@ MonoBehaviour:
   cellSize: 48.75
   spacing: 1
   useStorageGrid: 0
+  goBagGrid: 1
   gridContainer: {fileID: 2064378564}
 --- !u!1 &371340373
 GameObject:
@@ -34514,6 +34516,7 @@ MonoBehaviour:
   cellSize: 48.75
   spacing: 1
   useStorageGrid: 0
+  goBagGrid: 1
   gridContainer: {fileID: 1049653249}
 --- !u!1 &808326763
 GameObject:
@@ -37484,6 +37487,7 @@ MonoBehaviour:
   cellSize: 48.75
   spacing: 1
   useStorageGrid: 0
+  goBagGrid: 1
   gridContainer: {fileID: 1006281646}
 --- !u!65 &864267722
 BoxCollider:
@@ -49227,6 +49231,7 @@ MonoBehaviour:
   cellSize: 36
   spacing: 1
   useStorageGrid: 0
+  goBagGrid: 1
   gridContainer: {fileID: 122651351}
 --- !u!222 &1181163171
 CanvasRenderer:
@@ -52423,9 +52428,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryGridDisplay
   sectionName: MediumMiddleSection
-  cellSize: 38
+  cellSize: 36
   spacing: 1
   useStorageGrid: 0
+  goBagGrid: 1
   gridContainer: {fileID: 1036348809}
 --- !u!1 &1282904594
 GameObject:
@@ -60412,6 +60418,7 @@ MonoBehaviour:
   cellSize: 48.75
   spacing: 1
   useStorageGrid: 0
+  goBagGrid: 1
   gridContainer: {fileID: 1946941106}
 --- !u!1 &1505204298
 GameObject:
@@ -63843,6 +63850,7 @@ MonoBehaviour:
   cellSize: 48.75
   spacing: 1
   useStorageGrid: 0
+  goBagGrid: 1
   gridContainer: {fileID: 1588143282}
 --- !u!65 &1597183459
 BoxCollider:
