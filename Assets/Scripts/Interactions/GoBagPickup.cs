@@ -33,7 +33,7 @@ public class GoBagPickup : MonoBehaviour
     [SerializeField] private Vector2 maleHeldBagBottom = new Vector2(0f, 9f);
 
     [Header("Reveal")]
-    [Tooltip("Show the full-screen \"You got a ...\" reveal over the pickup pose. It stays up until the player taps.")]
+    [Tooltip("Play the \"You got a ...\" reveal around the pickup pose, with the camera turned to face the character. It stays up until the player taps.")]
     [SerializeField] private bool showReveal = true;
 
     private const string SELECTED_CHARACTER_SUFFIX = "_SelectedCharacter";

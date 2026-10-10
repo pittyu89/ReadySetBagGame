@@ -38,6 +38,13 @@ public class CameraOrbitController : MonoBehaviour
     [Tooltip("Seconds to zoom in (and back out).")]
     [SerializeField] private float petZoomTime = 0.5f;
 
+    [Header("Go-Bag Reveal")]
+    [Tooltip("Share of the screen height the character and the bag overhead fill while the " +
+             "\"You got a ...\" reveal is up. The camera levels out and moves in to frame them.")]
+    [SerializeField] private float revealFill = 0.55f;
+    [Tooltip("Seconds to turn to the reveal (and back).")]
+    [SerializeField] private float revealZoomTime = 0.6f;
+
     [Header("Input")]
     [Tooltip("Degrees turned when dragging the full height of the screen. Measured against " +
              "screen height so the feel is the same on every resolution.")]
@@ -55,6 +62,12 @@ public class CameraOrbitController : MonoBehaviour
     private PlayerController player;
     private float petBlend;
     private Vector3 petShift;
+
+    // 0 = normal view, 1 = level and framed on the go-bag reveal. The framing is kept after the
+    // reveal ends so the camera eases back from it.
+    private float revealBlend;
+    private Vector3 revealPivot;
+    private float revealDistance;
 
     // Finger currently orbiting the camera, or -1. Only one finger orbits at a time so a
     // joystick thumb plus a camera thumb never fight over the view.
@@ -87,10 +100,11 @@ public class CameraOrbitController : MonoBehaviour
     void Update()
     {
         UpdatePetZoom();
+        UpdateRevealZoom();
 
         // The view holds still while the character shows off the go-bag or pets the cat. Any
         // drag in progress is dropped, so the camera doesn't jump when that ends mid-drag.
-        if (BagPickupPose.IsPlaying || petBlend > 0f)
+        if (BagPickupPose.IsPlaying || petBlend > 0f || revealBlend > 0f)
         {
             orbitFingerId = -1;
             mouseOrbiting = false;
@@ -192,12 +206,43 @@ public class CameraOrbitController : MonoBehaviour
         petBlend = Mathf.MoveTowards(petBlend, petting ? 1f : 0f, step);
     }
 
+    /// <summary>
+    /// Frames the character and the bag overhead while the go-bag reveal is up, from straight
+    /// in front. The game is paused then, so this runs on real time.
+    /// </summary>
+    private void UpdateRevealZoom()
+    {
+        Bounds figure;
+        if (BagPickupPose.TryGetRevealFigure(out figure) && vcam.Follow != null)
+        {
+            float height = Mathf.Max(0.01f, figure.size.y);
+            // Aim a little above the middle, so the figure sits low enough to leave room for
+            // the words above it
+            revealPivot = figure.center + Vector3.up * height * 0.08f - vcam.Follow.position;
+            float halfFov = vcam.m_Lens.FieldOfView * 0.5f * Mathf.Deg2Rad;
+            revealDistance = height / (Mathf.Max(0.05f, revealFill) * 2f * Mathf.Tan(halfFov));
+
+            float step = revealZoomTime > 0f ? Time.unscaledDeltaTime / revealZoomTime : 1f;
+            revealBlend = Mathf.MoveTowards(revealBlend, 1f, step);
+        }
+        else
+        {
+            float step = revealZoomTime > 0f ? Time.deltaTime / revealZoomTime : 1f;
+            revealBlend = Mathf.MoveTowards(revealBlend, 0f, step);
+        }
+    }
+
     private void ApplyOffset()
     {
-        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
         float zoom = Mathf.SmoothStep(0f, 1f, petBlend);
         Vector3 pivot = Vector3.up * Mathf.Lerp(pivotHeight, petPivotHeight, zoom) + petShift * zoom;
         float currentDistance = Mathf.Lerp(distance, petDistance, zoom);
+
+        // The reveal levels the camera out, so the character is seen flat on
+        float reveal = Mathf.SmoothStep(0f, 1f, revealBlend);
+        Quaternion rotation = Quaternion.Euler(Mathf.Lerp(pitch, 0f, reveal), yaw, 0f);
+        pivot = Vector3.Lerp(pivot, revealPivot, reveal);
+        currentDistance = Mathf.Lerp(currentDistance, revealDistance, reveal);
 
         if (transposer != null)
             transposer.m_FollowOffset = pivot + rotation * new Vector3(0f, 0f, -currentDistance);

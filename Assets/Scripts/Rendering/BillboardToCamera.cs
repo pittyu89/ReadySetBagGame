@@ -21,6 +21,7 @@ public class BillboardToCamera : MonoBehaviour
     private float spriteLocalHeight = 1f;
     private bool baseScaleCaptured;
     private bool appliedCompensation;
+    private bool compensationOff;
 
     void Start()
     {
@@ -81,6 +82,28 @@ public class BillboardToCamera : MonoBehaviour
         baseScaleCaptured = true;
     }
 
+    /// <summary>
+    /// Switches the upright height stretch off or back on, straight away. The go-bag reveal turns
+    /// it off while the camera looks at the character head-on, where the stretch would only
+    /// make them look tall.
+    /// </summary>
+    public void SetHeightCompensation(bool on)
+    {
+        CaptureBaseScale();
+        compensationOff = !on;
+        appliedCompensation = false;
+
+        if (yawOnly && spriteTransform != null)
+            ApplyCompensation();
+    }
+
+    private void ApplyCompensation()
+    {
+        float stretch = compensationOff ? 1f : uprightHeightCompensation;
+        spriteTransform.localScale = new Vector3(baseScale.x, baseScale.y * stretch, baseScale.z);
+        appliedCompensation = true;
+    }
+
     void LateUpdate()
     {
         if (mainCamera == null)
@@ -107,13 +130,7 @@ public class BillboardToCamera : MonoBehaviour
             if (spriteTransform != null)
             {
                 if (!appliedCompensation)
-                {
-                    spriteTransform.localScale = new Vector3(
-                        baseScale.x,
-                        baseScale.y * uprightHeightCompensation,
-                        baseScale.z);
-                    appliedCompensation = true;
-                }
+                    ApplyCompensation();
 
                 KeepFeetPlanted();
             }

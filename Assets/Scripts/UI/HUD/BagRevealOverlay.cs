@@ -1,11 +1,17 @@
+using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 /// <summary>
-/// The full-screen "You got a Standard Bag" reveal shown while the character holds the go-bag
-/// overhead, over the game itself: warm light rays and sparkles behind the pickup pose drawn large,
-/// with the bag's name above it in the bag's own colour. It stays up until the player taps.
+/// The "You got a Standard Bag" reveal played while the character holds the go-bag overhead.
+/// It happens in the room itself: <see cref="CameraOrbitController"/> swings round to a level,
+/// head-on view of the character, warm light rays, a glow and sparkles burst out behind them,
+/// and the bag's name sits above them in the bag's own colour. It stays up until the player taps.
+///
+/// The burst is a set of world-space sprites facing the camera, drawn over the room but under
+/// the character. The words are screen-space UI that follows the character on screen.
 ///
 /// Built entirely in code and owned by <see cref="BagPickupPose"/>, which ends the pose once
 /// <see cref="IsDone"/> and destroys it. Runs on unscaled time because the game is paused meanwhile.
@@ -17,17 +23,19 @@ public class BagRevealOverlay : MonoBehaviour
     private static readonly Color CoreColor = new Color(1f, 0.95f, 0.85f, 1f);
     private const string HintText = "Tap to continue";
 
-    // Sizes in canvas units at the 1280x720 reference resolution
-    private const float FigureHeight = 330f;
-    private const float FigureOffsetY = -40f;
+    // Burst sizes as multiples of the figure's height (character plus bag)
+    private const float RaysSize = 2.4f;
+    private const float HaloSize = 2.1f;
+    private const float CoreSize = 1.1f;
+    private const int SparkleCount = 16;
+    // How far behind the character the burst sits, as a share of the figure's height
+    private const float BurstDepth = 0.05f;
+
+    // Text sizes in canvas units at the 1280x720 reference resolution
     private const float TitleGap = 14f;
     private const float TitleSize = 46f;
     private const float HintSize = 30f;
     private const float HintGap = 18f;
-    private const float RaysSize = 780f;
-    private const float HaloSize = 700f;
-    private const float CoreSize = 360f;
-    private const int SparkleCount = 16;
 
     private const float FadeIn = 0.18f;
     private const float FadeOut = 0.25f;
@@ -39,13 +47,19 @@ public class BagRevealOverlay : MonoBehaviour
     private static Sprite raysSprite;
     private static Sprite glowSprite;
 
+    private Func<Bounds> getFigure;
+    private RectTransform root;
     private CanvasGroup group;
-    private RectTransform raysA, raysB, figure, title, core;
-    private Image coreImage;
+    private RectTransform title, hintRect;
     private TextMeshProUGUI hint;
+    private float titleRise;
+
+    private GameObject burst;
+    private Material burstMaterial;
+    private SpriteRenderer raysA, raysB, halo, core;
     private Sparkle[] sparkles;
+
     private float elapsed;
-    private float titleRestY;
     private bool dismissing;
     private float dismissedAt;
 
@@ -54,10 +68,9 @@ public class BagRevealOverlay : MonoBehaviour
 
     private struct Sparkle
     {
-        public RectTransform rect;
-        public Image image;
+        public SpriteRenderer renderer;
         public Vector2 direction;
-        public float startRadius, speed, phase, twinkle;
+        public float startRadius, speed, phase, twinkle, size;
     }
 
     /// <summary>Builds the generated textures ahead of time so the pickup doesn't hitch on them.</summary>
@@ -70,20 +83,23 @@ public class BagRevealOverlay : MonoBehaviour
     }
 
     /// <summary>
-    /// Shows the reveal until the player taps. <paramref name="bagRect"/> is where the bag's
-    /// visible pixels sit, in pose-sprite pixels measured from the pose's pivot.
+    /// Shows the reveal until the player taps. <paramref name="getFigure"/> gives the world
+    /// bounds of the character and the bag they hold, each frame; <paramref name="character"/>
+    /// is the character's sprite, which the burst is sorted beneath.
     /// </summary>
-    public static BagRevealOverlay Show(Sprite poseSprite, Sprite bagSprite, Rect bagRect, string bagName, Color bagColor)
+    public static BagRevealOverlay Show(Func<Bounds> getFigure, SpriteRenderer character, string bagName, Color bagColor)
     {
         Prewarm();
 
         GameObject go = new GameObject("BagRevealOverlay", typeof(RectTransform));
         BagRevealOverlay overlay = go.AddComponent<BagRevealOverlay>();
-        overlay.Build(poseSprite, bagSprite, bagRect, bagName, bagColor);
+        overlay.getFigure = getFigure;
+        overlay.BuildCanvas(bagName, bagColor);
+        overlay.BuildBurst(character);
         return overlay;
     }
 
-    private void Build(Sprite poseSprite, Sprite bagSprite, Rect bagRect, string bagName, Color bagColor)
+    private void BuildCanvas(string bagName, Color bagColor)
     {
         Canvas canvas = gameObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -99,112 +115,38 @@ public class BagRevealOverlay : MonoBehaviour
         group = gameObject.AddComponent<CanvasGroup>();
         group.alpha = 0f;
 
-        RectTransform root = (RectTransform)transform;
+        root = (RectTransform)transform;
 
         // Invisible, so the game shows through, but it still catches the dismissing tap
         // before it can reach the HUD underneath
-        Image backdrop = MakeImage("InputBlocker", root, null, Color.clear);
-        backdrop.raycastTarget = true;
-        RectTransform backdropRect = backdrop.rectTransform;
-        backdropRect.anchorMin = Vector2.zero;
-        backdropRect.anchorMax = Vector2.one;
-        backdropRect.sizeDelta = Vector2.zero;
+        GameObject blockerObject = new GameObject("InputBlocker", typeof(RectTransform));
+        RectTransform blocker = (RectTransform)blockerObject.transform;
+        blocker.SetParent(root, false);
+        blocker.anchorMin = Vector2.zero;
+        blocker.anchorMax = Vector2.one;
+        blocker.sizeDelta = Vector2.zero;
+        Image blockerImage = blockerObject.AddComponent<Image>();
+        blockerImage.color = Color.clear;
 
-        // Light comes from the middle of the figure
-        Vector2 centre = new Vector2(0f, FigureOffsetY + FigureHeight * 0.1f);
+        title = MakeTextRect("Title", new Vector2(0.5f, 0f), new Vector2(1100f, TitleSize * 1.4f));
+        TextMeshProUGUI titleText = MakeText(title.gameObject, TitleSize, TextAlignmentOptions.Bottom);
+        titleText.text = "You got a <color=#" + ColorUtility.ToHtmlStringRGB(bagColor) + ">" + bagName + "</color>";
 
-        MakeCentred("Halo", root, glowSprite, HaloColor, HaloSize, centre);
-        raysB = MakeCentred("RaysBack", root, raysSprite, new Color(RayColor.r, RayColor.g, RayColor.b, 0.45f), RaysSize * 0.82f, centre);
-        raysB.localEulerAngles = new Vector3(0f, 0f, 5f);
-        raysA = MakeCentred("Rays", root, raysSprite, RayColor, RaysSize, centre);
-        core = MakeCentred("Core", root, glowSprite, CoreColor, CoreSize, centre);
-        coreImage = core.GetComponent<Image>();
-
-        BuildSparkles(root, centre);
-        float figureTop = BuildFigure(root, poseSprite, bagSprite, bagRect);
-        BuildTitle(root, bagName, bagColor, figureTop);
-        BuildHint(root, FigureOffsetY - figure.sizeDelta.y * 0.5f);
+        hintRect = MakeTextRect("Hint", new Vector2(0.5f, 1f), new Vector2(800f, HintSize * 1.4f));
+        hint = MakeText(hintRect.gameObject, HintSize, TextAlignmentOptions.Top);
+        hint.text = HintText;
+        hint.alpha = 0f;
     }
 
-    /// <summary>The pose with the bag overhead, scaled up as one piece. Returns the top of it in canvas units.</summary>
-    private float BuildFigure(RectTransform root, Sprite pose, Sprite bag, Rect bagRect)
+    private RectTransform MakeTextRect(string name, Vector2 pivot, Vector2 size)
     {
-        // Everything is laid out in pose-sprite pixels with the origin at the pose's pivot
-        Rect poseRect = new Rect(-pose.pivot.x, -pose.pivot.y, pose.rect.width, pose.rect.height);
-        Rect bounds = poseRect;
-        bool hasBag = bag != null && bagRect.width > 0f && bagRect.height > 0f;
-        if (hasBag)
-            bounds = Rect.MinMaxRect(Mathf.Min(bounds.xMin, bagRect.xMin), Mathf.Min(bounds.yMin, bagRect.yMin),
-                                     Mathf.Max(bounds.xMax, bagRect.xMax), Mathf.Max(bounds.yMax, bagRect.yMax));
-
-        float scale = FigureHeight / bounds.height;
-
-        GameObject go = new GameObject("Figure", typeof(RectTransform));
-        figure = (RectTransform)go.transform;
-        figure.SetParent(root, false);
-        figure.anchorMin = figure.anchorMax = new Vector2(0.5f, 0.5f);
-        figure.pivot = new Vector2(0.5f, 0.5f);
-        figure.sizeDelta = bounds.size * scale;
-        figure.anchoredPosition = new Vector2(0f, FigureOffsetY);
-
-        PlaceInFigure("Pose", pose, poseRect, bounds, scale);
-
-        if (hasBag)
-        {
-            // The bag sheets pad each frame, so map the visible pixels onto bagRect and let
-            // the padding fall around them
-            Vector2 min, max;
-            GoBagPickup.VisibleBounds(bag, out min, out max);
-            float unitsToPixels = bagRect.width / Mathf.Max(1e-5f, max.x - min.x);
-            float bagPpu = bag.pixelsPerUnit;
-            Rect full = new Rect(bagRect.x + (-bag.pivot.x / bagPpu - min.x) * unitsToPixels,
-                                 bagRect.y + (-bag.pivot.y / bagPpu - min.y) * unitsToPixels,
-                                 bag.rect.width / bagPpu * unitsToPixels,
-                                 bag.rect.height / bagPpu * unitsToPixels);
-            PlaceInFigure("Bag", bag, full, bounds, scale);
-        }
-
-        return FigureOffsetY + figure.sizeDelta.y * 0.5f;
-    }
-
-    private void PlaceInFigure(string name, Sprite sprite, Rect pixels, Rect bounds, float scale)
-    {
-        Image image = MakeImage(name, figure, sprite, Color.white);
-        RectTransform rect = image.rectTransform;
-        rect.anchorMin = rect.anchorMax = Vector2.zero;
-        rect.pivot = Vector2.zero;
-        rect.anchoredPosition = (pixels.position - bounds.position) * scale;
-        rect.sizeDelta = pixels.size * scale;
-    }
-
-    private void BuildTitle(RectTransform root, string bagName, Color bagColor, float figureTop)
-    {
-        GameObject go = new GameObject("Title", typeof(RectTransform));
-        title = (RectTransform)go.transform;
-        title.SetParent(root, false);
-        title.anchorMin = title.anchorMax = new Vector2(0.5f, 0.5f);
-        title.pivot = new Vector2(0.5f, 0f);
-        title.sizeDelta = new Vector2(1100f, TitleSize * 1.4f);
-        titleRestY = figureTop + TitleGap;
-        title.anchoredPosition = new Vector2(0f, titleRestY);
-
-        TextMeshProUGUI text = MakeText(go, TitleSize, TextAlignmentOptions.Bottom);
-        text.text = "You got a <color=#" + ColorUtility.ToHtmlStringRGB(bagColor) + ">" + bagName + "</color>";
-    }
-
-    private void BuildHint(RectTransform root, float figureBottom)
-    {
-        GameObject go = new GameObject("Hint", typeof(RectTransform));
+        GameObject go = new GameObject(name, typeof(RectTransform));
         RectTransform rect = (RectTransform)go.transform;
         rect.SetParent(root, false);
         rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
-        rect.pivot = new Vector2(0.5f, 1f);
-        rect.sizeDelta = new Vector2(800f, HintSize * 1.4f);
-        rect.anchoredPosition = new Vector2(0f, figureBottom - HintGap);
-
-        hint = MakeText(go, HintSize, TextAlignmentOptions.Top);
-        hint.text = HintText;
-        hint.alpha = 0f;
+        rect.pivot = pivot;
+        rect.sizeDelta = size;
+        return rect;
     }
 
     private static TextMeshProUGUI MakeText(GameObject go, float size, TextAlignmentOptions alignment)
@@ -224,24 +166,58 @@ public class BagRevealOverlay : MonoBehaviour
         return text;
     }
 
-    private void BuildSparkles(RectTransform root, Vector2 centre)
+    /// <summary>
+    /// The rays, glow and sparkles, as camera-facing sprites in the room. They ignore depth so
+    /// walls and furniture behind the character can't cut into them, and sort just under the
+    /// character's sprite so the character stays in front.
+    /// </summary>
+    private void BuildBurst(SpriteRenderer character)
     {
+        burst = new GameObject("BagRevealBurst");
+        if (character != null)
+            burst.layer = character.gameObject.layer;
+
+        burstMaterial = new Material(Shader.Find("UI/Default"));
+        burstMaterial.SetInt("unity_GUIZTestMode", (int)CompareFunction.Always);
+
+        int layer = character != null ? character.sortingLayerID : 0;
+        int order = character != null ? character.sortingOrder : 0;
+
+        halo = MakeBurstSprite("Halo", glowSprite, layer, order - 5);
+        raysB = MakeBurstSprite("RaysBack", raysSprite, layer, order - 4);
+        raysA = MakeBurstSprite("Rays", raysSprite, layer, order - 3);
+        core = MakeBurstSprite("Core", glowSprite, layer, order - 2);
+
         sparkles = new Sparkle[SparkleCount];
         for (int i = 0; i < SparkleCount; i++)
         {
-            float angle = (i + Random.value * 0.7f) / SparkleCount * Mathf.PI * 2f;
-            float size = Random.Range(5f, 11f);
+            float angle = (i + UnityEngine.Random.value * 0.7f) / SparkleCount * Mathf.PI * 2f;
             Sparkle s = new Sparkle();
-            s.rect = MakeCentred("Sparkle", root, glowSprite, Color.white, size, centre);
-            s.image = s.rect.GetComponent<Image>();
+            s.renderer = MakeBurstSprite("Sparkle", glowSprite, layer, order - 1);
             s.direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-            s.startRadius = Random.Range(70f, 260f);
-            s.speed = Random.Range(12f, 30f);
-            s.phase = Random.value * Mathf.PI * 2f;
-            s.twinkle = Random.Range(3f, 6f);
-            s.rect.anchoredPosition = centre + s.direction * s.startRadius;
+            s.size = UnityEngine.Random.Range(0.015f, 0.033f);
+            s.startRadius = UnityEngine.Random.Range(0.21f, 0.8f);
+            s.speed = UnityEngine.Random.Range(0.035f, 0.09f);
+            s.phase = UnityEngine.Random.value * Mathf.PI * 2f;
+            s.twinkle = UnityEngine.Random.Range(3f, 6f);
             sparkles[i] = s;
         }
+    }
+
+    private SpriteRenderer MakeBurstSprite(string name, Sprite sprite, int sortingLayer, int sortingOrder)
+    {
+        GameObject go = new GameObject(name);
+        go.layer = burst.layer;
+        go.transform.SetParent(burst.transform, false);
+
+        SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
+        renderer.sprite = sprite;
+        renderer.sharedMaterial = burstMaterial;
+        renderer.sortingLayerID = sortingLayer;
+        renderer.sortingOrder = sortingOrder;
+        renderer.shadowCastingMode = ShadowCastingMode.Off;
+        renderer.receiveShadows = false;
+        return renderer;
     }
 
     void Update()
@@ -269,30 +245,84 @@ public class BagRevealOverlay : MonoBehaviour
         float hintIn = Mathf.Clamp01((t - MinShowTime) / 0.3f);
         hint.alpha = hintIn * (0.55f + 0.35f * Mathf.Sin((t - MinShowTime) * 3f));
 
-        float pop = EaseOutBack(Mathf.Clamp01(t / PopDuration));
-
-        float raysScale = Mathf.LerpUnclamped(0.55f, 1f, pop);
-        raysA.localScale = Vector3.one * raysScale;
-        raysA.localEulerAngles = new Vector3(0f, 0f, -t * 9f);
-        raysB.localScale = Vector3.one * raysScale;
-        raysB.localEulerAngles = new Vector3(0f, 0f, 5f + t * 6f);
-
-        coreImage.color = new Color(CoreColor.r, CoreColor.g, CoreColor.b, CoreColor.a * (0.88f + 0.12f * Mathf.Sin(t * 4f)));
-
-        figure.localScale = Vector3.one * Mathf.LerpUnclamped(0.45f, 1f, pop);
-
         float titleIn = EaseOutCubic(Mathf.Clamp01((t - 0.12f) / 0.3f));
-        title.anchoredPosition = new Vector2(0f, titleRestY - 14f * (1f - titleIn));
+        titleRise = -14f * (1f - titleIn);
         title.localScale = Vector3.one * Mathf.Lerp(0.85f, 1f, titleIn);
+    }
+
+    // After the camera has moved for this frame, so the burst and the words line up with it
+    void LateUpdate()
+    {
+        Camera cam = Camera.main;
+        if (cam == null || getFigure == null)
+            return;
+
+        Bounds figure = getFigure();
+        float height = Mathf.Max(0.01f, figure.size.y);
+        float t = elapsed;
+        float fade = group.alpha;
+
+        // The burst faces the camera square-on, a little behind the character
+        Transform camTransform = cam.transform;
+        burst.transform.SetPositionAndRotation(figure.center + camTransform.forward * height * BurstDepth,
+                                               camTransform.rotation);
+
+        float pop = EaseOutBack(Mathf.Clamp01(t / PopDuration));
+        float raysScale = Mathf.LerpUnclamped(0.55f, 1f, pop);
+        PlaceBurst(halo, HaloSize * height, 0f, HaloColor, fade);
+        PlaceBurst(raysB, RaysSize * 0.82f * height * raysScale, 5f + t * 6f,
+                   new Color(RayColor.r, RayColor.g, RayColor.b, 0.45f), fade);
+        PlaceBurst(raysA, RaysSize * height * raysScale, -t * 9f, RayColor, fade);
+        PlaceBurst(core, CoreSize * height, 0f,
+                   new Color(CoreColor.r, CoreColor.g, CoreColor.b, CoreColor.a * (0.88f + 0.12f * Mathf.Sin(t * 4f))), fade);
 
         for (int i = 0; i < sparkles.Length; i++)
         {
             Sparkle s = sparkles[i];
-            Vector2 centre = new Vector2(0f, FigureOffsetY + FigureHeight * 0.1f);
-            s.rect.anchoredPosition = centre + s.direction * (s.startRadius + s.speed * t);
-            float a = 0.5f + 0.5f * Mathf.Sin(s.phase + t * s.twinkle);
-            s.image.color = new Color(1f, 0.97f, 0.9f, a * a);
+            Vector2 offset = s.direction * (s.startRadius + s.speed * t) * height;
+            s.renderer.transform.localPosition = new Vector3(offset.x, offset.y, 0f);
+            float twinkle = 0.5f + 0.5f * Mathf.Sin(s.phase + t * s.twinkle);
+            PlaceBurst(s.renderer, s.size * height, 0f, new Color(1f, 0.97f, 0.9f, twinkle * twinkle), fade, false);
         }
+
+        // The words sit just above the bag and just below the feet, wherever those are on screen
+        Vector2 top, bottom;
+        if (ToCanvas(cam, figure.center + Vector3.up * height * 0.5f, out top))
+            title.anchoredPosition = top + new Vector2(0f, TitleGap + titleRise);
+        if (ToCanvas(cam, figure.center - Vector3.up * height * 0.5f, out bottom))
+            hintRect.anchoredPosition = bottom - new Vector2(0f, HintGap);
+    }
+
+    private static void PlaceBurst(SpriteRenderer renderer, float worldSize, float angle, Color color, float fade, bool centred = true)
+    {
+        // The generated sprites are 100 pixels per unit
+        float spriteSize = renderer.sprite.rect.width / renderer.sprite.pixelsPerUnit;
+        Transform tr = renderer.transform;
+        tr.localScale = Vector3.one * (worldSize / spriteSize);
+        if (centred)
+        {
+            tr.localPosition = Vector3.zero;
+            tr.localRotation = Quaternion.Euler(0f, 0f, angle);
+        }
+        color.a *= fade;
+        renderer.color = color;
+    }
+
+    private bool ToCanvas(Camera cam, Vector3 world, out Vector2 local)
+    {
+        Vector3 screen = cam.WorldToScreenPoint(world);
+        local = Vector2.zero;
+        if (screen.z <= 0f)
+            return false;
+        return RectTransformUtility.ScreenPointToLocalPointInRectangle(root, screen, null, out local);
+    }
+
+    void OnDestroy()
+    {
+        if (burst != null)
+            Destroy(burst);
+        if (burstMaterial != null)
+            Destroy(burstMaterial);
     }
 
     private static float EaseOutBack(float x)
@@ -305,26 +335,6 @@ public class BagRevealOverlay : MonoBehaviour
     private static float EaseOutCubic(float x)
     {
         return 1f - Mathf.Pow(1f - x, 3f);
-    }
-
-    private static Image MakeImage(string name, RectTransform parent, Sprite sprite, Color color)
-    {
-        GameObject go = new GameObject(name, typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-        Image image = go.AddComponent<Image>();
-        image.sprite = sprite;
-        image.color = color;
-        image.raycastTarget = false;
-        return image;
-    }
-
-    private static RectTransform MakeCentred(string name, RectTransform parent, Sprite sprite, Color color, float size, Vector2 position)
-    {
-        RectTransform rect = MakeImage(name, parent, sprite, color).rectTransform;
-        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta = new Vector2(size, size);
-        rect.anchoredPosition = position;
-        return rect;
     }
 
     private static Sprite MakeSprite(Texture2D texture, string name)

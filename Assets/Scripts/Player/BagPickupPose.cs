@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using Cinemachine;
 using UnityEngine;
 
 /// <summary>
@@ -29,30 +29,104 @@ public class BagPickupPose : MonoBehaviour
     /// with its bottom-centre at <paramref name="bagBottom"/> (units from the pose sprite's
     /// centre), fitted into a <paramref name="bagWorldSize"/> world-unit square with its real
     /// proportions; pass null to show the pose on its own. With a <paramref name="revealBagName"/>,
-    /// the full-screen "You got a ..." reveal (<see cref="BagRevealOverlay"/>) plays over it,
-    /// with the name in <paramref name="revealBagColor"/>, and the pose is held until the
-    /// player taps it away rather than for <paramref name="duration"/>.
+    /// the "You got a ..." reveal (<see cref="BagRevealOverlay"/>) plays around the character,
+    /// with the name in <paramref name="revealBagColor"/>: the camera turns to a level, head-on
+    /// view of them, and the pose is held until the player taps rather than for <paramref name="duration"/>.
     /// </summary>
     public static BagPickupPose Play(GameObject spriteObject, Sprite poseSprite, Sprite bagSprite, Vector2 bagBottom,
                                      float bagWorldSize, float duration, Action onFinished,
                                      string revealBagName = null, Color revealBagColor = default)
     {
         BagPickupPose pose = spriteObject.AddComponent<BagPickupPose>();
-        pose.Begin(poseSprite, bagSprite, bagBottom, bagWorldSize, duration, onFinished);
-        if (!string.IsNullOrEmpty(revealBagName) && pose.spriteRenderer != null && pose.spriteRenderer.sprite != null)
+        bool revealing = !string.IsNullOrEmpty(revealBagName);
+
+        // Seen head-on, the character no longer needs stretching for a camera looking down.
+        // Done before the bag is sized, since the bag undoes the character's scale.
+        if (revealing)
         {
-            pose.reveal = BagRevealOverlay.Show(pose.spriteRenderer.sprite, bagSprite, pose.revealBagRect,
-                                                revealBagName, revealBagColor);
-            pose.HideCharacter();
+            pose.billboard = spriteObject.GetComponentInParent<BillboardToCamera>();
+            if (pose.billboard != null)
+                pose.billboard.SetHeightCompensation(false);
+        }
+
+        pose.Begin(poseSprite, bagSprite, bagBottom, bagWorldSize, duration, onFinished);
+
+        if (revealing && pose.spriteRenderer != null)
+        {
+            pose.reveal = BagRevealOverlay.Show(pose.GetFigureBounds, pose.spriteRenderer, revealBagName, revealBagColor);
+            pose.UnscaleCamera();
+            revealPose = pose;
         }
         return pose;
     }
 
     private BagRevealOverlay reveal;
-    private readonly List<Renderer> hiddenRenderers = new List<Renderer>();
-    private BlobShadow hiddenShadow;
-    // Where the held bag's visible pixels sit, in pose-sprite pixels from the pose's pivot
-    private Rect revealBagRect;
+    private BillboardToCamera billboard;
+    private CinemachineBrain brain;
+    private bool brainIgnoredTimeScale;
+
+    // The pose whose reveal is on screen, which the camera frames
+    private static BagPickupPose revealPose;
+
+    /// <summary>
+    /// World bounds of the character and the bag held overhead while a reveal is on screen,
+    /// for the camera to frame. False when there's no reveal.
+    /// </summary>
+    public static bool TryGetRevealFigure(out Bounds figure)
+    {
+        figure = default;
+        if (revealPose == null || revealPose.reveal == null)
+            return false;
+
+        figure = revealPose.GetFigureBounds();
+        return true;
+    }
+
+    private Bounds GetFigureBounds()
+    {
+        Bounds bounds = spriteRenderer.bounds;
+        if (bagOverlay != null)
+        {
+            Renderer bag = bagOverlay.GetComponent<Renderer>();
+            if (bag != null)
+                bounds.Encapsulate(bag.bounds);
+        }
+        return bounds;
+    }
+
+    /// <summary>
+    /// Cinemachine moves the camera by scaled time, which is stopped during the pose. Let it run
+    /// on real time instead so the camera can turn to the reveal.
+    /// </summary>
+    private void UnscaleCamera()
+    {
+        Camera main = Camera.main;
+        brain = main != null ? main.GetComponent<CinemachineBrain>() : null;
+        if (brain == null)
+            return;
+
+        brainIgnoredTimeScale = brain.m_IgnoreTimeScale;
+        brain.m_IgnoreTimeScale = true;
+    }
+
+    /// <summary>Hands the camera and the character's stretch back as they were before the reveal.</summary>
+    private void EndReveal()
+    {
+        if (reveal != null)
+            Destroy(reveal.gameObject);
+        reveal = null;
+
+        if (revealPose == this)
+            revealPose = null;
+
+        if (billboard != null)
+            billboard.SetHeightCompensation(true);
+        billboard = null;
+
+        if (brain != null)
+            brain.m_IgnoreTimeScale = brainIgnoredTimeScale;
+        brain = null;
+    }
 
     private void Begin(Sprite poseSprite, Sprite bagSprite, Vector2 bagBottom, float bagWorldSize,
                        float duration, Action onFinished)
@@ -217,12 +291,6 @@ public class BagPickupPose : MonoBehaviour
         float scaleX = worldScale / Mathf.Max(1e-5f, Mathf.Abs(parentScale.x));
         float scaleY = worldScale / Mathf.Max(1e-5f, Mathf.Abs(parentScale.y));
 
-        // The reveal draws the pose without the billboard's height stretch, so the bag keeps
-        // its proportions there and takes its size from the unstretched x axis
-        float ppu = spriteRenderer.sprite != null ? spriteRenderer.sprite.pixelsPerUnit : 100f;
-        Vector2 bagPixels = size * scaleX * ppu;
-        revealBagRect = new Rect(bottom.x * ppu - bagPixels.x * 0.5f, bottom.y * ppu, bagPixels.x, bagPixels.y);
-
         // Bottom-centre of the visible bag lands on the given point
         overlay.transform.localScale = new Vector3(scaleX, scaleY, scaleX);
         overlay.transform.localPosition = new Vector3(bottom.x - center.x * scaleX,
@@ -240,49 +308,9 @@ public class BagPickupPose : MonoBehaviour
             Finish();
     }
 
-    /// <summary>
-    /// Hides the character in the room while the reveal is up: the reveal draws them large in
-    /// the middle of the screen, so the small one behind it would be a duplicate. Same approach
-    /// as StorageFocus: switch off the renderers that are on, and the contact shadow.
-    /// </summary>
-    private void HideCharacter()
-    {
-        PlayerController player = GetComponentInParent<PlayerController>();
-        GameObject root = player != null ? player.gameObject : gameObject;
-
-        foreach (Renderer r in root.GetComponentsInChildren<Renderer>())
-        {
-            if (r.enabled)
-            {
-                r.enabled = false;
-                hiddenRenderers.Add(r);
-            }
-        }
-
-        hiddenShadow = root.GetComponent<BlobShadow>();
-        if (hiddenShadow != null && hiddenShadow.enabled)
-            hiddenShadow.enabled = false;
-        else
-            hiddenShadow = null;
-    }
-
-    private void ShowCharacter()
-    {
-        foreach (Renderer r in hiddenRenderers)
-            if (r != null)
-                r.enabled = true;
-        hiddenRenderers.Clear();
-
-        if (hiddenShadow != null)
-            hiddenShadow.enabled = true;
-        hiddenShadow = null;
-    }
-
     private void Finish()
     {
-        if (reveal != null)
-            Destroy(reveal.gameObject);
-        ShowCharacter();
+        EndReveal();
 
         if (bagOverlay != null)
             Destroy(bagOverlay);
@@ -311,9 +339,7 @@ public class BagPickupPose : MonoBehaviour
         if (!countReleased)
             activeCount = Mathf.Max(0, activeCount - 1);
 
-        if (reveal != null)
-            Destroy(reveal.gameObject);
-        ShowCharacter();
+        EndReveal();
 
         if (trimmedPose != null)
         {
