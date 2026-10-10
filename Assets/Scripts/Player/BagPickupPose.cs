@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -39,12 +40,17 @@ public class BagPickupPose : MonoBehaviour
         BagPickupPose pose = spriteObject.AddComponent<BagPickupPose>();
         pose.Begin(poseSprite, bagSprite, bagBottom, bagWorldSize, duration, onFinished);
         if (!string.IsNullOrEmpty(revealBagName) && pose.spriteRenderer != null && pose.spriteRenderer.sprite != null)
+        {
             pose.reveal = BagRevealOverlay.Show(pose.spriteRenderer.sprite, bagSprite, pose.revealBagRect,
                                                 revealBagName, revealBagColor);
+            pose.HideCharacter();
+        }
         return pose;
     }
 
     private BagRevealOverlay reveal;
+    private readonly List<Renderer> hiddenRenderers = new List<Renderer>();
+    private BlobShadow hiddenShadow;
     // Where the held bag's visible pixels sit, in pose-sprite pixels from the pose's pivot
     private Rect revealBagRect;
 
@@ -234,10 +240,49 @@ public class BagPickupPose : MonoBehaviour
             Finish();
     }
 
+    /// <summary>
+    /// Hides the character in the room while the reveal is up: the reveal draws them large in
+    /// the middle of the screen, so the small one behind it would be a duplicate. Same approach
+    /// as StorageFocus: switch off the renderers that are on, and the contact shadow.
+    /// </summary>
+    private void HideCharacter()
+    {
+        PlayerController player = GetComponentInParent<PlayerController>();
+        GameObject root = player != null ? player.gameObject : gameObject;
+
+        foreach (Renderer r in root.GetComponentsInChildren<Renderer>())
+        {
+            if (r.enabled)
+            {
+                r.enabled = false;
+                hiddenRenderers.Add(r);
+            }
+        }
+
+        hiddenShadow = root.GetComponent<BlobShadow>();
+        if (hiddenShadow != null && hiddenShadow.enabled)
+            hiddenShadow.enabled = false;
+        else
+            hiddenShadow = null;
+    }
+
+    private void ShowCharacter()
+    {
+        foreach (Renderer r in hiddenRenderers)
+            if (r != null)
+                r.enabled = true;
+        hiddenRenderers.Clear();
+
+        if (hiddenShadow != null)
+            hiddenShadow.enabled = true;
+        hiddenShadow = null;
+    }
+
     private void Finish()
     {
         if (reveal != null)
             Destroy(reveal.gameObject);
+        ShowCharacter();
 
         if (bagOverlay != null)
             Destroy(bagOverlay);
@@ -268,6 +313,7 @@ public class BagPickupPose : MonoBehaviour
 
         if (reveal != null)
             Destroy(reveal.gameObject);
+        ShowCharacter();
 
         if (trimmedPose != null)
         {
