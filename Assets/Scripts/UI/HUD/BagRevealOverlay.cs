@@ -11,7 +11,8 @@ using UnityEngine.UI;
 /// and the bag's name sits above them in the bag's own colour. It stays up until the player taps.
 ///
 /// The burst is a set of world-space sprites facing the camera, drawn over the room but under
-/// the character. The words are screen-space UI that follows the character on screen.
+/// the character: they ignore depth, and are queued just before the character's material so it
+/// draws over them. The words are screen-space UI that follows the character on screen.
 ///
 /// Built entirely in code and owned by <see cref="BagPickupPose"/>, which ends the pose once
 /// <see cref="IsDone"/> and destroys it. Runs on unscaled time because the game is paused meanwhile.
@@ -55,7 +56,7 @@ public class BagRevealOverlay : MonoBehaviour
     private float titleRise;
 
     private GameObject burst;
-    private Material burstMaterial;
+    private readonly System.Collections.Generic.List<Material> burstMaterials = new System.Collections.Generic.List<Material>();
     private SpriteRenderer raysA, raysB, halo, core;
     private Sparkle[] sparkles;
 
@@ -168,8 +169,13 @@ public class BagRevealOverlay : MonoBehaviour
 
     /// <summary>
     /// The rays, glow and sparkles, as camera-facing sprites in the room. They ignore depth so
-    /// walls and furniture behind the character can't cut into them, and sort just under the
-    /// character's sprite so the character stays in front.
+    /// walls and furniture behind the character can't cut into them.
+    ///
+    /// Sorting order alone can't keep the character in front: the character's material is
+    /// alpha-clipped and drawn with the opaque geometry, before any transparent sprite, so a
+    /// burst in the transparent queue would paint straight over them. Instead each layer gets
+    /// its own render queue just below the character's, so the room draws first, then the
+    /// burst back to front, then the character on top.
     /// </summary>
     private void BuildBurst(SpriteRenderer character)
     {
@@ -177,23 +183,23 @@ public class BagRevealOverlay : MonoBehaviour
         if (character != null)
             burst.layer = character.gameObject.layer;
 
-        burstMaterial = new Material(Shader.Find("UI/Default"));
-        burstMaterial.SetInt("unity_GUIZTestMode", (int)CompareFunction.Always);
+        Material characterMaterial = character != null ? character.sharedMaterial : null;
+        int characterQueue = characterMaterial != null ? characterMaterial.renderQueue : (int)RenderQueue.Transparent;
+        // Never ahead of the room's opaque geometry
+        int firstQueue = Mathf.Max((int)RenderQueue.Geometry + 1, characterQueue - 5);
 
-        int layer = character != null ? character.sortingLayerID : 0;
-        int order = character != null ? character.sortingOrder : 0;
-
-        halo = MakeBurstSprite("Halo", glowSprite, layer, order - 5);
-        raysB = MakeBurstSprite("RaysBack", raysSprite, layer, order - 4);
-        raysA = MakeBurstSprite("Rays", raysSprite, layer, order - 3);
-        core = MakeBurstSprite("Core", glowSprite, layer, order - 2);
+        halo = MakeBurstSprite("Halo", glowSprite, BurstMaterial(firstQueue));
+        raysB = MakeBurstSprite("RaysBack", raysSprite, BurstMaterial(firstQueue + 1));
+        raysA = MakeBurstSprite("Rays", raysSprite, BurstMaterial(firstQueue + 2));
+        core = MakeBurstSprite("Core", glowSprite, BurstMaterial(firstQueue + 3));
+        Material sparkleMaterial = BurstMaterial(firstQueue + 4);
 
         sparkles = new Sparkle[SparkleCount];
         for (int i = 0; i < SparkleCount; i++)
         {
             float angle = (i + UnityEngine.Random.value * 0.7f) / SparkleCount * Mathf.PI * 2f;
             Sparkle s = new Sparkle();
-            s.renderer = MakeBurstSprite("Sparkle", glowSprite, layer, order - 1);
+            s.renderer = MakeBurstSprite("Sparkle", glowSprite, sparkleMaterial);
             s.direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
             s.size = UnityEngine.Random.Range(0.015f, 0.033f);
             s.startRadius = UnityEngine.Random.Range(0.21f, 0.8f);
@@ -204,7 +210,16 @@ public class BagRevealOverlay : MonoBehaviour
         }
     }
 
-    private SpriteRenderer MakeBurstSprite(string name, Sprite sprite, int sortingLayer, int sortingOrder)
+    private Material BurstMaterial(int queue)
+    {
+        Material material = new Material(Shader.Find("UI/Default"));
+        material.SetInt("unity_GUIZTestMode", (int)CompareFunction.Always);
+        material.renderQueue = queue;
+        burstMaterials.Add(material);
+        return material;
+    }
+
+    private SpriteRenderer MakeBurstSprite(string name, Sprite sprite, Material material)
     {
         GameObject go = new GameObject(name);
         go.layer = burst.layer;
@@ -212,9 +227,7 @@ public class BagRevealOverlay : MonoBehaviour
 
         SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
         renderer.sprite = sprite;
-        renderer.sharedMaterial = burstMaterial;
-        renderer.sortingLayerID = sortingLayer;
-        renderer.sortingOrder = sortingOrder;
+        renderer.sharedMaterial = material;
         renderer.shadowCastingMode = ShadowCastingMode.Off;
         renderer.receiveShadows = false;
         return renderer;
@@ -321,8 +334,9 @@ public class BagRevealOverlay : MonoBehaviour
     {
         if (burst != null)
             Destroy(burst);
-        if (burstMaterial != null)
-            Destroy(burstMaterial);
+        foreach (Material material in burstMaterials)
+            if (material != null)
+                Destroy(material);
     }
 
     private static float EaseOutBack(float x)

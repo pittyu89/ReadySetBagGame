@@ -47,6 +47,10 @@ public class BagPickupPose : MonoBehaviour
             pose.billboard = spriteObject.GetComponentInParent<BillboardToCamera>();
             if (pose.billboard != null)
                 pose.billboard.SetHeightCompensation(false);
+
+            pose.dust = spriteObject.GetComponentInParent<DustTrail>();
+            if (pose.dust != null)
+                pose.dust.SetPuffsHidden(true);
         }
 
         pose.Begin(poseSprite, bagSprite, bagBottom, bagWorldSize, duration, onFinished);
@@ -62,6 +66,7 @@ public class BagPickupPose : MonoBehaviour
 
     private BagRevealOverlay reveal;
     private BillboardToCamera billboard;
+    private DustTrail dust;
     private CinemachineBrain brain;
     private bool brainIgnoredTimeScale;
 
@@ -122,6 +127,10 @@ public class BagPickupPose : MonoBehaviour
         if (billboard != null)
             billboard.SetHeightCompensation(true);
         billboard = null;
+
+        if (dust != null)
+            dust.SetPuffsHidden(false);
+        dust = null;
 
         if (brain != null)
             brain.m_IgnoreTimeScale = brainIgnoredTimeScale;

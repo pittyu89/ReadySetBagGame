@@ -53,6 +53,16 @@ public class DustTrail : MonoBehaviour
         puffParent = new GameObject(name + " Dust").transform;
     }
 
+    /// <summary>
+    /// Hides the puffs left on the floor, or shows them again. They freeze while the game is
+    /// paused, so the go-bag reveal hides them rather than leave them hanging at the feet.
+    /// </summary>
+    public void SetPuffsHidden(bool hidden)
+    {
+        if (puffParent != null)
+            puffParent.gameObject.SetActive(!hidden);
+    }
+
     void OnDestroy()
     {
         if (puffParent != null)
