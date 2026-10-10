@@ -41,7 +41,10 @@ public class CameraOrbitController : MonoBehaviour
     [Header("Go-Bag Reveal")]
     [Tooltip("Share of the screen height the character and the bag overhead fill while the " +
              "\"You got a ...\" reveal is up. The camera levels out and moves in to frame them.")]
-    [SerializeField] private float revealFill = 0.55f;
+    [SerializeField] private float revealFill = 0.7f;
+    [Tooltip("Widest the lens may open when a wall stops the camera backing far enough away " +
+             "to fit the figure. Wider fits more but bends the room at the edges.")]
+    [SerializeField] private float maxRevealFov = 90f;
     [Tooltip("Seconds to turn to the reveal (and back).")]
     [SerializeField] private float revealZoomTime = 0.6f;
 
@@ -68,6 +71,10 @@ public class CameraOrbitController : MonoBehaviour
     private float revealBlend;
     private Vector3 revealPivot;
     private float revealDistance;
+    // In a cramped room the collider stops the camera short of revealDistance, so the lens
+    // widens instead to keep the whole figure on screen
+    private float baseFov;
+    private float revealFov;
 
     // Finger currently orbiting the camera, or -1. Only one finger orbits at a time so a
     // joystick thumb plus a camera thumb never fight over the view.
@@ -83,6 +90,7 @@ public class CameraOrbitController : MonoBehaviour
 
         yaw = startYaw;
         pitch = startPitch;
+        baseFov = revealFov = vcam.m_Lens.FieldOfView;
         ApplyOffset();
     }
 
@@ -219,8 +227,15 @@ public class CameraOrbitController : MonoBehaviour
             // Aim a little above the middle, so the figure sits low enough to leave room for
             // the words above it
             revealPivot = figure.center + Vector3.up * height * 0.08f - vcam.Follow.position;
-            float halfFov = vcam.m_Lens.FieldOfView * 0.5f * Mathf.Deg2Rad;
-            revealDistance = height / (Mathf.Max(0.05f, revealFill) * 2f * Mathf.Tan(halfFov));
+            float halfFov = baseFov * 0.5f * Mathf.Deg2Rad;
+            float fill = Mathf.Max(0.05f, revealFill);
+            revealDistance = height / (fill * 2f * Mathf.Tan(halfFov));
+
+            // Where the camera actually got to, after the collider pulled it in front of walls
+            Camera cam = Camera.main;
+            float actual = cam != null ? Vector3.Distance(cam.transform.position, figure.center) : revealDistance;
+            float neededFov = 2f * Mathf.Atan(height / (fill * 2f * Mathf.Max(0.1f, actual))) * Mathf.Rad2Deg;
+            revealFov = Mathf.Clamp(neededFov, baseFov, Mathf.Max(baseFov, maxRevealFov));
 
             float step = revealZoomTime > 0f ? Time.unscaledDeltaTime / revealZoomTime : 1f;
             revealBlend = Mathf.MoveTowards(revealBlend, 1f, step);
@@ -243,6 +258,7 @@ public class CameraOrbitController : MonoBehaviour
         Quaternion rotation = Quaternion.Euler(Mathf.Lerp(pitch, 0f, reveal), yaw, 0f);
         pivot = Vector3.Lerp(pivot, revealPivot, reveal);
         currentDistance = Mathf.Lerp(currentDistance, revealDistance, reveal);
+        vcam.m_Lens.FieldOfView = Mathf.Lerp(baseFov, revealFov, reveal);
 
         if (transposer != null)
             transposer.m_FollowOffset = pivot + rotation * new Vector3(0f, 0f, -currentDistance);

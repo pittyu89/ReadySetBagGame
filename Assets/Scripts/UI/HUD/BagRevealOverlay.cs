@@ -11,8 +11,10 @@ using UnityEngine.UI;
 /// and the bag's name sits above them in the bag's own colour. It stays up until the player taps.
 ///
 /// The burst is a set of world-space sprites facing the camera, drawn over the room but under
-/// the character: they ignore depth, and are queued just before the character's material so it
-/// draws over them. The words are screen-space UI that follows the character on screen.
+/// the character: they ignore depth (see the ReadySetBag/BagRevealBurst shader) and draw in the
+/// transparent queue, after the whole room, while <see cref="BagPickupPose"/> moves the
+/// character to <see cref="CharacterQueue"/> so it draws over them. The words are screen-space
+/// UI that follows the character on screen.
 ///
 /// Built entirely in code and owned by <see cref="BagPickupPose"/>, which ends the pose once
 /// <see cref="IsDone"/> and destroys it. Runs on unscaled time because the game is paused meanwhile.
@@ -20,14 +22,23 @@ using UnityEngine.UI;
 public class BagRevealOverlay : MonoBehaviour
 {
     private static readonly Color RayColor = new Color(1f, 0.93f, 0.8f, 1f);
+    // A soft dark patch behind the burst gives the rays the contrast the black backdrop of the
+    // reference has, while the room still shows towards the edges of the screen
+    private static readonly Color ShadeColor = new Color(0.02f, 0.02f, 0.02f, 0.85f);
     private static readonly Color HaloColor = new Color(0.66f, 0.48f, 0.3f, 0.8f);
     private static readonly Color CoreColor = new Color(1f, 0.95f, 0.85f, 1f);
     private const string HintText = "Tap to continue";
 
+    // The burst's layers take the queues from here up, back to front
+    private const int FirstBurstQueue = (int)RenderQueue.Transparent + 1;
+    /// <summary>The render queue the character and the bag overhead draw at during the reveal: after the burst.</summary>
+    public const int CharacterQueue = FirstBurstQueue + 10;
+
     // Burst sizes as multiples of the figure's height (character plus bag)
     private const float RaysSize = 2.4f;
+    private const float ShadeSize = 3.6f;
     private const float HaloSize = 2.1f;
-    private const float CoreSize = 1.1f;
+    private const float CoreSize = 1.25f;
     private const int SparkleCount = 16;
     // How far behind the character the burst sits, as a share of the figure's height
     private const float BurstDepth = 0.05f;
@@ -47,6 +58,7 @@ public class BagRevealOverlay : MonoBehaviour
 
     private static Sprite raysSprite;
     private static Sprite glowSprite;
+    private static Sprite shadeSprite;
 
     private Func<Bounds> getFigure;
     private RectTransform root;
@@ -57,7 +69,7 @@ public class BagRevealOverlay : MonoBehaviour
 
     private GameObject burst;
     private readonly System.Collections.Generic.List<Material> burstMaterials = new System.Collections.Generic.List<Material>();
-    private SpriteRenderer raysA, raysB, halo, core;
+    private SpriteRenderer shade, raysA, raysB, halo, core;
     private Sparkle[] sparkles;
 
     private float elapsed;
@@ -81,6 +93,8 @@ public class BagRevealOverlay : MonoBehaviour
             raysSprite = MakeSprite(BuildRaysTexture(512), "BagRevealRays");
         if (glowSprite == null)
             glowSprite = MakeSprite(BuildGlowTexture(128), "BagRevealGlow");
+        if (shadeSprite == null)
+            shadeSprite = MakeSprite(BuildShadeTexture(128), "BagRevealShade");
     }
 
     /// <summary>
@@ -171,11 +185,10 @@ public class BagRevealOverlay : MonoBehaviour
     /// The rays, glow and sparkles, as camera-facing sprites in the room. They ignore depth so
     /// walls and furniture behind the character can't cut into them.
     ///
-    /// Sorting order alone can't keep the character in front: the character's material is
-    /// alpha-clipped and drawn with the opaque geometry, before any transparent sprite, so a
-    /// burst in the transparent queue would paint straight over them. Instead each layer gets
-    /// its own render queue just below the character's, so the room draws first, then the
-    /// burst back to front, then the character on top.
+    /// Each layer gets its own render queue in the transparent range, so the whole room has drawn
+    /// first and nothing in it can paint over the rays, then the layers draw back to front, then
+    /// the character on top at <see cref="CharacterQueue"/>. Sorting order alone can't do this:
+    /// the character's material is alpha-clipped and normally draws with the opaque geometry.
     /// </summary>
     private void BuildBurst(SpriteRenderer character)
     {
@@ -183,16 +196,14 @@ public class BagRevealOverlay : MonoBehaviour
         if (character != null)
             burst.layer = character.gameObject.layer;
 
-        Material characterMaterial = character != null ? character.sharedMaterial : null;
-        int characterQueue = characterMaterial != null ? characterMaterial.renderQueue : (int)RenderQueue.Transparent;
-        // Never ahead of the room's opaque geometry
-        int firstQueue = Mathf.Max((int)RenderQueue.Geometry + 1, characterQueue - 5);
+        int firstQueue = FirstBurstQueue;
 
-        halo = MakeBurstSprite("Halo", glowSprite, BurstMaterial(firstQueue));
-        raysB = MakeBurstSprite("RaysBack", raysSprite, BurstMaterial(firstQueue + 1));
-        raysA = MakeBurstSprite("Rays", raysSprite, BurstMaterial(firstQueue + 2));
-        core = MakeBurstSprite("Core", glowSprite, BurstMaterial(firstQueue + 3));
-        Material sparkleMaterial = BurstMaterial(firstQueue + 4);
+        shade = MakeBurstSprite("Shade", shadeSprite, BurstMaterial(firstQueue));
+        halo = MakeBurstSprite("Halo", glowSprite, BurstMaterial(firstQueue + 1));
+        raysB = MakeBurstSprite("RaysBack", raysSprite, BurstMaterial(firstQueue + 2));
+        raysA = MakeBurstSprite("Rays", raysSprite, BurstMaterial(firstQueue + 3));
+        core = MakeBurstSprite("Core", glowSprite, BurstMaterial(firstQueue + 4));
+        Material sparkleMaterial = BurstMaterial(firstQueue + 5);
 
         sparkles = new Sparkle[SparkleCount];
         for (int i = 0; i < SparkleCount; i++)
@@ -212,8 +223,8 @@ public class BagRevealOverlay : MonoBehaviour
 
     private Material BurstMaterial(int queue)
     {
-        Material material = new Material(Shader.Find("UI/Default"));
-        material.SetInt("unity_GUIZTestMode", (int)CompareFunction.Always);
+        // Ignores depth: the room around the character mustn't cut into the burst
+        Material material = new Material(Shader.Find("ReadySetBag/BagRevealBurst"));
         material.renderQueue = queue;
         burstMaterials.Add(material);
         return material;
@@ -282,6 +293,7 @@ public class BagRevealOverlay : MonoBehaviour
 
         float pop = EaseOutBack(Mathf.Clamp01(t / PopDuration));
         float raysScale = Mathf.LerpUnclamped(0.55f, 1f, pop);
+        PlaceBurst(shade, ShadeSize * height, 0f, ShadeColor, fade);
         PlaceBurst(halo, HaloSize * height, 0f, HaloColor, fade);
         PlaceBurst(raysB, RaysSize * 0.82f * height * raysScale, 5f + t * 6f,
                    new Color(RayColor.r, RayColor.g, RayColor.b, 0.45f), fade);
@@ -375,6 +387,25 @@ public class BagRevealOverlay : MonoBehaviour
         }
 
         return FinishTexture(pixels, size, "BagRevealGlow");
+    }
+
+    /// <summary>A disc that stays solid through the middle and fades out only towards its rim.</summary>
+    private static Texture2D BuildShadeTexture(int size)
+    {
+        Color32[] pixels = new Color32[size * size];
+        float c = size * 0.5f;
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float dx = (x + 0.5f - c) / c, dy = (y + 0.5f - c) / c;
+                float r = Mathf.Sqrt(dx * dx + dy * dy);
+                float a = 1f - Mathf.SmoothStep(0.3f, 1f, r);
+                pixels[y * size + x] = new Color32(255, 255, 255, (byte)(a * 255f));
+            }
+        }
+
+        return FinishTexture(pixels, size, "BagRevealShade");
     }
 
     /// <summary>

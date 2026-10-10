@@ -58,6 +58,7 @@ public class BagPickupPose : MonoBehaviour
         if (revealing && pose.spriteRenderer != null)
         {
             pose.reveal = BagRevealOverlay.Show(pose.GetFigureBounds, pose.spriteRenderer, revealBagName, revealBagColor);
+            pose.DrawAfterBurst();
             pose.UnscaleCamera();
             revealPose = pose;
         }
@@ -66,6 +67,8 @@ public class BagPickupPose : MonoBehaviour
 
     private BagRevealOverlay reveal;
     private BillboardToCamera billboard;
+    private Material characterMaterialBeforeReveal;
+    private Material revealCharacterMaterial;
     private DustTrail dust;
     private CinemachineBrain brain;
     private bool brainIgnoredTimeScale;
@@ -100,6 +103,26 @@ public class BagPickupPose : MonoBehaviour
     }
 
     /// <summary>
+    /// Moves the character and the bag overhead to a render queue after the reveal's light burst,
+    /// so they stay in front of it. Their own material normally draws with the opaque geometry,
+    /// well before the burst.
+    /// </summary>
+    private void DrawAfterBurst()
+    {
+        characterMaterialBeforeReveal = spriteRenderer.sharedMaterial;
+        if (characterMaterialBeforeReveal == null)
+            return;
+
+        revealCharacterMaterial = new Material(characterMaterialBeforeReveal);
+        revealCharacterMaterial.renderQueue = BagRevealOverlay.CharacterQueue;
+        spriteRenderer.sharedMaterial = revealCharacterMaterial;
+
+        Renderer bag = bagOverlay != null ? bagOverlay.GetComponent<Renderer>() : null;
+        if (bag != null)
+            bag.sharedMaterial = revealCharacterMaterial;
+    }
+
+    /// <summary>
     /// Cinemachine moves the camera by scaled time, which is stopped during the pose. Let it run
     /// on real time instead so the camera can turn to the reveal.
     /// </summary>
@@ -123,6 +146,14 @@ public class BagPickupPose : MonoBehaviour
 
         if (revealPose == this)
             revealPose = null;
+
+        if (revealCharacterMaterial != null)
+        {
+            if (spriteRenderer != null)
+                spriteRenderer.sharedMaterial = characterMaterialBeforeReveal;
+            Destroy(revealCharacterMaterial);
+        }
+        revealCharacterMaterial = null;
 
         if (billboard != null)
             billboard.SetHeightCompensation(true);
