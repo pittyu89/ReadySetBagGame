@@ -105,6 +105,12 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private float defaultCrossfadeDuration = 1f;
     [Tooltip("Seconds StopMusic() fades out over when no length is given. 0 is a hard cut.")]
     [SerializeField] private float defaultStopFadeDuration = 0.6f;
+    [Tooltip("Music level, as a fraction of normal, while a voice-over is speaking (see " +
+             "SetMusicDucked). 1 leaves the music alone.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float musicDuckLevel = 0.35f;
+    [Tooltip("Seconds the music takes to dip under a voice, and to come back up after.")]
+    [SerializeField] private float musicDuckFadeSeconds = 0.3f;
 
     [Header("Volume Ranges")]
     [SerializeField] private float minVolume = 0f;
@@ -142,6 +148,10 @@ public class SoundManager : MonoBehaviour
     private float fadeA = 1f;
     private float fadeB;
     private Coroutine musicFadeRoutine;
+
+    // Music level under a voice-over: eased toward duckTarget, applied on top of the volumes
+    private float duckLevel = 1f;
+    private float duckTarget = 1f;
 
     private readonly List<AudioSource> sfxVoices = new List<AudioSource>();
     // Parallel to sfxVoices: true while that voice plays a sound that must not be cut off
@@ -391,8 +401,8 @@ public class SoundManager : MonoBehaviour
     private void ApplyMusicVolumes()
     {
         // With a mixer group the bus owns the level, so the source only carries
-        // the crossfade envelope.
-        float amp = musicGroup != null ? 1f : MusicAmplitude;
+        // the crossfade envelope (and the duck under a voice-over).
+        float amp = (musicGroup != null ? 1f : MusicAmplitude) * duckLevel;
 
         if (musicA != null)
             musicA.volume = amp * fadeA;
@@ -591,6 +601,26 @@ public class SoundManager : MonoBehaviour
     public bool IsMusicPlaying()
     {
         return activeMusic != null && activeMusic.isPlaying;
+    }
+
+    /// <summary>
+    /// Turns the music down to <see cref="musicDuckLevel"/> while a voice-over speaks, so the
+    /// words aren't lost under it, and back up when <paramref name="ducked"/> is false.
+    /// </summary>
+    public void SetMusicDucked(bool ducked)
+    {
+        duckTarget = ducked ? musicDuckLevel : 1f;
+    }
+
+    private void Update()
+    {
+        if (Mathf.Approximately(duckLevel, duckTarget))
+            return;
+
+        // Unscaled, so the music still comes back up behind the pause menu
+        float step = musicDuckFadeSeconds > 0f ? Time.unscaledDeltaTime / musicDuckFadeSeconds : 1f;
+        duckLevel = Mathf.MoveTowards(duckLevel, duckTarget, step);
+        ApplyMusicVolumes();
     }
 
     /// <summary>The music clip currently playing, or null.</summary>

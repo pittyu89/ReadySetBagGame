@@ -23,9 +23,59 @@ public struct QuestionData
 
     // Voice-over read out alongside each line above. Optional: a line with no clip is
     // just typed out in silence.
-    public AudioClip questionVoice;
-    public AudioClip correctFeedbackVoice;
-    public AudioClip incorrectFeedbackVoice;
+    public VoiceLine questionVoice;
+    public VoiceLine correctFeedbackVoice;
+    public VoiceLine incorrectFeedbackVoice;
+}
+
+/// <summary>
+/// A recorded line and when each part of its text is spoken, so the typewriter can keep
+/// pace with the voice instead of running at its own speed.
+/// </summary>
+[System.Serializable]
+public struct VoiceLine
+{
+    public AudioClip clip;
+
+    [Tooltip("Sync keys: x = characters shown, y = seconds into the clip. Worked out from " +
+             "the recording's pauses; in order of time. Empty types the line at the normal " +
+             "speed over the length of the clip. If the text is edited, re-record the line " +
+             "and regenerate these — the keys are scaled to the new length meanwhile.")]
+    public Vector2[] sync;
+
+    public bool HasClip => clip != null;
+
+    /// <summary>
+    /// How many of <paramref name="totalChars"/> characters should be showing
+    /// <paramref name="time"/> seconds into the clip.
+    /// </summary>
+    public int CharsAt(float time, int totalChars)
+    {
+        if (clip == null || totalChars <= 0)
+            return totalChars;
+
+        if (sync == null || sync.Length < 2)
+            return Mathf.Clamp(Mathf.FloorToInt(time / Mathf.Max(0.01f, clip.length) * totalChars), 0, totalChars);
+
+        // The keys were made for the text as it was recorded; scale them if it has changed
+        float scale = totalChars / Mathf.Max(1f, sync[sync.Length - 1].x);
+
+        if (time <= sync[0].y)
+            return Mathf.RoundToInt(sync[0].x * scale);
+
+        for (int i = 1; i < sync.Length; i++)
+        {
+            if (time > sync[i].y)
+                continue;
+
+            Vector2 a = sync[i - 1];
+            Vector2 b = sync[i];
+            float t = b.y > a.y ? (time - a.y) / (b.y - a.y) : 1f;
+            return Mathf.Clamp(Mathf.FloorToInt(Mathf.Lerp(a.x, b.x, t) * scale), 0, totalChars);
+        }
+
+        return totalChars;
+    }
 }
 
 /// <summary>

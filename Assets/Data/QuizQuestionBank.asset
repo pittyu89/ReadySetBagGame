@@ -19,159 +19,2045 @@ MonoBehaviour:
     - Big Flashlight
     correctFeedback: 'Tama! Ang flashlight ang nagbibigay ng matinding liwanag upang makakita sa dilim.'
     incorrectFeedback: 'Mahalaga ang flashlight! Kapag nagka-blackout matapos ang sakuna, ito ang pangunahing ligtas na gabay upang makakita sa paligid na madilim.'
-    questionVoice: {fileID: 8300000, guid: ae77dc566fa74ac9939f54141b5fcf0a, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: c168317a17b04ed88461765a851c7399, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 904e763844e340beaa01c8a43af83079, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: ae77dc566fa74ac9939f54141b5fcf0a, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 8, y: 0.666}
+      - {x: 11, y: 0.864}
+      - {x: 19, y: 1.46}
+      - {x: 20, y: 1.99}
+      - {x: 26, y: 2.31}
+      - {x: 29, y: 2.47}
+      - {x: 35, y: 2.95}
+      - {x: 36, y: 3.15}
+      - {x: 39, y: 3.338}
+      - {x: 47, y: 3.713}
+      - {x: 53, y: 4.089}
+      - {x: 56, y: 4.277}
+      - {x: 64, y: 4.84}
+      - {x: 65, y: 5.54}
+      - {x: 71, y: 5.875}
+      - {x: 76, y: 6.21}
+      - {x: 77, y: 6.9}
+      - {x: 81, y: 7.078}
+      - {x: 92, y: 7.792}
+      - {x: 94, y: 7.97}
+      - {x: 95, y: 8.11}
+      - {x: 102, y: 8.403}
+      - {x: 105, y: 8.55}
+      - {x: 112, y: 8.99}
+      - {x: 113, y: 9.65}
+      - {x: 119, y: 9.98}
+      - {x: 127, y: 10.64}
+      - {x: 128, y: 10.9}
+      - {x: 131, y: 11.097}
+      - {x: 137, y: 11.49}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: c168317a17b04ed88461765a851c7399, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 5, y: 0.49}
+      - {x: 6, y: 1.19}
+      - {x: 10, y: 1.375}
+      - {x: 21, y: 1.745}
+      - {x: 24, y: 1.93}
+      - {x: 25, y: 2.46}
+      - {x: 36, y: 3.075}
+      - {x: 39, y: 3.229}
+      - {x: 49, y: 3.691}
+      - {x: 57, y: 4.152}
+      - {x: 62, y: 4.46}
+      - {x: 63, y: 5.15}
+      - {x: 72, y: 5.91}
+      - {x: 75, y: 6.1}
+      - {x: 81, y: 6.48}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 904e763844e340beaa01c8a43af83079, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 9, y: 0.817}
+      - {x: 13, y: 1.001}
+      - {x: 24, y: 1.37}
+      - {x: 25, y: 2.06}
+      - {x: 31, y: 2.38}
+      - {x: 45, y: 3.18}
+      - {x: 46, y: 3.7}
+      - {x: 54, y: 4.129}
+      - {x: 58, y: 4.271}
+      - {x: 65, y: 4.7}
+      - {x: 66, y: 5.4}
+      - {x: 70, y: 5.737}
+      - {x: 74, y: 5.906}
+      - {x: 85, y: 6.58}
+      - {x: 86, y: 6.7}
+      - {x: 93, y: 7.032}
+      - {x: 96, y: 7.198}
+      - {x: 101, y: 7.53}
+      - {x: 102, y: 8.12}
+      - {x: 108, y: 8.441}
+      - {x: 117, y: 9.084}
+      - {x: 120, y: 9.245}
+      - {x: 128, y: 9.727}
+      - {x: 131, y: 9.888}
+      - {x: 139, y: 10.37}
   - questionText: 'Bumagsak ang pader at naipit ka sa loob ng silid. Paos ka na sa kakasigaw at nauubusan ng hangin. Anong gamit ang lilikha ng matinis at malakas na tunog upang marinig ka ng search and rescue team?'
     correctAnswerItemNames:
     - Whistle
     correctFeedback: 'Tumpak! Mas malayo ang nararating ng tunog ng pito kaysa sa boses, at hindi ka mauubusan ng lakas habang naghihintay ng tulong.'
     incorrectFeedback: 'Dapat may pito ka! Ang pito ang pinakamabisang gamit pantawag ng rescuer nang hindi nauubos ang iyong hininga.'
-    questionVoice: {fileID: 8300000, guid: ff95fe22ee90498cbc026fc8559250f8, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: 086c2b4ea74e4b179ebbf893ac41a02e, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: b8112b4309504f308ffe816338162b3d, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: ff95fe22ee90498cbc026fc8559250f8, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 9, y: 0.52}
+      - {x: 13, y: 0.67}
+      - {x: 19, y: 0.97}
+      - {x: 22, y: 1.12}
+      - {x: 29, y: 1.57}
+      - {x: 31, y: 1.72}
+      - {x: 32, y: 1.86}
+      - {x: 35, y: 2.027}
+      - {x: 40, y: 2.36}
+      - {x: 43, y: 2.527}
+      - {x: 49, y: 2.86}
+      - {x: 50, y: 3.56}
+      - {x: 55, y: 3.88}
+      - {x: 58, y: 4.04}
+      - {x: 61, y: 4.2}
+      - {x: 64, y: 4.36}
+      - {x: 74, y: 5.0}
+      - {x: 77, y: 5.16}
+      - {x: 87, y: 5.96}
+      - {x: 90, y: 6.12}
+      - {x: 97, y: 6.44}
+      - {x: 98, y: 7.12}
+      - {x: 104, y: 7.44}
+      - {x: 110, y: 7.76}
+      - {x: 114, y: 7.92}
+      - {x: 122, y: 8.4}
+      - {x: 125, y: 8.56}
+      - {x: 132, y: 9.04}
+      - {x: 133, y: 9.16}
+      - {x: 136, y: 9.339}
+      - {x: 144, y: 9.876}
+      - {x: 147, y: 10.054}
+      - {x: 153, y: 10.412}
+      - {x: 158, y: 10.77}
+      - {x: 159, y: 11.46}
+      - {x: 167, y: 12.015}
+      - {x: 169, y: 12.2}
+      - {x: 170, y: 12.33}
+      - {x: 173, y: 12.512}
+      - {x: 180, y: 12.877}
+      - {x: 184, y: 13.059}
+      - {x: 191, y: 13.606}
+      - {x: 196, y: 13.97}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: 086c2b4ea74e4b179ebbf893ac41a02e, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 7, y: 0.57}
+      - {x: 8, y: 0.92}
+      - {x: 12, y: 1.149}
+      - {x: 19, y: 1.837}
+      - {x: 23, y: 2.066}
+      - {x: 34, y: 2.982}
+      - {x: 37, y: 3.212}
+      - {x: 42, y: 3.67}
+      - {x: 43, y: 4.19}
+      - {x: 46, y: 4.39}
+      - {x: 51, y: 4.79}
+      - {x: 57, y: 5.19}
+      - {x: 59, y: 5.39}
+      - {x: 60, y: 5.8}
+      - {x: 66, y: 6.44}
+      - {x: 67, y: 7.14}
+      - {x: 70, y: 7.291}
+      - {x: 76, y: 7.593}
+      - {x: 79, y: 7.744}
+      - {x: 89, y: 8.499}
+      - {x: 92, y: 8.65}
+      - {x: 98, y: 8.951}
+      - {x: 105, y: 9.253}
+      - {x: 117, y: 9.857}
+      - {x: 120, y: 10.008}
+      - {x: 127, y: 10.31}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: b8112b4309504f308ffe816338162b3d, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 5, y: 0.46}
+      - {x: 6, y: 0.58}
+      - {x: 10, y: 0.775}
+      - {x: 15, y: 1.165}
+      - {x: 18, y: 1.36}
+      - {x: 19, y: 2.04}
+      - {x: 23, y: 2.204}
+      - {x: 28, y: 2.532}
+      - {x: 32, y: 2.697}
+      - {x: 47, y: 3.682}
+      - {x: 52, y: 4.01}
+      - {x: 53, y: 4.14}
+      - {x: 62, y: 4.676}
+      - {x: 65, y: 4.855}
+      - {x: 73, y: 5.391}
+      - {x: 77, y: 5.57}
+      - {x: 78, y: 6.12}
+      - {x: 84, y: 6.455}
+      - {x: 92, y: 7.125}
+      - {x: 96, y: 7.293}
+      - {x: 102, y: 7.628}
+      - {x: 110, y: 8.13}
   - questionText: 'May galos at sugat ka sa braso mula sa gumuhong pader. Anong gamit mula sa go-bag ang naglalaman ng sterile gauze at plaster upang takpan ang sugat at mapigilan ang pagdurugo at dumi?'
     correctAnswerItemNames:
     - First Aid Kit
     correctFeedback: 'Tama! Ang First Aid Kit ang nagbibigay ng agarang proteksyon sa sugat upang hindi ito mapasukan ng dumi o ma-impeksyon.'
     incorrectFeedback: 'Dapat may first aid kit! Ito ang kumpletong kagamitan sa paggamot ng sugat habang naghihintay ng medic.'
-    questionVoice: {fileID: 8300000, guid: 185be7cea7ea4fae8c7da502613860fb, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: ee023549c44a437ebdf581270516ea9c, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 39d2d524ff854ee08bd9556a39b4fde5, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 185be7cea7ea4fae8c7da502613860fb, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 4, y: 0.318}
+      - {x: 10, y: 0.792}
+      - {x: 12, y: 1.03}
+      - {x: 13, y: 1.26}
+      - {x: 19, y: 1.607}
+      - {x: 21, y: 1.78}
+      - {x: 22, y: 1.92}
+      - {x: 25, y: 2.132}
+      - {x: 31, y: 2.556}
+      - {x: 35, y: 2.98}
+      - {x: 36, y: 3.11}
+      - {x: 39, y: 3.327}
+      - {x: 48, y: 3.977}
+      - {x: 54, y: 4.41}
+      - {x: 55, y: 5.1}
+      - {x: 61, y: 5.44}
+      - {x: 67, y: 5.78}
+      - {x: 72, y: 6.12}
+      - {x: 75, y: 6.29}
+      - {x: 82, y: 6.63}
+      - {x: 85, y: 6.8}
+      - {x: 86, y: 7.26}
+      - {x: 97, y: 7.915}
+      - {x: 100, y: 8.078}
+      - {x: 108, y: 8.569}
+      - {x: 113, y: 9.06}
+      - {x: 114, y: 9.74}
+      - {x: 117, y: 9.93}
+      - {x: 125, y: 10.31}
+      - {x: 131, y: 10.69}
+      - {x: 137, y: 11.07}
+      - {x: 138, y: 11.24}
+      - {x: 142, y: 11.435}
+      - {x: 148, y: 11.825}
+      - {x: 150, y: 12.02}
+      - {x: 151, y: 12.71}
+      - {x: 161, y: 13.479}
+      - {x: 165, y: 13.671}
+      - {x: 174, y: 14.44}
+      - {x: 175, y: 14.99}
+      - {x: 178, y: 15.18}
+      - {x: 183, y: 15.56}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: ee023549c44a437ebdf581270516ea9c, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 5, y: 0.52}
+      - {x: 6, y: 1.19}
+      - {x: 10, y: 1.333}
+      - {x: 16, y: 1.475}
+      - {x: 19, y: 1.76}
+      - {x: 20, y: 1.95}
+      - {x: 23, y: 2.12}
+      - {x: 24, y: 2.62}
+      - {x: 28, y: 2.783}
+      - {x: 39, y: 3.433}
+      - {x: 42, y: 3.596}
+      - {x: 50, y: 4.084}
+      - {x: 61, y: 4.572}
+      - {x: 64, y: 4.735}
+      - {x: 69, y: 5.06}
+      - {x: 70, y: 5.76}
+      - {x: 76, y: 6.074}
+      - {x: 82, y: 6.388}
+      - {x: 86, y: 6.702}
+      - {x: 95, y: 7.33}
+      - {x: 96, y: 7.63}
+      - {x: 99, y: 7.833}
+      - {x: 103, y: 8.24}
+      - {x: 104, y: 8.38}
+      - {x: 106, y: 8.562}
+      - {x: 119, y: 9.29}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 39d2d524ff854ee08bd9556a39b4fde5, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 6, y: 0.474}
+      - {x: 10, y: 0.671}
+      - {x: 16, y: 0.869}
+      - {x: 20, y: 1.263}
+      - {x: 24, y: 1.46}
+      - {x: 25, y: 2.16}
+      - {x: 29, y: 2.493}
+      - {x: 33, y: 2.659}
+      - {x: 44, y: 3.159}
+      - {x: 54, y: 3.825}
+      - {x: 57, y: 3.991}
+      - {x: 66, y: 4.491}
+      - {x: 69, y: 4.657}
+      - {x: 74, y: 4.99}
+      - {x: 75, y: 5.49}
+      - {x: 82, y: 5.81}
+      - {x: 94, y: 6.45}
+      - {x: 97, y: 6.61}
+      - {x: 103, y: 6.93}
   - questionText: 'Nakalabas ka na sa open field ngunit naputol ang linya ng tubig sa gripo dahil sa sakuna. Tuyong-tuyo ang lalamunan mo at may galos ka na napasukan ng maruming buhangin. Anong gamit ang kailangan upang ligtas na makainom at mahugasan ang dumi sa sugat?'
     correctAnswerItemNames:
     - Water Bottle
     correctFeedback: 'Magaling! Ang malinis na nakaboteng tubig ang numero unong kailangan para sa hydration at paglilinis ng sugat kapag bagsak ang water supply.'
     incorrectFeedback: 'Laging unahin ang tubig! Sa panahon ng sakuna, maaring maging limitado ang supply ng tubig.'
-    questionVoice: {fileID: 8300000, guid: 74ce3e43dc7b48e482b97cc36e72ef4b, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: 548ec6e6089042d1973de6dcf6f0a5e7, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: d502594e050a4e4f8106b0fe1af4d682, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 74ce3e43dc7b48e482b97cc36e72ef4b, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 10, y: 0.713}
+      - {x: 13, y: 0.871}
+      - {x: 16, y: 1.029}
+      - {x: 19, y: 1.187}
+      - {x: 24, y: 1.504}
+      - {x: 29, y: 1.82}
+      - {x: 30, y: 2.52}
+      - {x: 37, y: 2.857}
+      - {x: 45, y: 3.362}
+      - {x: 49, y: 3.531}
+      - {x: 55, y: 3.868}
+      - {x: 58, y: 4.037}
+      - {x: 64, y: 4.373}
+      - {x: 67, y: 4.542}
+      - {x: 73, y: 4.879}
+      - {x: 79, y: 5.216}
+      - {x: 82, y: 5.384}
+      - {x: 89, y: 5.89}
+      - {x: 90, y: 6.57}
+      - {x: 102, y: 7.249}
+      - {x: 106, y: 7.418}
+      - {x: 116, y: 8.097}
+      - {x: 119, y: 8.266}
+      - {x: 122, y: 8.436}
+      - {x: 126, y: 8.606}
+      - {x: 132, y: 8.945}
+      - {x: 135, y: 9.114}
+      - {x: 138, y: 9.284}
+      - {x: 148, y: 9.963}
+      - {x: 151, y: 10.132}
+      - {x: 160, y: 10.641}
+      - {x: 169, y: 11.15}
+      - {x: 170, y: 11.84}
+      - {x: 176, y: 12.156}
+      - {x: 182, y: 12.471}
+      - {x: 186, y: 12.629}
+      - {x: 196, y: 13.261}
+      - {x: 202, y: 13.576}
+      - {x: 209, y: 13.892}
+      - {x: 211, y: 14.05}
+      - {x: 212, y: 14.21}
+      - {x: 221, y: 14.914}
+      - {x: 223, y: 15.09}
+      - {x: 224, y: 15.54}
+      - {x: 234, y: 16.172}
+      - {x: 238, y: 16.33}
+      - {x: 243, y: 16.646}
+      - {x: 246, y: 16.804}
+      - {x: 252, y: 17.12}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: 548ec6e6089042d1973de6dcf6f0a5e7, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 9, y: 0.54}
+      - {x: 10, y: 1.23}
+      - {x: 14, y: 1.394}
+      - {x: 22, y: 1.885}
+      - {x: 25, y: 2.048}
+      - {x: 36, y: 2.703}
+      - {x: 41, y: 3.03}
+      - {x: 42, y: 3.6}
+      - {x: 46, y: 3.761}
+      - {x: 53, y: 4.244}
+      - {x: 59, y: 4.566}
+      - {x: 68, y: 5.21}
+      - {x: 69, y: 5.91}
+      - {x: 74, y: 6.327}
+      - {x: 77, y: 6.535}
+      - {x: 86, y: 7.16}
+      - {x: 87, y: 7.63}
+      - {x: 90, y: 7.83}
+      - {x: 101, y: 8.63}
+      - {x: 103, y: 8.83}
+      - {x: 104, y: 9.51}
+      - {x: 110, y: 9.878}
+      - {x: 116, y: 10.246}
+      - {x: 123, y: 10.614}
+      - {x: 127, y: 10.798}
+      - {x: 133, y: 11.166}
+      - {x: 140, y: 11.35}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: d502594e050a4e4f8106b0fe1af4d682, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 7, y: 0.42}
+      - {x: 14, y: 0.93}
+      - {x: 18, y: 1.1}
+      - {x: 24, y: 1.44}
+      - {x: 25, y: 2.12}
+      - {x: 28, y: 2.272}
+      - {x: 36, y: 2.73}
+      - {x: 39, y: 2.882}
+      - {x: 46, y: 3.34}
+      - {x: 47, y: 4.03}
+      - {x: 55, y: 4.558}
+      - {x: 62, y: 4.91}
+      - {x: 71, y: 5.614}
+      - {x: 74, y: 5.79}
+      - {x: 75, y: 5.96}
+      - {x: 82, y: 6.133}
+      - {x: 85, y: 6.305}
+      - {x: 91, y: 6.65}
   - questionText: 'Kasunod ng matinding sakuna, gumuho ang kisame at napuno ng makapal na alikabok at pinong semento ang daanan. Anong gamit ang dapat mong isuot agad upang hindi malanghap ang mapanganib na alikabok habang lumilikas?'
     correctAnswerItemNames:
     - N95 Mask
     correctFeedback: 'Magaling! Sinasala ng N95 mask ang mapanganib na alikabok at pinong semento upang maprotektahan ang iyong baga habang lumilikas.'
     incorrectFeedback: 'Tandaan ito! Pagkatapos ng sakuna, makapal ang alikabok ng semento. Ang N95 mask ang kailangan upang makahinga nang ligtas at maiwasan ang hirap sa paghinga.'
-    questionVoice: {fileID: 8300000, guid: 8f56160d86044fcbbf38da9b4856c50c, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: d6cc213282324e498ffe7b524cd51fb4, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 122fbe73c7b44aa8b49a5a404c115368, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 8f56160d86044fcbbf38da9b4856c50c, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 8, y: 0.512}
+      - {x: 11, y: 0.656}
+      - {x: 21, y: 1.088}
+      - {x: 28, y: 1.52}
+      - {x: 29, y: 2.19}
+      - {x: 36, y: 2.704}
+      - {x: 40, y: 2.875}
+      - {x: 47, y: 3.389}
+      - {x: 49, y: 3.56}
+      - {x: 50, y: 4.25}
+      - {x: 57, y: 4.71}
+      - {x: 60, y: 4.863}
+      - {x: 68, y: 5.323}
+      - {x: 71, y: 5.477}
+      - {x: 79, y: 6.09}
+      - {x: 80, y: 6.64}
+      - {x: 83, y: 6.82}
+      - {x: 90, y: 7.18}
+      - {x: 98, y: 7.72}
+      - {x: 102, y: 7.9}
+      - {x: 109, y: 8.44}
+      - {x: 110, y: 9.13}
+      - {x: 116, y: 9.473}
+      - {x: 122, y: 9.816}
+      - {x: 126, y: 9.988}
+      - {x: 132, y: 10.331}
+      - {x: 137, y: 10.502}
+      - {x: 143, y: 11.017}
+      - {x: 147, y: 11.36}
+      - {x: 148, y: 12.0}
+      - {x: 154, y: 12.3}
+      - {x: 160, y: 12.6}
+      - {x: 170, y: 13.05}
+      - {x: 173, y: 13.2}
+      - {x: 174, y: 13.84}
+      - {x: 185, y: 14.409}
+      - {x: 188, y: 14.551}
+      - {x: 196, y: 15.12}
+      - {x: 197, y: 15.36}
+      - {x: 204, y: 15.7}
+      - {x: 214, y: 16.38}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: d6cc213282324e498ffe7b524cd51fb4, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 9, y: 0.56}
+      - {x: 10, y: 1.25}
+      - {x: 19, y: 1.918}
+      - {x: 22, y: 2.085}
+      - {x: 26, y: 2.586}
+      - {x: 31, y: 2.753}
+      - {x: 35, y: 2.92}
+      - {x: 46, y: 3.588}
+      - {x: 49, y: 3.755}
+      - {x: 58, y: 4.423}
+      - {x: 60, y: 4.59}
+      - {x: 61, y: 5.25}
+      - {x: 68, y: 5.584}
+      - {x: 76, y: 6.086}
+      - {x: 81, y: 6.42}
+      - {x: 82, y: 7.1}
+      - {x: 95, y: 7.91}
+      - {x: 96, y: 8.04}
+      - {x: 100, y: 8.254}
+      - {x: 106, y: 8.682}
+      - {x: 110, y: 9.11}
+      - {x: 111, y: 9.26}
+      - {x: 118, y: 9.663}
+      - {x: 128, y: 10.47}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 122fbe73c7b44aa8b49a5a404c115368, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 8, y: 0.572}
+      - {x: 12, y: 0.9}
+      - {x: 13, y: 1.59}
+      - {x: 24, y: 2.26}
+      - {x: 27, y: 2.428}
+      - {x: 34, y: 2.93}
+      - {x: 35, y: 3.44}
+      - {x: 43, y: 3.947}
+      - {x: 47, y: 4.117}
+      - {x: 56, y: 4.793}
+      - {x: 59, y: 4.963}
+      - {x: 67, y: 5.47}
+      - {x: 68, y: 6.13}
+      - {x: 72, y: 6.313}
+      - {x: 76, y: 6.863}
+      - {x: 81, y: 7.047}
+      - {x: 85, y: 7.23}
+      - {x: 95, y: 7.963}
+      - {x: 100, y: 8.33}
+      - {x: 101, y: 8.8}
+      - {x: 111, y: 9.434}
+      - {x: 116, y: 9.593}
+      - {x: 122, y: 9.91}
+      - {x: 123, y: 10.06}
+      - {x: 126, y: 10.261}
+      - {x: 135, y: 11.064}
+      - {x: 139, y: 11.265}
+      - {x: 145, y: 11.667}
+      - {x: 148, y: 11.867}
+      - {x: 157, y: 12.47}
   - questionText: 'Nadurog ng gumuhong pader ang iyong flashlight, at may naaamoy kang tumatagas na gas kaya bawal magsindi ng apoy. Anong ligtas na ilaw na hindi kailangan ng baterya o apoy ang maaari mong gamitin sa dilim?'
     correctAnswerItemNames:
     - Glow Sticks
     correctFeedback: 'Tama! Ang glow stick ay nagbibigay ng liwanag nang walang baterya o apoy, kaya ligtas itong gamitin.'
     incorrectFeedback: 'Isama ang glow stick! Ito ang alternatibong ilaw kapag hindi na magamit ang iyong flashlight sa dilim, at hindi ito nangangailangan ng baterya o apoy.'
-    questionVoice: {fileID: 8300000, guid: 310fc26b755e48e5ac4ed0dca8116d38, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: f34ccdb6d4f84defb3f7cfa0130f2905, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 8fd4b706cc544fd285b2a83107f4dae2, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 310fc26b755e48e5ac4ed0dca8116d38, type: 3}
+      sync:
+      - {x: 0, y: 0.06}
+      - {x: 7, y: 0.69}
+      - {x: 8, y: 1.19}
+      - {x: 11, y: 1.423}
+      - {x: 20, y: 2.123}
+      - {x: 25, y: 2.59}
+      - {x: 26, y: 2.99}
+      - {x: 30, y: 3.2}
+      - {x: 36, y: 3.62}
+      - {x: 47, y: 4.04}
+      - {x: 48, y: 4.73}
+      - {x: 51, y: 4.918}
+      - {x: 55, y: 5.105}
+      - {x: 63, y: 5.856}
+      - {x: 68, y: 6.044}
+      - {x: 78, y: 6.795}
+      - {x: 81, y: 6.982}
+      - {x: 84, y: 7.17}
+      - {x: 85, y: 7.84}
+      - {x: 90, y: 8.196}
+      - {x: 96, y: 8.552}
+      - {x: 105, y: 9.086}
+      - {x: 108, y: 9.264}
+      - {x: 113, y: 9.62}
+      - {x: 114, y: 10.3}
+      - {x: 119, y: 10.76}
+      - {x: 120, y: 10.92}
+      - {x: 127, y: 11.24}
+      - {x: 130, y: 11.4}
+      - {x: 135, y: 11.72}
+      - {x: 137, y: 11.88}
+      - {x: 138, y: 12.34}
+      - {x: 144, y: 12.66}
+      - {x: 154, y: 13.3}
+      - {x: 157, y: 13.46}
+      - {x: 164, y: 13.94}
+      - {x: 165, y: 14.63}
+      - {x: 167, y: 14.793}
+      - {x: 172, y: 15.117}
+      - {x: 175, y: 15.28}
+      - {x: 176, y: 15.72}
+      - {x: 183, y: 16.356}
+      - {x: 188, y: 16.515}
+      - {x: 196, y: 16.993}
+      - {x: 199, y: 17.152}
+      - {x: 205, y: 17.47}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: f34ccdb6d4f84defb3f7cfa0130f2905, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 5, y: 0.43}
+      - {x: 6, y: 1.12}
+      - {x: 10, y: 1.309}
+      - {x: 15, y: 1.498}
+      - {x: 21, y: 1.688}
+      - {x: 24, y: 1.877}
+      - {x: 35, y: 2.633}
+      - {x: 38, y: 2.823}
+      - {x: 45, y: 3.39}
+      - {x: 46, y: 4.08}
+      - {x: 51, y: 4.263}
+      - {x: 58, y: 4.63}
+      - {x: 66, y: 5.18}
+      - {x: 68, y: 5.363}
+      - {x: 73, y: 5.73}
+      - {x: 74, y: 6.42}
+      - {x: 79, y: 6.751}
+      - {x: 86, y: 7.082}
+      - {x: 92, y: 7.413}
+      - {x: 100, y: 7.91}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 8fd4b706cc544fd285b2a83107f4dae2, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 6, y: 0.7}
+      - {x: 10, y: 0.91}
+      - {x: 15, y: 1.12}
+      - {x: 21, y: 1.33}
+      - {x: 22, y: 2.03}
+      - {x: 26, y: 2.39}
+      - {x: 30, y: 2.57}
+      - {x: 44, y: 3.47}
+      - {x: 48, y: 3.83}
+      - {x: 49, y: 4.34}
+      - {x: 55, y: 4.709}
+      - {x: 61, y: 5.077}
+      - {x: 64, y: 5.262}
+      - {x: 72, y: 5.815}
+      - {x: 76, y: 5.999}
+      - {x: 82, y: 6.368}
+      - {x: 93, y: 6.737}
+      - {x: 96, y: 6.921}
+      - {x: 102, y: 7.29}
+      - {x: 103, y: 7.98}
+      - {x: 105, y: 8.13}
+      - {x: 106, y: 8.28}
+      - {x: 112, y: 8.561}
+      - {x: 116, y: 8.843}
+      - {x: 132, y: 9.687}
+      - {x: 135, y: 9.828}
+      - {x: 142, y: 10.25}
+      - {x: 143, y: 10.71}
+      - {x: 145, y: 10.937}
+      - {x: 150, y: 11.39}
   - questionText: 'Maiihip ng malakas na hangin ang inyong tent sa evacuation site. Anong matibay na kagamitan ang gagamitin upang itali ito nang maayos sa puno o poste?'
     correctAnswerItemNames:
     - Rope
     correctFeedback: 'Tama! Ang 7-meter rope ay matibay na pantali sa pagtatayo ng shelter at pag-secure ng mga gamit sa panahon ng kalamidad.'
     incorrectFeedback: 'Kailangan ang lubid! Ito ang humahawak sa mga tent at pansamantalang shelter kapag walang matirhan matapos gumuho ng mga bahay at gusali.'
-    questionVoice: {fileID: 8300000, guid: fcba7709d3124f179ba35661f108c541, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: a969548d7f4348888fe81ffca6a64412, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: bed08806bbed41a0881ada4ea53e1aac, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: fcba7709d3124f179ba35661f108c541, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 8, y: 0.715}
+      - {x: 11, y: 0.874}
+      - {x: 19, y: 1.35}
+      - {x: 22, y: 1.509}
+      - {x: 29, y: 1.826}
+      - {x: 33, y: 1.985}
+      - {x: 40, y: 2.303}
+      - {x: 45, y: 2.461}
+      - {x: 48, y: 2.62}
+      - {x: 59, y: 3.572}
+      - {x: 64, y: 3.89}
+      - {x: 65, y: 4.58}
+      - {x: 71, y: 4.904}
+      - {x: 79, y: 5.39}
+      - {x: 82, y: 5.552}
+      - {x: 92, y: 6.2}
+      - {x: 96, y: 6.362}
+      - {x: 105, y: 7.01}
+      - {x: 106, y: 7.49}
+      - {x: 112, y: 7.845}
+      - {x: 118, y: 8.378}
+      - {x: 122, y: 8.734}
+      - {x: 127, y: 8.911}
+      - {x: 134, y: 9.444}
+      - {x: 137, y: 9.622}
+      - {x: 142, y: 9.977}
+      - {x: 144, y: 10.155}
+      - {x: 150, y: 10.51}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: a969548d7f4348888fe81ffca6a64412, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 5, y: 0.48}
+      - {x: 6, y: 1.16}
+      - {x: 10, y: 1.334}
+      - {x: 18, y: 1.944}
+      - {x: 23, y: 2.292}
+      - {x: 26, y: 2.467}
+      - {x: 34, y: 2.989}
+      - {x: 37, y: 3.164}
+      - {x: 45, y: 3.686}
+      - {x: 48, y: 3.86}
+      - {x: 58, y: 4.557}
+      - {x: 61, y: 4.732}
+      - {x: 68, y: 5.08}
+      - {x: 69, y: 5.21}
+      - {x: 71, y: 5.38}
+      - {x: 72, y: 5.94}
+      - {x: 83, y: 6.585}
+      - {x: 86, y: 6.746}
+      - {x: 90, y: 6.907}
+      - {x: 96, y: 7.229}
+      - {x: 99, y: 7.391}
+      - {x: 107, y: 7.874}
+      - {x: 110, y: 8.035}
+      - {x: 120, y: 8.68}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: bed08806bbed41a0881ada4ea53e1aac, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 10, y: 0.699}
+      - {x: 14, y: 0.856}
+      - {x: 20, y: 1.17}
+      - {x: 21, y: 1.86}
+      - {x: 25, y: 2.246}
+      - {x: 29, y: 2.439}
+      - {x: 39, y: 3.211}
+      - {x: 42, y: 3.404}
+      - {x: 46, y: 3.597}
+      - {x: 50, y: 3.79}
+      - {x: 51, y: 4.47}
+      - {x: 54, y: 4.669}
+      - {x: 69, y: 5.662}
+      - {x: 76, y: 6.06}
+      - {x: 77, y: 6.76}
+      - {x: 83, y: 7.109}
+      - {x: 90, y: 7.458}
+      - {x: 99, y: 7.981}
+      - {x: 107, y: 8.504}
+      - {x: 114, y: 9.028}
+      - {x: 117, y: 9.202}
+      - {x: 121, y: 9.377}
+      - {x: 127, y: 9.726}
+      - {x: 129, y: 9.9}
+      - {x: 130, y: 10.06}
+      - {x: 137, y: 10.48}
   - questionText: 'Kailangan mo ng kagamitan upang makapagputol ng matigas na lubid. Anong gamit ang mabilis na makakaputol nito?'
     correctAnswerItemNames:
     - Pocket Knife
     correctFeedback: 'Magaling! Ang multi-tool o pocket knife ay maaaring magamit para sa pagputol ng lubid.'
     incorrectFeedback: 'Isama ang multi-tool o pocket knife! Napakahalaga nito sa pagputol ng mga materyales habang nagtatayo ng proteksyon sa init at ulan.'
-    questionVoice: {fileID: 8300000, guid: 9b28d6ec55004ad0bccdfa640f6efed4, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: ffe4713c99a2458aa736cd69b515da11, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 06ea769f2c3f4523b51aedd0763773a5, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 9b28d6ec55004ad0bccdfa640f6efed4, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 10, y: 0.724}
+      - {x: 13, y: 0.885}
+      - {x: 16, y: 1.046}
+      - {x: 25, y: 1.69}
+      - {x: 26, y: 2.05}
+      - {x: 32, y: 2.406}
+      - {x: 45, y: 3.295}
+      - {x: 48, y: 3.473}
+      - {x: 56, y: 4.006}
+      - {x: 59, y: 4.184}
+      - {x: 65, y: 4.54}
+      - {x: 66, y: 5.22}
+      - {x: 72, y: 5.59}
+      - {x: 77, y: 5.96}
+      - {x: 78, y: 6.14}
+      - {x: 82, y: 6.316}
+      - {x: 90, y: 6.843}
+      - {x: 93, y: 7.019}
+      - {x: 105, y: 7.898}
+      - {x: 110, y: 8.25}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: ffe4713c99a2458aa736cd69b515da11, type: 3}
+      sync:
+      - {x: 0, y: 0.06}
+      - {x: 9, y: 0.56}
+      - {x: 10, y: 1.26}
+      - {x: 14, y: 1.437}
+      - {x: 25, y: 2.143}
+      - {x: 26, y: 2.32}
+      - {x: 27, y: 2.71}
+      - {x: 34, y: 3.05}
+      - {x: 40, y: 3.39}
+      - {x: 42, y: 3.56}
+      - {x: 43, y: 4.18}
+      - {x: 52, y: 4.82}
+      - {x: 59, y: 5.3}
+      - {x: 60, y: 5.63}
+      - {x: 65, y: 5.957}
+      - {x: 67, y: 6.12}
+      - {x: 68, y: 6.25}
+      - {x: 77, y: 6.705}
+      - {x: 80, y: 6.857}
+      - {x: 86, y: 7.16}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 06ea769f2c3f4523b51aedd0763773a5, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 6, y: 0.583}
+      - {x: 10, y: 0.751}
+      - {x: 21, y: 1.422}
+      - {x: 23, y: 1.589}
+      - {x: 30, y: 1.925}
+      - {x: 36, y: 2.26}
+      - {x: 37, y: 2.96}
+      - {x: 49, y: 4.11}
+      - {x: 50, y: 4.31}
+      - {x: 54, y: 4.64}
+      - {x: 55, y: 4.76}
+      - {x: 58, y: 4.91}
+      - {x: 67, y: 5.36}
+      - {x: 70, y: 5.51}
+      - {x: 74, y: 5.66}
+      - {x: 84, y: 6.26}
+      - {x: 85, y: 6.83}
+      - {x: 92, y: 7.184}
+      - {x: 102, y: 7.892}
+      - {x: 105, y: 8.069}
+      - {x: 115, y: 8.6}
+      - {x: 116, y: 8.8}
+      - {x: 119, y: 8.992}
+      - {x: 124, y: 9.378}
+      - {x: 126, y: 9.57}
+      - {x: 127, y: 9.69}
+      - {x: 132, y: 10.04}
   - questionText: 'Dahil sa takot at alikabok dulot ng sakuna, inatake ng hika ang iyong kapatid o tumaas ang alta presyon ng lola mo, at sarado ang lahat ng botika. Anong gamit ang dapat nakahanda para sa kanilang tiyak na sakit?'
     correctAnswerItemNames:
     - Medication
     correctFeedback: 'Mahusay! Ang sariling maintenance medicines ay hindi maibibigay agad ng rescue teams kaya dapat nakahanda ito sa go-bag.'
     incorrectFeedback: 'Ang personal na gamot sa hika o maintenance ay kailangang laging nasa go-bag dahil sarado ang mga botika pagtapos ng sakuna.'
-    questionVoice: {fileID: 8300000, guid: cc895a1eae88473bb00af7d0ec887e7f, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: c431c779fe394c33ac7173be947a4ac3, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: aca4803759004dc5b1ea7c6c66960ce3, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: cc895a1eae88473bb00af7d0ec887e7f, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 6, y: 0.414}
+      - {x: 9, y: 0.586}
+      - {x: 14, y: 0.93}
+      - {x: 15, y: 1.63}
+      - {x: 18, y: 1.774}
+      - {x: 26, y: 2.35}
+      - {x: 27, y: 2.52}
+      - {x: 33, y: 2.853}
+      - {x: 36, y: 3.02}
+      - {x: 43, y: 3.52}
+      - {x: 44, y: 4.22}
+      - {x: 52, y: 4.854}
+      - {x: 55, y: 5.012}
+      - {x: 60, y: 5.329}
+      - {x: 64, y: 5.488}
+      - {x: 70, y: 5.805}
+      - {x: 77, y: 6.28}
+      - {x: 78, y: 6.95}
+      - {x: 80, y: 7.116}
+      - {x: 87, y: 7.615}
+      - {x: 91, y: 7.781}
+      - {x: 96, y: 8.113}
+      - {x: 104, y: 8.445}
+      - {x: 107, y: 8.612}
+      - {x: 112, y: 8.944}
+      - {x: 115, y: 9.11}
+      - {x: 116, y: 9.8}
+      - {x: 119, y: 9.969}
+      - {x: 126, y: 10.476}
+      - {x: 130, y: 10.645}
+      - {x: 136, y: 10.984}
+      - {x: 139, y: 11.153}
+      - {x: 146, y: 11.66}
+      - {x: 147, y: 12.33}
+      - {x: 153, y: 12.65}
+      - {x: 159, y: 12.97}
+      - {x: 162, y: 13.13}
+      - {x: 163, y: 13.28}
+      - {x: 169, y: 13.633}
+      - {x: 178, y: 14.34}
+      - {x: 179, y: 14.93}
+      - {x: 184, y: 15.214}
+      - {x: 187, y: 15.355}
+      - {x: 196, y: 15.781}
+      - {x: 202, y: 16.065}
+      - {x: 205, y: 16.206}
+      - {x: 211, y: 16.49}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: c431c779fe394c33ac7173be947a4ac3, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 8, y: 0.8}
+      - {x: 9, y: 1.49}
+      - {x: 13, y: 1.647}
+      - {x: 22, y: 2.119}
+      - {x: 34, y: 2.904}
+      - {x: 44, y: 3.533}
+      - {x: 46, y: 3.69}
+      - {x: 47, y: 3.96}
+      - {x: 53, y: 4.283}
+      - {x: 64, y: 5.089}
+      - {x: 69, y: 5.412}
+      - {x: 72, y: 5.573}
+      - {x: 79, y: 6.057}
+      - {x: 84, y: 6.38}
+      - {x: 85, y: 7.05}
+      - {x: 90, y: 7.335}
+      - {x: 95, y: 7.62}
+      - {x: 96, y: 8.17}
+      - {x: 106, y: 8.739}
+      - {x: 110, y: 9.023}
+      - {x: 113, y: 9.166}
+      - {x: 120, y: 9.45}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: aca4803759004dc5b1ea7c6c66960ce3, type: 3}
+      sync:
+      - {x: 0, y: 0.06}
+      - {x: 4, y: 0.22}
+      - {x: 13, y: 0.7}
+      - {x: 16, y: 0.86}
+      - {x: 22, y: 1.18}
+      - {x: 25, y: 1.34}
+      - {x: 30, y: 1.66}
+      - {x: 32, y: 1.82}
+      - {x: 44, y: 2.62}
+      - {x: 46, y: 2.78}
+      - {x: 47, y: 3.39}
+      - {x: 58, y: 4.082}
+      - {x: 65, y: 4.428}
+      - {x: 70, y: 4.774}
+      - {x: 76, y: 5.12}
+      - {x: 77, y: 5.59}
+      - {x: 83, y: 5.976}
+      - {x: 90, y: 6.555}
+      - {x: 94, y: 6.748}
+      - {x: 98, y: 6.941}
+      - {x: 105, y: 7.519}
+      - {x: 114, y: 8.098}
+      - {x: 117, y: 8.291}
+      - {x: 124, y: 8.87}
   - questionText: 'Biglang bumuhos ang malakas na ulan sa evacuation center. Paano mo poprotektahan ang iyong gamot, contact card, baterya, at N95 mask upang hindi mabasa at masira ng tubig-ulan?'
     correctAnswerItemNames:
     - Ziplock Bag
     correctFeedback: 'Tama! Hindi pinapasok ng tubig ang nakasarang ziplock bag, kaya napoprotektahan nito ang mga sensitibong gamit laban sa ulan.'
     incorrectFeedback: 'Mahalaga ang ziplock! Pinapanatili nitong tuyo at hindi madumi ang mga gamit na madaling masira sa tubig o alikabok habang nasa evacuation center.'
-    questionVoice: {fileID: 8300000, guid: 6663ae7a9a4e4e8da8ed3b6dc51ec3b3, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: c4018b4c3c774c9e9e71cf32f938f57f, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 678a9a1c8a164095b6fe2be146fd6eca, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 6663ae7a9a4e4e8da8ed3b6dc51ec3b3, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 8, y: 0.402}
+      - {x: 16, y: 0.901}
+      - {x: 20, y: 1.067}
+      - {x: 28, y: 1.566}
+      - {x: 31, y: 1.732}
+      - {x: 36, y: 2.064}
+      - {x: 39, y: 2.23}
+      - {x: 50, y: 3.228}
+      - {x: 57, y: 3.56}
+      - {x: 58, y: 4.25}
+      - {x: 64, y: 4.666}
+      - {x: 67, y: 4.804}
+      - {x: 81, y: 5.497}
+      - {x: 85, y: 5.636}
+      - {x: 91, y: 5.913}
+      - {x: 97, y: 6.19}
+      - {x: 98, y: 6.71}
+      - {x: 106, y: 7.19}
+      - {x: 111, y: 7.43}
+      - {x: 112, y: 7.83}
+      - {x: 120, y: 8.41}
+      - {x: 121, y: 8.87}
+      - {x: 124, y: 9.044}
+      - {x: 128, y: 9.566}
+      - {x: 132, y: 9.74}
+      - {x: 133, y: 10.15}
+      - {x: 139, y: 10.47}
+      - {x: 145, y: 10.79}
+      - {x: 151, y: 11.27}
+      - {x: 152, y: 11.57}
+      - {x: 155, y: 11.774}
+      - {x: 162, y: 12.388}
+      - {x: 165, y: 12.592}
+      - {x: 176, y: 13.41}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: c4018b4c3c774c9e9e71cf32f938f57f, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 5, y: 0.5}
+      - {x: 6, y: 1.18}
+      - {x: 12, y: 1.509}
+      - {x: 22, y: 2.167}
+      - {x: 25, y: 2.331}
+      - {x: 30, y: 2.66}
+      - {x: 31, y: 3.14}
+      - {x: 35, y: 3.316}
+      - {x: 45, y: 4.02}
+      - {x: 46, y: 4.14}
+      - {x: 54, y: 4.48}
+      - {x: 58, y: 4.65}
+      - {x: 59, y: 5.32}
+      - {x: 64, y: 5.632}
+      - {x: 80, y: 6.569}
+      - {x: 85, y: 6.881}
+      - {x: 89, y: 7.037}
+      - {x: 93, y: 7.193}
+      - {x: 105, y: 7.817}
+      - {x: 111, y: 8.13}
+      - {x: 117, y: 8.442}
+      - {x: 120, y: 8.598}
+      - {x: 125, y: 8.91}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 678a9a1c8a164095b6fe2be146fd6eca, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 9, y: 0.737}
+      - {x: 13, y: 0.901}
+      - {x: 21, y: 1.23}
+      - {x: 22, y: 1.92}
+      - {x: 35, y: 2.808}
+      - {x: 42, y: 3.104}
+      - {x: 46, y: 3.4}
+      - {x: 47, y: 3.62}
+      - {x: 50, y: 3.776}
+      - {x: 56, y: 4.087}
+      - {x: 63, y: 4.554}
+      - {x: 67, y: 4.71}
+      - {x: 71, y: 4.866}
+      - {x: 77, y: 5.177}
+      - {x: 80, y: 5.333}
+      - {x: 89, y: 5.8}
+      - {x: 96, y: 6.267}
+      - {x: 99, y: 6.423}
+      - {x: 105, y: 6.734}
+      - {x: 106, y: 6.89}
+      - {x: 107, y: 7.26}
+      - {x: 116, y: 7.94}
+      - {x: 123, y: 8.28}
+      - {x: 128, y: 8.62}
+      - {x: 139, y: 9.64}
+      - {x: 146, y: 9.98}
   - questionText: 'Gabi na at magdamag kayong matutulog sa malamig na semento ng evacuation center dahil sa sakuna. Anong magaan at makintab na kumot ang tumutulong mapanatili ang init ng iyong katawan?'
     correctAnswerItemNames:
     - Thermal Blanket
     correctFeedback: 'Tama! Ang thermal foil blanket ang nagpapanatili ng init ng katawan at pumipigil sa hypothermia kapag natutulog sa labas.'
     incorrectFeedback: 'Kailangan ang thermal blanket! Mahalaga ito na mabisang panlaban sa matinding lamig kapag bawal pumasok sa mga gusali dahil sa sakuna.'
-    questionVoice: {fileID: 8300000, guid: bbc04570ddc344238b4bbaedca720d30, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: 3048cd97840847048ea206520bf2fbcd, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: ddc3da0d65e847d5bc255123f3daf676, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: bbc04570ddc344238b4bbaedca720d30, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 5, y: 0.403}
+      - {x: 8, y: 0.565}
+      - {x: 11, y: 0.727}
+      - {x: 20, y: 1.212}
+      - {x: 27, y: 1.535}
+      - {x: 37, y: 2.182}
+      - {x: 40, y: 2.343}
+      - {x: 48, y: 2.828}
+      - {x: 51, y: 2.99}
+      - {x: 59, y: 3.475}
+      - {x: 62, y: 3.637}
+      - {x: 73, y: 4.607}
+      - {x: 79, y: 4.93}
+      - {x: 80, y: 5.39}
+      - {x: 86, y: 5.68}
+      - {x: 89, y: 5.825}
+      - {x: 96, y: 6.26}
+      - {x: 97, y: 6.96}
+      - {x: 103, y: 7.28}
+      - {x: 110, y: 7.76}
+      - {x: 112, y: 7.92}
+      - {x: 113, y: 8.25}
+      - {x: 122, y: 8.769}
+      - {x: 125, y: 8.941}
+      - {x: 131, y: 9.287}
+      - {x: 134, y: 9.46}
+      - {x: 135, y: 10.11}
+      - {x: 146, y: 10.808}
+      - {x: 157, y: 11.68}
+      - {x: 161, y: 11.854}
+      - {x: 166, y: 12.203}
+      - {x: 169, y: 12.378}
+      - {x: 175, y: 12.727}
+      - {x: 183, y: 13.25}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: 3048cd97840847048ea206520bf2fbcd, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 5, y: 0.47}
+      - {x: 6, y: 1.17}
+      - {x: 9, y: 1.32}
+      - {x: 10, y: 1.44}
+      - {x: 17, y: 1.88}
+      - {x: 18, y: 2.01}
+      - {x: 23, y: 2.36}
+      - {x: 30, y: 2.71}
+      - {x: 31, y: 2.85}
+      - {x: 35, y: 3.01}
+      - {x: 49, y: 3.97}
+      - {x: 52, y: 4.13}
+      - {x: 57, y: 4.45}
+      - {x: 60, y: 4.61}
+      - {x: 67, y: 5.09}
+      - {x: 68, y: 5.61}
+      - {x: 70, y: 5.73}
+      - {x: 71, y: 5.88}
+      - {x: 81, y: 6.544}
+      - {x: 84, y: 6.711}
+      - {x: 96, y: 7.375}
+      - {x: 102, y: 7.707}
+      - {x: 112, y: 8.372}
+      - {x: 115, y: 8.538}
+      - {x: 121, y: 8.87}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: ddc3da0d65e847d5bc255123f3daf676, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 10, y: 0.773}
+      - {x: 14, y: 0.947}
+      - {x: 22, y: 1.293}
+      - {x: 30, y: 1.64}
+      - {x: 31, y: 2.34}
+      - {x: 39, y: 2.91}
+      - {x: 40, y: 3.06}
+      - {x: 44, y: 3.397}
+      - {x: 47, y: 3.566}
+      - {x: 56, y: 4.072}
+      - {x: 65, y: 4.578}
+      - {x: 68, y: 4.747}
+      - {x: 78, y: 5.253}
+      - {x: 83, y: 5.59}
+      - {x: 84, y: 6.27}
+      - {x: 90, y: 6.622}
+      - {x: 96, y: 6.973}
+      - {x: 104, y: 7.501}
+      - {x: 107, y: 7.677}
+      - {x: 111, y: 7.853}
+      - {x: 117, y: 8.38}
+      - {x: 118, y: 8.74}
+      - {x: 124, y: 9.097}
+      - {x: 127, y: 9.275}
+      - {x: 134, y: 9.81}
   - questionText: 'Basang-basa at puno putik ang suot mong damit mula sa paglikas sa gumuhong lugar. Ano ang dapat mong ipalit upang hindi magkasakit at ginawin sa gabi?'
     correctAnswerItemNames:
     - Spare Clothes
     correctFeedback: 'Tama! Ang tuyong ekstrang damit ay nagpoprotekta laban sa pulmonya, lagnat, at impeksyon sa balat sa evacuation shelter.'
     incorrectFeedback: 'Magbaon ng tuyong damit! Ang pagpapalit ng tuyong damit ay nagliligtas sa iyo laban sa sakit.'
-    questionVoice: {fileID: 8300000, guid: 7dc0002053f245548c3eac0653c0a44d, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: 154246ea99bb448f9c941e547fe6203e, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 28d4d1b3a79d4e5c91fa7fe7632fe1b0, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 7dc0002053f245548c3eac0653c0a44d, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 12, y: 1.063}
+      - {x: 15, y: 1.309}
+      - {x: 19, y: 1.8}
+      - {x: 20, y: 2.47}
+      - {x: 26, y: 3.057}
+      - {x: 29, y: 3.35}
+      - {x: 30, y: 3.5}
+      - {x: 35, y: 4.067}
+      - {x: 39, y: 4.35}
+      - {x: 40, y: 4.66}
+      - {x: 46, y: 5.131}
+      - {x: 51, y: 5.603}
+      - {x: 54, y: 5.839}
+      - {x: 63, y: 6.546}
+      - {x: 66, y: 6.781}
+      - {x: 75, y: 7.489}
+      - {x: 81, y: 7.96}
+      - {x: 82, y: 8.41}
+      - {x: 86, y: 8.852}
+      - {x: 90, y: 9.073}
+      - {x: 96, y: 9.516}
+      - {x: 101, y: 9.737}
+      - {x: 107, y: 10.4}
+      - {x: 108, y: 10.81}
+      - {x: 114, y: 11.151}
+      - {x: 120, y: 11.493}
+      - {x: 131, y: 12.175}
+      - {x: 134, y: 12.346}
+      - {x: 142, y: 12.858}
+      - {x: 145, y: 13.029}
+      - {x: 150, y: 13.37}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: 154246ea99bb448f9c941e547fe6203e, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 6, y: 0.556}
+      - {x: 10, y: 0.799}
+      - {x: 17, y: 1.284}
+      - {x: 25, y: 1.77}
+      - {x: 26, y: 2.47}
+      - {x: 31, y: 2.88}
+      - {x: 32, y: 3.57}
+      - {x: 35, y: 3.788}
+      - {x: 48, y: 4.88}
+      - {x: 49, y: 5.43}
+      - {x: 55, y: 6.173}
+      - {x: 58, y: 6.545}
+      - {x: 67, y: 7.66}
+      - {x: 68, y: 7.91}
+      - {x: 75, y: 8.39}
+      - {x: 76, y: 8.97}
+      - {x: 79, y: 9.154}
+      - {x: 89, y: 9.705}
+      - {x: 92, y: 9.889}
+      - {x: 98, y: 10.256}
+      - {x: 101, y: 10.44}
+      - {x: 112, y: 11.543}
+      - {x: 120, y: 11.91}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 28d4d1b3a79d4e5c91fa7fe7632fe1b0, type: 3}
+      sync:
+      - {x: 0, y: 0.09}
+      - {x: 8, y: 0.551}
+      - {x: 11, y: 0.705}
+      - {x: 18, y: 1.012}
+      - {x: 24, y: 1.32}
+      - {x: 25, y: 2.02}
+      - {x: 29, y: 2.188}
+      - {x: 40, y: 2.86}
+      - {x: 43, y: 3.028}
+      - {x: 50, y: 3.364}
+      - {x: 55, y: 3.7}
+      - {x: 56, y: 4.3}
+      - {x: 59, y: 4.477}
+      - {x: 71, y: 5.185}
+      - {x: 74, y: 5.362}
+      - {x: 78, y: 5.715}
+      - {x: 84, y: 6.069}
+      - {x: 87, y: 6.246}
+      - {x: 93, y: 6.6}
   - questionText: 'Ikalawang araw na matapos ang sakuna; sarado ang mga palengke at walang kuryente o gas para magluto. Anong pagkain ang ligtas at handang kainin agad upang magbigay ng lakas?'
     correctAnswerItemNames:
     - Canned Corned Beef
     - Canned Fish
     correctFeedback: 'Magaling! Ang easy-open canned goods ay nagbibigay ng agarang protina at sustansya nang hindi na kailangan lutuin pa.'
     incorrectFeedback: 'Mahalaga ang de-lata! Nagtatagal ito nang walang refrigerator at hindi nangangailangan pang iluto sa panahon ng kalamidad.'
-    questionVoice: {fileID: 8300000, guid: 715ddf3951f045e8bab94086e4e6821b, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: ebf54f5a16634374969b0d4bac709ba4, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: be4a517bb9c844b9868083a506c57620, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 715ddf3951f045e8bab94086e4e6821b, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 10, y: 0.65}
+      - {x: 15, y: 0.94}
+      - {x: 18, y: 1.085}
+      - {x: 26, y: 1.52}
+      - {x: 30, y: 1.665}
+      - {x: 37, y: 2.1}
+      - {x: 38, y: 2.56}
+      - {x: 45, y: 3.083}
+      - {x: 49, y: 3.257}
+      - {x: 53, y: 3.431}
+      - {x: 62, y: 3.954}
+      - {x: 65, y: 4.129}
+      - {x: 72, y: 4.477}
+      - {x: 80, y: 5.0}
+      - {x: 81, y: 5.45}
+      - {x: 83, y: 5.629}
+      - {x: 87, y: 5.807}
+      - {x: 92, y: 6.164}
+      - {x: 100, y: 6.7}
+      - {x: 101, y: 7.39}
+      - {x: 107, y: 7.717}
+      - {x: 115, y: 8.207}
+      - {x: 118, y: 8.37}
+      - {x: 119, y: 8.56}
+      - {x: 125, y: 8.92}
+      - {x: 126, y: 9.04}
+      - {x: 129, y: 9.209}
+      - {x: 137, y: 9.546}
+      - {x: 144, y: 10.053}
+      - {x: 148, y: 10.39}
+      - {x: 149, y: 11.01}
+      - {x: 155, y: 11.35}
+      - {x: 164, y: 11.86}
+      - {x: 167, y: 12.03}
+      - {x: 173, y: 12.37}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: ebf54f5a16634374969b0d4bac709ba4, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 10, y: 0.82}
+      - {x: 14, y: 1.07}
+      - {x: 23, y: 2.07}
+      - {x: 24, y: 2.3}
+      - {x: 30, y: 2.8}
+      - {x: 31, y: 3.49}
+      - {x: 37, y: 3.915}
+      - {x: 40, y: 4.128}
+      - {x: 51, y: 4.978}
+      - {x: 53, y: 5.19}
+      - {x: 54, y: 5.34}
+      - {x: 62, y: 5.895}
+      - {x: 69, y: 6.45}
+      - {x: 70, y: 6.73}
+      - {x: 73, y: 6.956}
+      - {x: 83, y: 7.633}
+      - {x: 88, y: 7.859}
+      - {x: 93, y: 8.31}
+      - {x: 94, y: 8.87}
+      - {x: 97, y: 9.076}
+      - {x: 107, y: 9.898}
+      - {x: 114, y: 10.514}
+      - {x: 117, y: 10.72}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: be4a517bb9c844b9868083a506c57620, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 9, y: 0.73}
+      - {x: 13, y: 0.892}
+      - {x: 21, y: 1.38}
+      - {x: 22, y: 2.08}
+      - {x: 33, y: 2.76}
+      - {x: 37, y: 3.1}
+      - {x: 42, y: 3.27}
+      - {x: 49, y: 3.61}
+      - {x: 61, y: 4.46}
+      - {x: 62, y: 4.99}
+      - {x: 65, y: 5.151}
+      - {x: 71, y: 5.474}
+      - {x: 87, y: 6.442}
+      - {x: 92, y: 6.604}
+      - {x: 98, y: 7.088}
+      - {x: 101, y: 7.249}
+      - {x: 109, y: 7.733}
+      - {x: 112, y: 7.895}
+      - {x: 122, y: 8.54}
   - questionText: 'Dumating ang mga opisyal ng barangay upang irehistro ang mga biktima ng sakuna para sa relief assistance at ayuda. Anong gamit ang magpapatunay ng iyong pagkakakilanlan at ng iyong pamilya?'
     correctAnswerItemNames:
     - Important Documents
     correctFeedback: 'Tama! Ang kopya ng birth certificate at iba pang dokumento ang patunay ng pagkakakilanlan upang mapadali ang tulong at emergency aid.'
     incorrectFeedback: 'Isama ang mga dokumento! Kapag nawalan ng bahay dahil sa sakuna, ang kopya ng birth certificate ang magpapatunay sa inyong pamilya para kaagaran na tulong.'
-    questionVoice: {fileID: 8300000, guid: c43298ca6620494493ad07f4f36f719a, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: fc585bbf8e214865ada8e01167aaf07a, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 61b5ea80ab14429a9f5dd3f4b4a29718, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: c43298ca6620494493ad07f4f36f719a, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 9, y: 0.481}
+      - {x: 13, y: 0.614}
+      - {x: 17, y: 0.748}
+      - {x: 25, y: 1.149}
+      - {x: 28, y: 1.282}
+      - {x: 37, y: 1.683}
+      - {x: 42, y: 1.95}
+      - {x: 43, y: 2.29}
+      - {x: 53, y: 2.93}
+      - {x: 57, y: 3.09}
+      - {x: 61, y: 3.25}
+      - {x: 69, y: 3.73}
+      - {x: 71, y: 3.89}
+      - {x: 72, y: 4.02}
+      - {x: 79, y: 4.518}
+      - {x: 83, y: 4.85}
+      - {x: 84, y: 5.46}
+      - {x: 87, y: 5.632}
+      - {x: 94, y: 6.149}
+      - {x: 105, y: 6.838}
+      - {x: 107, y: 7.01}
+      - {x: 108, y: 7.14}
+      - {x: 114, y: 7.59}
+      - {x: 115, y: 8.28}
+      - {x: 121, y: 8.631}
+      - {x: 127, y: 8.982}
+      - {x: 131, y: 9.157}
+      - {x: 144, y: 10.035}
+      - {x: 147, y: 10.21}
+      - {x: 153, y: 10.561}
+      - {x: 169, y: 11.614}
+      - {x: 171, y: 11.79}
+      - {x: 172, y: 12.29}
+      - {x: 175, y: 12.493}
+      - {x: 181, y: 12.9}
+      - {x: 189, y: 13.51}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: fc585bbf8e214865ada8e01167aaf07a, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 5, y: 0.52}
+      - {x: 6, y: 1.22}
+      - {x: 10, y: 1.392}
+      - {x: 16, y: 1.736}
+      - {x: 19, y: 1.908}
+      - {x: 25, y: 2.08}
+      - {x: 36, y: 2.94}
+      - {x: 37, y: 3.63}
+      - {x: 40, y: 3.815}
+      - {x: 44, y: 4.186}
+      - {x: 49, y: 4.372}
+      - {x: 59, y: 5.113}
+      - {x: 63, y: 5.298}
+      - {x: 71, y: 5.855}
+      - {x: 73, y: 6.04}
+      - {x: 74, y: 6.52}
+      - {x: 90, y: 7.518}
+      - {x: 95, y: 7.85}
+      - {x: 96, y: 8.0}
+      - {x: 105, y: 8.778}
+      - {x: 109, y: 8.973}
+      - {x: 116, y: 9.362}
+      - {x: 119, y: 9.557}
+      - {x: 129, y: 10.141}
+      - {x: 133, y: 10.53}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 61b5ea80ab14429a9f5dd3f4b4a29718, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 6, y: 0.64}
+      - {x: 10, y: 0.827}
+      - {x: 14, y: 1.013}
+      - {x: 24, y: 1.76}
+      - {x: 25, y: 2.45}
+      - {x: 31, y: 2.767}
+      - {x: 39, y: 3.243}
+      - {x: 42, y: 3.401}
+      - {x: 48, y: 3.719}
+      - {x: 54, y: 4.036}
+      - {x: 57, y: 4.194}
+      - {x: 64, y: 4.67}
+      - {x: 65, y: 5.34}
+      - {x: 69, y: 5.501}
+      - {x: 75, y: 5.823}
+      - {x: 78, y: 5.984}
+      - {x: 84, y: 6.145}
+      - {x: 95, y: 6.95}
+      - {x: 96, y: 7.13}
+      - {x: 100, y: 7.283}
+      - {x: 113, y: 8.05}
+      - {x: 116, y: 8.203}
+      - {x: 123, y: 8.51}
+      - {x: 130, y: 8.97}
+      - {x: 131, y: 9.55}
+      - {x: 136, y: 9.872}
+      - {x: 145, y: 10.517}
+      - {x: 148, y: 10.678}
+      - {x: 155, y: 11.0}
   - questionText: 'Siksikan ang libu-libong lumikas sa evacuation area at marumi ang paligid. Anong kit ang naglalaman ng sabon at toothbrush upang maiwasan ang nakakahawang sakit at diarrhea?'
     correctAnswerItemNames:
     - Toiletries
     correctFeedback: 'Tumpak! Ang toiletries kit ay mahalaga upang mapanatiling malinis ang sarili at malayo sa sakit or impeksyon.'
     incorrectFeedback: 'Dapat may hygiene kit! Sa gitna ng kalamidad, ang kalinisan sa katawan ang humahadlang sa malawakang pagkalat ng sakit.'
-    questionVoice: {fileID: 8300000, guid: f7c079b0247c4d2bb5e731e3bbf6770e, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: 880107f6e6bf4a3684422e7f988695b0, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 1f78cece0aa246e29b016706f77e95a5, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: f7c079b0247c4d2bb5e731e3bbf6770e, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 9, y: 0.593}
+      - {x: 13, y: 0.764}
+      - {x: 25, y: 1.447}
+      - {x: 33, y: 1.96}
+      - {x: 36, y: 2.131}
+      - {x: 47, y: 3.156}
+      - {x: 52, y: 3.669}
+      - {x: 54, y: 3.84}
+      - {x: 55, y: 4.33}
+      - {x: 62, y: 4.857}
+      - {x: 66, y: 5.033}
+      - {x: 74, y: 5.56}
+      - {x: 75, y: 6.25}
+      - {x: 81, y: 6.565}
+      - {x: 85, y: 6.723}
+      - {x: 88, y: 6.88}
+      - {x: 89, y: 7.0}
+      - {x: 100, y: 7.737}
+      - {x: 103, y: 7.921}
+      - {x: 108, y: 8.29}
+      - {x: 109, y: 8.57}
+      - {x: 112, y: 8.768}
+      - {x: 122, y: 9.36}
+      - {x: 123, y: 9.9}
+      - {x: 129, y: 10.206}
+      - {x: 138, y: 10.819}
+      - {x: 142, y: 10.972}
+      - {x: 155, y: 11.738}
+      - {x: 161, y: 12.044}
+      - {x: 164, y: 12.197}
+      - {x: 173, y: 12.81}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: 880107f6e6bf4a3684422e7f988695b0, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 7, y: 0.46}
+      - {x: 8, y: 1.15}
+      - {x: 12, y: 1.338}
+      - {x: 22, y: 2.28}
+      - {x: 23, y: 2.56}
+      - {x: 27, y: 2.728}
+      - {x: 30, y: 2.895}
+      - {x: 39, y: 3.566}
+      - {x: 45, y: 3.901}
+      - {x: 58, y: 4.739}
+      - {x: 66, y: 5.242}
+      - {x: 69, y: 5.41}
+      - {x: 70, y: 6.05}
+      - {x: 77, y: 6.521}
+      - {x: 80, y: 6.679}
+      - {x: 86, y: 7.15}
+      - {x: 87, y: 7.37}
+      - {x: 90, y: 7.52}
+      - {x: 96, y: 7.82}
+      - {x: 99, y: 7.97}
+      - {x: 109, y: 8.42}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 1f78cece0aa246e29b016706f77e95a5, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 6, y: 0.456}
+      - {x: 10, y: 0.649}
+      - {x: 18, y: 1.227}
+      - {x: 22, y: 1.42}
+      - {x: 23, y: 2.11}
+      - {x: 26, y: 2.265}
+      - {x: 32, y: 2.575}
+      - {x: 35, y: 2.73}
+      - {x: 45, y: 3.35}
+      - {x: 46, y: 4.05}
+      - {x: 50, y: 4.218}
+      - {x: 60, y: 4.89}
+      - {x: 63, y: 5.058}
+      - {x: 71, y: 5.562}
+      - {x: 75, y: 5.73}
+      - {x: 87, y: 6.402}
+      - {x: 90, y: 6.57}
+      - {x: 101, y: 7.242}
+      - {x: 110, y: 7.746}
+      - {x: 113, y: 7.914}
+      - {x: 119, y: 8.25}
   - questionText: 'Anong alternatibong gamit ang maaari mong gamitin upang makagawa ng mapa papunta sa evacuation center kung sakaling hindi mo magamit ang iyong telepono at walang signal?'
     correctAnswerItemNames:
     - Pen & Paper
     correctFeedback: 'Tama! Ang panulat at papel ay ang bagay na pwede mong gamitin upang makagawa ng mapa na maaari niyong gawing gabay sakaling kayo ay maligaw.'
     incorrectFeedback: 'Isama ito sa go-bag! Kapag walang kuryente at cellphone, maaari mo itong gamitin na gabay at pangkomunikasyon.'
-    questionVoice: {fileID: 8300000, guid: 2d14bddab0b648e197a8ef0ad833efa6, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: ee693af0f0b14bee8f0c3348241db54c, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 668b838b3ba04e87b59b8e89610165ba, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 2d14bddab0b648e197a8ef0ad833efa6, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 6, y: 0.423}
+      - {x: 20, y: 1.282}
+      - {x: 26, y: 1.625}
+      - {x: 30, y: 1.797}
+      - {x: 37, y: 2.483}
+      - {x: 42, y: 2.655}
+      - {x: 49, y: 3.17}
+      - {x: 50, y: 3.85}
+      - {x: 56, y: 4.18}
+      - {x: 65, y: 4.841}
+      - {x: 68, y: 5.007}
+      - {x: 73, y: 5.337}
+      - {x: 81, y: 5.833}
+      - {x: 84, y: 5.998}
+      - {x: 95, y: 6.99}
+      - {x: 101, y: 7.32}
+      - {x: 102, y: 7.99}
+      - {x: 107, y: 8.149}
+      - {x: 116, y: 8.628}
+      - {x: 122, y: 8.946}
+      - {x: 125, y: 9.106}
+      - {x: 133, y: 9.584}
+      - {x: 137, y: 9.744}
+      - {x: 143, y: 10.062}
+      - {x: 151, y: 10.7}
+      - {x: 152, y: 11.18}
+      - {x: 155, y: 11.386}
+      - {x: 162, y: 11.798}
+      - {x: 169, y: 12.21}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: ee693af0f0b14bee8f0c3348241db54c, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 5, y: 0.48}
+      - {x: 6, y: 1.18}
+      - {x: 10, y: 1.385}
+      - {x: 17, y: 2.0}
+      - {x: 18, y: 2.14}
+      - {x: 21, y: 2.303}
+      - {x: 26, y: 2.63}
+      - {x: 27, y: 3.18}
+      - {x: 30, y: 3.344}
+      - {x: 34, y: 3.507}
+      - {x: 40, y: 3.835}
+      - {x: 43, y: 3.998}
+      - {x: 49, y: 4.325}
+      - {x: 54, y: 4.489}
+      - {x: 61, y: 4.98}
+      - {x: 62, y: 5.11}
+      - {x: 68, y: 5.43}
+      - {x: 77, y: 6.07}
+      - {x: 80, y: 6.23}
+      - {x: 84, y: 6.55}
+      - {x: 85, y: 6.9}
+      - {x: 87, y: 7.03}
+      - {x: 88, y: 7.18}
+      - {x: 95, y: 7.908}
+      - {x: 102, y: 8.273}
+      - {x: 109, y: 8.637}
+      - {x: 115, y: 9.001}
+      - {x: 124, y: 9.547}
+      - {x: 129, y: 9.912}
+      - {x: 132, y: 10.094}
+      - {x: 140, y: 10.64}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 668b838b3ba04e87b59b8e89610165ba, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 6, y: 0.56}
+      - {x: 10, y: 0.88}
+      - {x: 13, y: 1.04}
+      - {x: 20, y: 1.36}
+      - {x: 21, y: 2.06}
+      - {x: 27, y: 2.396}
+      - {x: 34, y: 2.733}
+      - {x: 43, y: 3.237}
+      - {x: 46, y: 3.405}
+      - {x: 56, y: 3.91}
+      - {x: 57, y: 4.47}
+      - {x: 64, y: 5.042}
+      - {x: 67, y: 5.185}
+      - {x: 73, y: 5.472}
+      - {x: 81, y: 5.901}
+      - {x: 84, y: 6.044}
+      - {x: 89, y: 6.33}
+      - {x: 90, y: 6.49}
+      - {x: 92, y: 6.6}
+      - {x: 93, y: 6.77}
+      - {x: 110, y: 7.66}
   - questionText: 'Naubusan ng baterya ang iyong cellphone at hindi mo na ito mabuksan. Paano mo malalaman ang opisyal na numero ng Valenzuela CDRRMO at mga kamag-anak upang humingi ng tulong?'
     correctAnswerItemNames:
     - Contact Card
     correctFeedback: 'Tama! Ang nakasulat sa Contact Card ay napakahalaga at makatutulong ito sa mga oras na kailangan ng tulong pagkatapos ng sakuna.'
     incorrectFeedback: 'Laging magbaon nito! Ang nakasulat na emergency numbers sa papel ang sasagip sa iyo kapag walang baterya ang smartphone.'
-    questionVoice: {fileID: 8300000, guid: 8c8828fa87fb4fb89f3f0f0db6c6afd1, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: 408609a73e724dc890765bc36aa3601d, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 27de7b2c62264d889e45b3d297a4bc6d, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 8c8828fa87fb4fb89f3f0f0db6c6afd1, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 9, y: 0.712}
+      - {x: 12, y: 0.87}
+      - {x: 20, y: 1.343}
+      - {x: 24, y: 1.501}
+      - {x: 30, y: 1.817}
+      - {x: 40, y: 2.291}
+      - {x: 43, y: 2.449}
+      - {x: 49, y: 2.765}
+      - {x: 52, y: 2.923}
+      - {x: 55, y: 3.08}
+      - {x: 59, y: 3.396}
+      - {x: 68, y: 3.87}
+      - {x: 69, y: 4.57}
+      - {x: 75, y: 5.039}
+      - {x: 78, y: 5.196}
+      - {x: 88, y: 5.821}
+      - {x: 92, y: 5.978}
+      - {x: 100, y: 6.447}
+      - {x: 103, y: 6.604}
+      - {x: 110, y: 7.073}
+      - {x: 113, y: 7.229}
+      - {x: 124, y: 8.011}
+      - {x: 130, y: 8.95}
+      - {x: 131, y: 9.64}
+      - {x: 134, y: 9.827}
+      - {x: 138, y: 10.013}
+      - {x: 148, y: 10.76}
+      - {x: 149, y: 10.9}
+      - {x: 155, y: 11.338}
+      - {x: 163, y: 11.994}
+      - {x: 166, y: 12.213}
+      - {x: 173, y: 12.65}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: 408609a73e724dc890765bc36aa3601d, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 5, y: 0.56}
+      - {x: 6, y: 1.22}
+      - {x: 10, y: 1.384}
+      - {x: 20, y: 2.039}
+      - {x: 23, y: 2.202}
+      - {x: 30, y: 2.53}
+      - {x: 31, y: 2.69}
+      - {x: 36, y: 2.85}
+      - {x: 38, y: 3.01}
+      - {x: 39, y: 3.52}
+      - {x: 52, y: 4.587}
+      - {x: 55, y: 4.764}
+      - {x: 68, y: 5.653}
+      - {x: 72, y: 6.009}
+      - {x: 75, y: 6.187}
+      - {x: 79, y: 6.364}
+      - {x: 83, y: 6.72}
+      - {x: 84, y: 7.16}
+      - {x: 87, y: 7.331}
+      - {x: 97, y: 8.013}
+      - {x: 100, y: 8.184}
+      - {x: 107, y: 8.525}
+      - {x: 118, y: 9.207}
+      - {x: 121, y: 9.378}
+      - {x: 128, y: 9.89}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 27de7b2c62264d889e45b3d297a4bc6d, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 7, y: 0.414}
+      - {x: 15, y: 0.916}
+      - {x: 20, y: 1.25}
+      - {x: 21, y: 1.95}
+      - {x: 25, y: 2.133}
+      - {x: 35, y: 2.863}
+      - {x: 38, y: 3.046}
+      - {x: 48, y: 3.594}
+      - {x: 56, y: 3.959}
+      - {x: 59, y: 4.142}
+      - {x: 65, y: 4.507}
+      - {x: 68, y: 4.69}
+      - {x: 69, y: 5.24}
+      - {x: 77, y: 5.845}
+      - {x: 80, y: 6.047}
+      - {x: 84, y: 6.451}
+      - {x: 90, y: 6.854}
+      - {x: 97, y: 7.258}
+      - {x: 105, y: 7.863}
+      - {x: 109, y: 8.065}
+      - {x: 120, y: 8.67}
   - questionText: 'Namatay na ang iyong radyo at flashlight dahil naubusan ng karga, at nananatiling walang kuryente sa inyong lugar. Anong gamit ang kailangan mo para mapagana ulit ang mga ito?'
     correctAnswerItemNames:
     - Batteries
     correctFeedback: 'Tama! Ang mga extra na baterya ay ang magsisilbing kuryente upang patuloy na magamit ang radyo at flashlight sa oras ng sakuna.'
     incorrectFeedback: 'Huwag kalimutan ang mga extra na baterya! Walang silbi ang iyong radyo at flashlight kung wala itong power.'
-    questionVoice: {fileID: 8300000, guid: 44c19b8a07a04a78b4b7319ed0c576f5, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: 3d7024dcda8f4c36adcba93295420848, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 904b1dc1ed844f40b5109350e138ff2f, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 44c19b8a07a04a78b4b7319ed0c576f5, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 8, y: 0.593}
+      - {x: 11, y: 0.764}
+      - {x: 15, y: 0.936}
+      - {x: 21, y: 1.278}
+      - {x: 26, y: 1.62}
+      - {x: 27, y: 1.8}
+      - {x: 30, y: 1.96}
+      - {x: 40, y: 2.28}
+      - {x: 41, y: 2.43}
+      - {x: 47, y: 2.737}
+      - {x: 56, y: 3.35}
+      - {x: 59, y: 3.503}
+      - {x: 65, y: 3.81}
+      - {x: 66, y: 4.5}
+      - {x: 69, y: 4.678}
+      - {x: 82, y: 5.569}
+      - {x: 89, y: 5.925}
+      - {x: 98, y: 6.459}
+      - {x: 101, y: 6.637}
+      - {x: 108, y: 6.994}
+      - {x: 114, y: 7.35}
+      - {x: 115, y: 8.04}
+      - {x: 121, y: 8.37}
+      - {x: 127, y: 8.7}
+      - {x: 131, y: 8.865}
+      - {x: 141, y: 9.525}
+      - {x: 144, y: 9.69}
+      - {x: 149, y: 10.02}
+      - {x: 158, y: 10.68}
+      - {x: 163, y: 11.01}
+      - {x: 167, y: 11.175}
+      - {x: 171, y: 11.34}
+      - {x: 175, y: 11.67}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: 3d7024dcda8f4c36adcba93295420848, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 5, y: 0.59}
+      - {x: 6, y: 1.28}
+      - {x: 10, y: 1.468}
+      - {x: 14, y: 1.656}
+      - {x: 20, y: 2.031}
+      - {x: 23, y: 2.219}
+      - {x: 31, y: 2.782}
+      - {x: 33, y: 2.97}
+      - {x: 34, y: 3.43}
+      - {x: 38, y: 3.612}
+      - {x: 51, y: 4.34}
+      - {x: 60, y: 4.886}
+      - {x: 66, y: 5.25}
+      - {x: 74, y: 5.796}
+      - {x: 77, y: 5.978}
+      - {x: 85, y: 6.524}
+      - {x: 89, y: 6.706}
+      - {x: 94, y: 7.07}
+      - {x: 95, y: 7.56}
+      - {x: 98, y: 7.82}
+      - {x: 108, y: 8.34}
+      - {x: 109, y: 8.65}
+      - {x: 112, y: 8.837}
+      - {x: 117, y: 9.211}
+      - {x: 120, y: 9.399}
+      - {x: 127, y: 9.96}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 904b1dc1ed844f40b5109350e138ff2f, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 6, y: 0.411}
+      - {x: 16, y: 1.094}
+      - {x: 20, y: 1.265}
+      - {x: 24, y: 1.436}
+      - {x: 30, y: 1.777}
+      - {x: 33, y: 1.948}
+      - {x: 41, y: 2.46}
+      - {x: 42, y: 3.15}
+      - {x: 49, y: 3.537}
+      - {x: 55, y: 3.923}
+      - {x: 59, y: 4.117}
+      - {x: 65, y: 4.503}
+      - {x: 70, y: 4.89}
+      - {x: 71, y: 5.02}
+      - {x: 74, y: 5.177}
+      - {x: 84, y: 5.49}
+      - {x: 85, y: 6.04}
+      - {x: 90, y: 6.219}
+      - {x: 95, y: 6.576}
+      - {x: 101, y: 6.933}
+      - {x: 107, y: 7.29}
   - questionText: 'Bagsak ang internet at walang signal sa inyong lugar at kumakalat ang fake news tungkol sa sakuna. Anong gamit ang makakasagap ng opisyal na balita at emergency advisories ukol sa sakuna?'
     correctAnswerItemNames:
     - Radio
     correctFeedback: 'Tumpak! Ang radyo ang pinakamatatag na linya ng komunikasyon upang makasagap ng totoong balita mula sa gobyerno kapag walang internet.'
     incorrectFeedback: 'Isama ang radyo! Ito ang maaasahang paraan upang malaman ang opisyal na babala ukol sa sakuna kapag walang kuryente at internet.'
-    questionVoice: {fileID: 8300000, guid: 26d84b90d25540a0a74f79ed41b2d398, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: 33d4b367d5d044e8a36138236eb308d2, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: b2efca3fea6c4cc396366dc93d81cd5f, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 26d84b90d25540a0a74f79ed41b2d398, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 7, y: 0.446}
+      - {x: 11, y: 0.629}
+      - {x: 20, y: 1.177}
+      - {x: 22, y: 1.36}
+      - {x: 23, y: 1.6}
+      - {x: 30, y: 1.989}
+      - {x: 37, y: 2.378}
+      - {x: 40, y: 2.572}
+      - {x: 47, y: 2.961}
+      - {x: 52, y: 3.35}
+      - {x: 53, y: 4.05}
+      - {x: 56, y: 4.238}
+      - {x: 66, y: 4.992}
+      - {x: 69, y: 5.18}
+      - {x: 70, y: 5.33}
+      - {x: 74, y: 5.69}
+      - {x: 75, y: 6.16}
+      - {x: 79, y: 6.28}
+      - {x: 80, y: 6.4}
+      - {x: 87, y: 6.66}
+      - {x: 88, y: 6.79}
+      - {x: 91, y: 6.945}
+      - {x: 98, y: 7.41}
+      - {x: 99, y: 8.11}
+      - {x: 105, y: 8.465}
+      - {x: 110, y: 8.82}
+      - {x: 111, y: 9.24}
+      - {x: 115, y: 9.383}
+      - {x: 126, y: 10.1}
+      - {x: 127, y: 10.23}
+      - {x: 130, y: 10.381}
+      - {x: 138, y: 10.835}
+      - {x: 141, y: 10.986}
+      - {x: 147, y: 11.44}
+      - {x: 148, y: 11.97}
+      - {x: 150, y: 12.11}
+      - {x: 151, y: 12.24}
+      - {x: 161, y: 12.78}
+      - {x: 171, y: 13.68}
+      - {x: 172, y: 13.84}
+      - {x: 177, y: 14.17}
+      - {x: 180, y: 14.335}
+      - {x: 187, y: 14.83}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: 33d4b367d5d044e8a36138236eb308d2, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 7, y: 0.5}
+      - {x: 8, y: 1.18}
+      - {x: 12, y: 1.342}
+      - {x: 18, y: 1.666}
+      - {x: 22, y: 1.828}
+      - {x: 36, y: 2.801}
+      - {x: 39, y: 2.963}
+      - {x: 45, y: 3.287}
+      - {x: 48, y: 3.449}
+      - {x: 60, y: 4.26}
+      - {x: 61, y: 4.92}
+      - {x: 67, y: 5.237}
+      - {x: 77, y: 5.871}
+      - {x: 80, y: 6.029}
+      - {x: 88, y: 6.505}
+      - {x: 94, y: 6.98}
+      - {x: 95, y: 7.22}
+      - {x: 100, y: 7.598}
+      - {x: 103, y: 7.788}
+      - {x: 112, y: 8.355}
+      - {x: 118, y: 8.734}
+      - {x: 125, y: 9.112}
+      - {x: 134, y: 9.68}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: b2efca3fea6c4cc396366dc93d81cd5f, type: 3}
+      sync:
+      - {x: 0, y: 0.07}
+      - {x: 6, y: 0.785}
+      - {x: 10, y: 1.023}
+      - {x: 16, y: 1.5}
+      - {x: 17, y: 2.19}
+      - {x: 21, y: 2.473}
+      - {x: 25, y: 2.614}
+      - {x: 35, y: 3.32}
+      - {x: 36, y: 4.02}
+      - {x: 43, y: 4.573}
+      - {x: 49, y: 4.942}
+      - {x: 57, y: 5.496}
+      - {x: 60, y: 5.68}
+      - {x: 61, y: 6.37}
+      - {x: 69, y: 6.987}
+      - {x: 72, y: 7.192}
+      - {x: 79, y: 7.809}
+      - {x: 83, y: 8.22}
+      - {x: 84, y: 8.68}
+      - {x: 87, y: 8.925}
+      - {x: 93, y: 9.66}
+      - {x: 94, y: 10.15}
+      - {x: 100, y: 10.527}
+      - {x: 107, y: 10.904}
+      - {x: 115, y: 11.47}
+      - {x: 116, y: 12.15}
+      - {x: 119, y: 12.338}
+      - {x: 128, y: 12.9}
   - questionText: 'Kahit humupa na ang sakuna, may basag na salamin na humaharang sa iyong daraanan. Kailangan mong maingat na alisin ang mga basag na salamin. Ano ang unang-unang dapat mong isuot sa iyong mga kamay?'
     correctAnswerItemNames:
     - Gloves
     correctFeedback: 'Tama! Napakatibay ng mga heavy-duty gloves! Nagsisilbi itong pangbalot sa iyong mga kamay para hindi ka masugatan ng mga matutulis na salamin, kalawanging pako, o magagaspang na semento habang nililinis mo ang iyong daraanan.'
     incorrectFeedback: 'Huwag na huwag mong hahawakan ang mga kalat mula sa sakuna gamit ang iyong mga kamay nang walang proteksyon! Kahit mag-ingat ka pa, ang mga nakatagong bubog o kalawanging bakal ay maaaring magdulot ng malubhang sugat. Laging protektahan muna ang iyong mga kamay!'
-    questionVoice: {fileID: 8300000, guid: 27087084a2a74e478f3d4d9d468a3b5b, type: 3}
-    correctFeedbackVoice: {fileID: 8300000, guid: 2dd2f68a9f234122a33bb06d40b48eea, type: 3}
-    incorrectFeedbackVoice: {fileID: 8300000, guid: 61cd25e529b149278b2ad4caefddd7b1, type: 3}
+    questionVoice:
+      clip: {fileID: 8300000, guid: 27087084a2a74e478f3d4d9d468a3b5b, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 6, y: 0.426}
+      - {x: 13, y: 0.945}
+      - {x: 16, y: 1.118}
+      - {x: 20, y: 1.291}
+      - {x: 27, y: 1.81}
+      - {x: 28, y: 2.51}
+      - {x: 32, y: 2.663}
+      - {x: 38, y: 2.968}
+      - {x: 41, y: 3.121}
+      - {x: 49, y: 3.578}
+      - {x: 52, y: 3.731}
+      - {x: 63, y: 4.342}
+      - {x: 66, y: 4.494}
+      - {x: 72, y: 4.799}
+      - {x: 81, y: 5.41}
+      - {x: 82, y: 6.09}
+      - {x: 92, y: 6.706}
+      - {x: 96, y: 6.86}
+      - {x: 97, y: 6.99}
+      - {x: 104, y: 7.36}
+      - {x: 105, y: 8.06}
+      - {x: 108, y: 8.221}
+      - {x: 115, y: 8.703}
+      - {x: 119, y: 8.864}
+      - {x: 123, y: 9.025}
+      - {x: 129, y: 9.347}
+      - {x: 132, y: 9.508}
+      - {x: 140, y: 9.99}
+      - {x: 141, y: 10.68}
+      - {x: 145, y: 11.016}
+      - {x: 149, y: 11.184}
+      - {x: 161, y: 11.856}
+      - {x: 167, y: 12.192}
+      - {x: 171, y: 12.36}
+      - {x: 172, y: 12.5}
+      - {x: 178, y: 13.043}
+      - {x: 181, y: 13.224}
+      - {x: 187, y: 13.587}
+      - {x: 191, y: 13.768}
+      - {x: 197, y: 14.13}
+    correctFeedbackVoice:
+      clip: {fileID: 8300000, guid: 2dd2f68a9f234122a33bb06d40b48eea, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 5, y: 0.51}
+      - {x: 6, y: 1.2}
+      - {x: 18, y: 2.117}
+      - {x: 21, y: 2.3}
+      - {x: 25, y: 2.483}
+      - {x: 36, y: 3.033}
+      - {x: 43, y: 3.4}
+      - {x: 44, y: 4.08}
+      - {x: 55, y: 4.689}
+      - {x: 61, y: 4.994}
+      - {x: 71, y: 5.451}
+      - {x: 74, y: 5.604}
+      - {x: 80, y: 5.908}
+      - {x: 84, y: 6.061}
+      - {x: 90, y: 6.365}
+      - {x: 94, y: 6.67}
+      - {x: 95, y: 7.28}
+      - {x: 101, y: 7.615}
+      - {x: 104, y: 7.783}
+      - {x: 114, y: 8.454}
+      - {x: 117, y: 8.621}
+      - {x: 121, y: 8.789}
+      - {x: 131, y: 9.459}
+      - {x: 134, y: 9.627}
+      - {x: 142, y: 10.13}
+      - {x: 143, y: 10.72}
+      - {x: 155, y: 11.38}
+      - {x: 160, y: 11.71}
+      - {x: 161, y: 12.41}
+      - {x: 163, y: 12.574}
+      - {x: 175, y: 13.23}
+      - {x: 178, y: 13.393}
+      - {x: 186, y: 13.885}
+      - {x: 193, y: 14.213}
+      - {x: 203, y: 14.869}
+      - {x: 206, y: 15.033}
+      - {x: 210, y: 15.197}
+      - {x: 216, y: 15.524}
+      - {x: 225, y: 16.18}
+    incorrectFeedbackVoice:
+      clip: {fileID: 8300000, guid: 61cd25e529b149278b2ad4caefddd7b1, type: 3}
+      sync:
+      - {x: 0, y: 0.08}
+      - {x: 6, y: 0.396}
+      - {x: 9, y: 0.554}
+      - {x: 15, y: 0.869}
+      - {x: 20, y: 1.027}
+      - {x: 30, y: 1.659}
+      - {x: 34, y: 1.816}
+      - {x: 38, y: 1.974}
+      - {x: 43, y: 2.29}
+      - {x: 44, y: 2.78}
+      - {x: 49, y: 3.113}
+      - {x: 52, y: 3.279}
+      - {x: 59, y: 3.779}
+      - {x: 65, y: 4.112}
+      - {x: 69, y: 4.279}
+      - {x: 75, y: 4.612}
+      - {x: 79, y: 4.778}
+      - {x: 85, y: 5.111}
+      - {x: 90, y: 5.277}
+      - {x: 97, y: 5.611}
+      - {x: 108, y: 6.11}
+      - {x: 109, y: 6.81}
+      - {x: 115, y: 7.193}
+      - {x: 125, y: 7.767}
+      - {x: 128, y: 7.959}
+      - {x: 131, y: 8.15}
+      - {x: 132, y: 8.63}
+      - {x: 136, y: 8.8}
+      - {x: 140, y: 8.97}
+      - {x: 151, y: 9.65}
+      - {x: 156, y: 9.99}
+      - {x: 157, y: 10.56}
+      - {x: 159, y: 10.719}
+      - {x: 171, y: 11.355}
+      - {x: 177, y: 11.673}
+      - {x: 180, y: 11.832}
+      - {x: 189, y: 12.469}
+      - {x: 198, y: 12.946}
+      - {x: 201, y: 13.105}
+      - {x: 211, y: 13.582}
+      - {x: 217, y: 13.9}
+      - {x: 218, y: 14.4}
+      - {x: 225, y: 14.803}
+      - {x: 237, y: 15.609}
+      - {x: 242, y: 16.011}
+      - {x: 246, y: 16.213}
+      - {x: 252, y: 16.616}
+      - {x: 256, y: 16.817}
+      - {x: 262, y: 17.22}

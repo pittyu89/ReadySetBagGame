@@ -128,6 +128,10 @@ public class QuizManager : MonoBehaviour
              "which is a comfortable pace for thirty words of Filipino. Nothing is waiting " +
              "on it — the timer is stopped by this point — so err on the generous side.")]
     [SerializeField] private float feedbackReadSeconds = 6f;
+    [Tooltip("The same hold for a line that was read aloud. The text finishes typing as " +
+             "the voice finishes speaking, so the player has already heard it through and " +
+             "only needs a beat before the round moves on.")]
+    [SerializeField] private float voicedFeedbackHoldSeconds = 1.5f;
 
     [Header("Minigames")]
     [Tooltip("Runs after the water bottle question, whether the answer was right or wrong.")]
@@ -360,6 +364,8 @@ public class QuizManager : MonoBehaviour
     private AudioSource voiceSource;
     // Set while the pause menu is holding the voice, so a held line still counts as unfinished
     private bool voicePaused;
+    // Set while the music is turned down under the voice
+    private bool musicDucked;
 
     // The onboarding's practice quiz: one question, nothing timed, nothing scored or uploaded
     private bool practiceQuiz = false;
@@ -845,9 +851,10 @@ public class QuizManager : MonoBehaviour
 
         UpdateQuestionTimerDisplay(questionTimeLeft);
 
-        PlayVoice(index < randomizedQuestions.Count ? randomizedQuestions[index].questionVoice : null);
+        VoiceLine voice = index < randomizedQuestions.Count ? randomizedQuestions[index].questionVoice : default;
+        PlayVoice(voice);
 
-        typewriterRoutine = StartCoroutine(TypeQuestion(text, true));
+        typewriterRoutine = StartCoroutine(TypeQuestion(text, true, voice));
     }
 
     /// <summary>
@@ -1179,8 +1186,12 @@ public class QuizManager : MonoBehaviour
     ///
     /// <paramref name="startTimerWhenDone"/> is set for a question and left alone for the
     /// feedback that follows one, which is read at leisure with nothing counting down.
+    ///
+    /// A line being read aloud (<paramref name="voice"/>) is typed in step with the voice:
+    /// each frame shows as much of the text as the recording has reached, so the two stay
+    /// together through pauses, hitches and the pause menu.
     /// </summary>
-    private IEnumerator TypeQuestion(string text, bool startTimerWhenDone = false)
+    private IEnumerator TypeQuestion(string text, bool startTimerWhenDone = false, VoiceLine voice = default)
     {
         if (questionText == null)
             yield break;
@@ -1194,10 +1205,21 @@ public class QuizManager : MonoBehaviour
 
         int total = questionText.textInfo.characterCount;
 
-        for (int i = 1; i <= total; i++)
+        if (voice.HasClip && IsVoiceSpeaking && voiceSource.clip == voice.clip)
         {
-            questionText.maxVisibleCharacters = i;
-            yield return new WaitForSecondsRealtime(typewriterCharDelay);
+            while (IsVoiceSpeaking && voiceSource.clip == voice.clip)
+            {
+                questionText.maxVisibleCharacters = voice.CharsAt(voiceSource.time, total);
+                yield return null;
+            }
+        }
+        else
+        {
+            for (int i = 1; i <= total; i++)
+            {
+                questionText.maxVisibleCharacters = i;
+                yield return new WaitForSecondsRealtime(typewriterCharDelay);
+            }
         }
 
         questionText.maxVisibleCharacters = int.MaxValue;
@@ -1301,11 +1323,13 @@ public class QuizManager : MonoBehaviour
         // way the question was. It waits until the scrim has cleared, or the explanation
         // would be spelling itself out behind a blur nobody can read.
         string feedback = GetFeedback(answerBoxIndex, isCorrect);
+        VoiceLine feedbackVoice = default;
         bool hasFeedback = !string.IsNullOrEmpty(feedback) && questionText != null;
         if (hasFeedback)
         {
-            PlayVoice(GetFeedbackVoice(answerBoxIndex, isCorrect));
-            typewriterRoutine = StartCoroutine(TypeQuestion(feedback));
+            feedbackVoice = GetFeedbackVoice(answerBoxIndex, isCorrect);
+            PlayVoice(feedbackVoice);
+            typewriterRoutine = StartCoroutine(TypeQuestion(feedback, false, feedbackVoice));
             yield return typewriterRoutine;
         }
 
@@ -1319,7 +1343,7 @@ public class QuizManager : MonoBehaviour
         }
         else if (hasFeedback)
         {
-            yield return new WaitForSecondsRealtime(feedbackReadSeconds);
+            yield return new WaitForSecondsRealtime(feedbackVoice.HasClip ? voicedFeedbackHoldSeconds : feedbackReadSeconds);
 
             // A voiced line is heard out to the end before the round moves on
             while (IsVoiceSpeaking)
@@ -1442,25 +1466,26 @@ public class QuizManager : MonoBehaviour
         return string.IsNullOrEmpty(text) ? string.Empty : text;
     }
 
-    /// <summary>The voice-over for <see cref="GetFeedback"/>'s line, or null if it has none.</summary>
-    private AudioClip GetFeedbackVoice(int answerBoxIndex, bool isCorrect)
+    /// <summary>The voice-over for <see cref="GetFeedback"/>'s line; empty if it has none.</summary>
+    private VoiceLine GetFeedbackVoice(int answerBoxIndex, bool isCorrect)
     {
         if (answerBoxIndex < 0 || answerBoxIndex >= randomizedQuestions.Count)
-            return null;
+            return default;
 
         QuestionData q = randomizedQuestions[answerBoxIndex];
         return isCorrect ? q.correctFeedbackVoice : q.incorrectFeedbackVoice;
     }
 
     /// <summary>
-    /// Reads a line aloud, cutting off whatever was being read before. A null clip just
-    /// silences the voice, so an unvoiced line doesn't carry on with the last one's.
+    /// Reads a line aloud, cutting off whatever was being read before, and turns the music
+    /// down under it. A line without a clip just silences the voice, so an unvoiced line
+    /// doesn't carry on with the last one's.
     /// </summary>
-    private void PlayVoice(AudioClip clip)
+    private void PlayVoice(VoiceLine line)
     {
         StopVoice();
 
-        if (clip == null)
+        if (!line.HasClip)
             return;
 
         if (voiceSource == null)
@@ -1474,8 +1499,9 @@ public class QuizManager : MonoBehaviour
                 SoundManager.Instance.RegisterSFXSource(voiceSource);
         }
 
-        voiceSource.clip = clip;
+        voiceSource.clip = line.clip;
         voiceSource.Play();
+        SetMusicDucked(true);
     }
 
     private void StopVoice()
@@ -1484,6 +1510,19 @@ public class QuizManager : MonoBehaviour
 
         if (voiceSource != null)
             voiceSource.Stop();
+
+        SetMusicDucked(false);
+    }
+
+    private void SetMusicDucked(bool ducked)
+    {
+        if (musicDucked == ducked)
+            return;
+
+        musicDucked = ducked;
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.SetMusicDucked(ducked);
     }
 
     /// <summary>True while a line is being read, or is held part-way by the pause menu.</summary>
@@ -1497,6 +1536,10 @@ public class QuizManager : MonoBehaviour
     {
         if (voiceSource == null)
             return;
+
+        // The line has been read through: bring the music back up
+        if (musicDucked && !IsVoiceSpeaking)
+            SetMusicDucked(false);
 
         if (Time.timeScale == 0f)
         {
