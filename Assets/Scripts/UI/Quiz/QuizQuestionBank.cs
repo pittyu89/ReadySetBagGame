@@ -20,6 +20,12 @@ public struct QuestionData
     public string correctFeedback;
     [TextArea(2, 6)]
     public string incorrectFeedback;
+
+    // Voice-over read out alongside each line above. Optional: a line with no clip is
+    // just typed out in silence.
+    public AudioClip questionVoice;
+    public AudioClip correctFeedbackVoice;
+    public AudioClip incorrectFeedbackVoice;
 }
 
 /// <summary>

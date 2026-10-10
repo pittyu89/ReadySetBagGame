@@ -13,192 +13,165 @@ MonoBehaviour:
   m_Name: QuizQuestionBank
   m_EditorClassIdentifier: Assembly-CSharp::QuizQuestionBank
   questions:
-  - questionText: Nawalan ng kuryente dahil sa lindol at sobrang dilim ng paligid.
-      Anong gamit ang magbibigay ng ligtas na liwanag upang makakita sa dilim?
+  - questionText: 'Nawalan ng kuryente dahil sa sakuna at sobrang dilim ng paligid. Anong gamit ang magbibigay ng ligtas na liwanag upang makakita sa dilim?'
     correctAnswerItemNames:
     - Small Flashlight
     - Big Flashlight
-    correctFeedback: Tama! Ang flashlight ang nagbibigay ng matinding liwanag upang
-      makakita sa dilim.
-    incorrectFeedback: Mahalaga ang flashlight! Kapag nagka-blackout matapos ang
-      lindol, ito ang pangunahing ligtas na gabay upang makakita sa paligid na madilim.
-  - questionText: Bumagsak ang pader at naipit ka sa loob ng silid. Paos ka na sa
-      kakasigaw at nauubusan ng hangin. Anong gamit ang lilikha ng matinis at malakas
-      na tunog upang marinig ka ng search and rescue team?
+    correctFeedback: 'Tama! Ang flashlight ang nagbibigay ng matinding liwanag upang makakita sa dilim.'
+    incorrectFeedback: 'Mahalaga ang flashlight! Kapag nagka-blackout matapos ang sakuna, ito ang pangunahing ligtas na gabay upang makakita sa paligid na madilim.'
+    questionVoice: {fileID: 8300000, guid: ae77dc566fa74ac9939f54141b5fcf0a, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: c168317a17b04ed88461765a851c7399, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 904e763844e340beaa01c8a43af83079, type: 3}
+  - questionText: 'Bumagsak ang pader at naipit ka sa loob ng silid. Paos ka na sa kakasigaw at nauubusan ng hangin. Anong gamit ang lilikha ng matinis at malakas na tunog upang marinig ka ng search and rescue team?'
     correctAnswerItemNames:
     - Whistle
-    correctFeedback: Tumpak! Mas malayo ang nararating ng tunog ng pito kaysa sa
-      boses, at hindi ka mauubusan ng lakas habang naghihintay ng tulong.
-    incorrectFeedback: Dapat may pito ka! Ang pito ang pinakamabisang gamit pantawag
-      ng rescuer nang hindi nauubos ang iyong hininga.
-  - questionText: May galos at sugat ka sa braso mula sa gumuhong pader. Anong gamit
-      mula sa go-bag ang naglalaman ng sterile gauze at plaster upang ibendahe ang
-      sugat at mapigilan ang pagdurugo at dumi?
+    correctFeedback: 'Tumpak! Mas malayo ang nararating ng tunog ng pito kaysa sa boses, at hindi ka mauubusan ng lakas habang naghihintay ng tulong.'
+    incorrectFeedback: 'Dapat may pito ka! Ang pito ang pinakamabisang gamit pantawag ng rescuer nang hindi nauubos ang iyong hininga.'
+    questionVoice: {fileID: 8300000, guid: ff95fe22ee90498cbc026fc8559250f8, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: 086c2b4ea74e4b179ebbf893ac41a02e, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: b8112b4309504f308ffe816338162b3d, type: 3}
+  - questionText: 'May galos at sugat ka sa braso mula sa gumuhong pader. Anong gamit mula sa go-bag ang naglalaman ng sterile gauze at plaster upang takpan ang sugat at mapigilan ang pagdurugo at dumi?'
     correctAnswerItemNames:
     - First Aid Kit
-    correctFeedback: Tama! Ang First Aid Kit ang nagbibigay ng agarang proteksyon
-      sa sugat upang hindi ito mapasukan ng dumi o ma-impeksyon.
-    incorrectFeedback: Dapat may first aid kit! Ito ang kumpletong kagamitan sa pagbendahe
-      ng sugat habang naghihintay ng medic.
-  - questionText: Nakalabas ka na sa open field ngunit naputol ang linya ng tubig
-      sa gripo dahil sa lindol. Tuyong-tuyo ang lalamunan mo at may galos ka na napasukan
-      ng maruming buhangin. Anong gamit ang kailangan upang ligtas na makainom at
-      mahugasan ang dumi sa sugat?
+    correctFeedback: 'Tama! Ang First Aid Kit ang nagbibigay ng agarang proteksyon sa sugat upang hindi ito mapasukan ng dumi o ma-impeksyon.'
+    incorrectFeedback: 'Dapat may first aid kit! Ito ang kumpletong kagamitan sa paggamot ng sugat habang naghihintay ng medic.'
+    questionVoice: {fileID: 8300000, guid: 185be7cea7ea4fae8c7da502613860fb, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: ee023549c44a437ebdf581270516ea9c, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 39d2d524ff854ee08bd9556a39b4fde5, type: 3}
+  - questionText: 'Nakalabas ka na sa open field ngunit naputol ang linya ng tubig sa gripo dahil sa sakuna. Tuyong-tuyo ang lalamunan mo at may galos ka na napasukan ng maruming buhangin. Anong gamit ang kailangan upang ligtas na makainom at mahugasan ang dumi sa sugat?'
     correctAnswerItemNames:
     - Water Bottle
-    correctFeedback: Magaling! Ang malinis na nakaboteng tubig ang numero unong kailangan
-      para sa hydration at paglilinis ng sugat kapag bagsak ang water supply.
-    incorrectFeedback: Laging unahin ang tubig! Sa lindol, pumuputok ang mga tubo
-      sa ilalim ng lupa. Ang nakaimbak na malinis na tubig ang bubuhay sa iyo sa
-      72 oras.
-  - questionText: Kasunod ng malakas na pagyanig, gumuho ang kisame at napuno ng
-      makapal na alikabok at pinong semento ang daanan. Anong gamit ang dapat mong
-      isuot agad upang hindi malanghap ang mapanganib na alikabok habang lumilikas?
+    correctFeedback: 'Magaling! Ang malinis na nakaboteng tubig ang numero unong kailangan para sa hydration at paglilinis ng sugat kapag bagsak ang water supply.'
+    incorrectFeedback: 'Laging unahin ang tubig! Sa panahon ng sakuna, maaring maging limitado ang supply ng tubig.'
+    questionVoice: {fileID: 8300000, guid: 74ce3e43dc7b48e482b97cc36e72ef4b, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: 548ec6e6089042d1973de6dcf6f0a5e7, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: d502594e050a4e4f8106b0fe1af4d682, type: 3}
+  - questionText: 'Kasunod ng matinding sakuna, gumuho ang kisame at napuno ng makapal na alikabok at pinong semento ang daanan. Anong gamit ang dapat mong isuot agad upang hindi malanghap ang mapanganib na alikabok habang lumilikas?'
     correctAnswerItemNames:
     - N95 Mask
-    correctFeedback: Magaling! Sinasala ng N95 mask ang mapanganib na alikabok at
-      pinong semento upang maprotektahan ang iyong baga habang lumalabas ng gumuhong
-      gusali.
-    incorrectFeedback: Tandaan ito! Pagkatapos ng lindol, makapal ang alikabok ng
-      semento. Ang N95 mask ang kailangan upang makahinga nang ligtas at maiwasan
-      ang hirap sa paghinga.
-  - questionText: Nadurog ng gumuhong pader ang iyong flashlight, at may naaamoy
-      kang tumatagas na gas kaya bawal magsindi ng apoy. Anong ligtas na ilaw na
-      hindi kailangan ng baterya o apoy ang maaari mong gamitin sa dilim?
+    correctFeedback: 'Magaling! Sinasala ng N95 mask ang mapanganib na alikabok at pinong semento upang maprotektahan ang iyong baga habang lumilikas.'
+    incorrectFeedback: 'Tandaan ito! Pagkatapos ng sakuna, makapal ang alikabok ng semento. Ang N95 mask ang kailangan upang makahinga nang ligtas at maiwasan ang hirap sa paghinga.'
+    questionVoice: {fileID: 8300000, guid: 8f56160d86044fcbbf38da9b4856c50c, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: d6cc213282324e498ffe7b524cd51fb4, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 122fbe73c7b44aa8b49a5a404c115368, type: 3}
+  - questionText: 'Nadurog ng gumuhong pader ang iyong flashlight, at may naaamoy kang tumatagas na gas kaya bawal magsindi ng apoy. Anong ligtas na ilaw na hindi kailangan ng baterya o apoy ang maaari mong gamitin sa dilim?'
     correctAnswerItemNames:
     - Glow Sticks
-    correctFeedback: Tama! Ang glow stick ay nagbibigay ng liwanag nang walang baterya
-      o apoy, kaya ligtas itong gamitin kahit may tagas ng gas.
-    incorrectFeedback: Isama ang glow stick! Ito ang alternatibong ilaw kapag hindi
-      na magamit ang iyong flashlight sa dilim, at hindi ito nangangailangan ng baterya
-      o apoy.
-  - questionText: Maiihip ng malakas na hangin ang inyong tent sa evacuation site.
-      Anong matibay na kagamitan ang gagamitin upang itali ito nang maayos sa puno
-      o poste?
+    correctFeedback: 'Tama! Ang glow stick ay nagbibigay ng liwanag nang walang baterya o apoy, kaya ligtas itong gamitin.'
+    incorrectFeedback: 'Isama ang glow stick! Ito ang alternatibong ilaw kapag hindi na magamit ang iyong flashlight sa dilim, at hindi ito nangangailangan ng baterya o apoy.'
+    questionVoice: {fileID: 8300000, guid: 310fc26b755e48e5ac4ed0dca8116d38, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: f34ccdb6d4f84defb3f7cfa0130f2905, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 8fd4b706cc544fd285b2a83107f4dae2, type: 3}
+  - questionText: 'Maiihip ng malakas na hangin ang inyong tent sa evacuation site. Anong matibay na kagamitan ang gagamitin upang itali ito nang maayos sa puno o poste?'
     correctAnswerItemNames:
     - Rope
-    correctFeedback: Tama! Ang 7-meter rope ay matibay na pantali sa pagtatayo ng
-      shelter at pag-secure ng mga gamit sa panahon ng kalamidad.
-    incorrectFeedback: Kailangan ang lubid! Ito ang humahawak sa mga tent at pansamantalang
-      shelter kapag walang matirhan matapos gumuho ang mga bahay at gusali.
-  - questionText: Kailangan mo ng kagamitan upang makapagputol ng matigas na lubid.
-      Anong gamit ang mabilis na makakaputol nito?
+    correctFeedback: 'Tama! Ang 7-meter rope ay matibay na pantali sa pagtatayo ng shelter at pag-secure ng mga gamit sa panahon ng kalamidad.'
+    incorrectFeedback: 'Kailangan ang lubid! Ito ang humahawak sa mga tent at pansamantalang shelter kapag walang matirhan matapos gumuho ng mga bahay at gusali.'
+    questionVoice: {fileID: 8300000, guid: fcba7709d3124f179ba35661f108c541, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: a969548d7f4348888fe81ffca6a64412, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: bed08806bbed41a0881ada4ea53e1aac, type: 3}
+  - questionText: 'Kailangan mo ng kagamitan upang makapagputol ng matigas na lubid. Anong gamit ang mabilis na makakaputol nito?'
     correctAnswerItemNames:
     - Pocket Knife
-    correctFeedback: Magaling! Ang multi-tool o pocket knife ay maraming gamit para
-      sa pagputol ng lubid.
-    incorrectFeedback: Isama ang multi-tool o pocket knife! Napakahalaga nito sa
-      pagputol ng mga materyales habang nagtatayo ng proteksyon sa init at ulan.
-  - questionText: Dahil sa takot at alikabok ng lindol, inatake ng hika ang iyong
-      kapatid o tumaas ang alta presyon ng lola mo, at sarado ang lahat ng botika.
-      Anong gamit ang dapat nakahanda para sa kanilang tiyak na sakit?
+    correctFeedback: 'Magaling! Ang multi-tool o pocket knife ay maaaring magamit para sa pagputol ng lubid.'
+    incorrectFeedback: 'Isama ang multi-tool o pocket knife! Napakahalaga nito sa pagputol ng mga materyales habang nagtatayo ng proteksyon sa init at ulan.'
+    questionVoice: {fileID: 8300000, guid: 9b28d6ec55004ad0bccdfa640f6efed4, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: ffe4713c99a2458aa736cd69b515da11, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 06ea769f2c3f4523b51aedd0763773a5, type: 3}
+  - questionText: 'Dahil sa takot at alikabok dulot ng sakuna, inatake ng hika ang iyong kapatid o tumaas ang alta presyon ng lola mo, at sarado ang lahat ng botika. Anong gamit ang dapat nakahanda para sa kanilang tiyak na sakit?'
     correctAnswerItemNames:
     - Medication
-    correctFeedback: Mahusay! Ang sariling maintenance medicines ay hindi maibibigay
-      agad ng relief teams kaya dapat nakahanda ito sa go-bag.
-    incorrectFeedback: Huwag kalimutan ito! Ang personal na gamot sa hika o maintenance
-      ay kailangang laging nasa go-bag dahil sarado ang mga botika matapos ang lindol.
-  - questionText: Biglang bumuhos ang malakas na ulan sa evacuation center. Paano
-      mo poprotektahan ang iyong gamot, contact card, baterya, at N95 mask upang
-      hindi mabasa at masira ng tubig-ulan?
+    correctFeedback: 'Mahusay! Ang sariling maintenance medicines ay hindi maibibigay agad ng rescue teams kaya dapat nakahanda ito sa go-bag.'
+    incorrectFeedback: 'Ang personal na gamot sa hika o maintenance ay kailangang laging nasa go-bag dahil sarado ang mga botika pagtapos ng sakuna.'
+    questionVoice: {fileID: 8300000, guid: cc895a1eae88473bb00af7d0ec887e7f, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: c431c779fe394c33ac7173be947a4ac3, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: aca4803759004dc5b1ea7c6c66960ce3, type: 3}
+  - questionText: 'Biglang bumuhos ang malakas na ulan sa evacuation center. Paano mo poprotektahan ang iyong gamot, contact card, baterya, at N95 mask upang hindi mabasa at masira ng tubig-ulan?'
     correctAnswerItemNames:
     - Ziplock Bag
-    correctFeedback: Tama! Hindi pinapasok ng tubig ang nakasarang ziplock bag, kaya
-      napoprotektahan nito ang mga sensitibong gamit laban sa ulan.
-    incorrectFeedback: Mahalaga ang ziplock! Pinapanatili nitong tuyo at hindi madumi
-      ang mga gamit na madaling masira sa tubig o alikabok habang nasa evacuation
-      center.
-  - questionText: Gabi na at magdamag kayong matutulog sa malamig na semento ng evacuation
-      center dahil sa mga aftershock. Anong magaan at makintab na kumot ang tumutulong
-      mapanatili ang init ng iyong katawan?
+    correctFeedback: 'Tama! Hindi pinapasok ng tubig ang nakasarang ziplock bag, kaya napoprotektahan nito ang mga sensitibong gamit laban sa ulan.'
+    incorrectFeedback: 'Mahalaga ang ziplock! Pinapanatili nitong tuyo at hindi madumi ang mga gamit na madaling masira sa tubig o alikabok habang nasa evacuation center.'
+    questionVoice: {fileID: 8300000, guid: 6663ae7a9a4e4e8da8ed3b6dc51ec3b3, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: c4018b4c3c774c9e9e71cf32f938f57f, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 678a9a1c8a164095b6fe2be146fd6eca, type: 3}
+  - questionText: 'Gabi na at magdamag kayong matutulog sa malamig na semento ng evacuation center dahil sa sakuna. Anong magaan at makintab na kumot ang tumutulong mapanatili ang init ng iyong katawan?'
     correctAnswerItemNames:
     - Thermal Blanket
-    correctFeedback: Tama! Ang thermal foil blanket ay nagpapanatili ng init ng katawan
-      at pumipigil sa hypothermia kapag natutulog sa labas.
-    incorrectFeedback: Kailangan ang thermal blanket! Napakagaan nito ngunit mabisang
-      panlaban sa matinding lamig kapag bawal pumasok sa mga gusali dahil sa aftershocks.
-  - questionText: Basang-basa at puno ng maruming putik ang suot mong damit mula
-      sa paglikas sa gumuhong lugar. Ano ang dapat mong ipalit upang hindi magkasakit
-      at ginawin sa gabi?
+    correctFeedback: 'Tama! Ang thermal foil blanket ang nagpapanatili ng init ng katawan at pumipigil sa hypothermia kapag natutulog sa labas.'
+    incorrectFeedback: 'Kailangan ang thermal blanket! Mahalaga ito na mabisang panlaban sa matinding lamig kapag bawal pumasok sa mga gusali dahil sa sakuna.'
+    questionVoice: {fileID: 8300000, guid: bbc04570ddc344238b4bbaedca720d30, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: 3048cd97840847048ea206520bf2fbcd, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: ddc3da0d65e847d5bc255123f3daf676, type: 3}
+  - questionText: 'Basang-basa at puno putik ang suot mong damit mula sa paglikas sa gumuhong lugar. Ano ang dapat mong ipalit upang hindi magkasakit at ginawin sa gabi?'
     correctAnswerItemNames:
     - Spare Clothes
-    correctFeedback: Tama! Ang tuyong ekstrang damit ay nagpoprotekta laban sa pulmonya,
-      lagnat, at impeksyon sa balat sa evacuation shelter.
-    incorrectFeedback: Magbaon ng tuyong damit! Ang pagpapalit ng tuyong damit ay
-      nagliligtas sa iyo laban sa sakit.
-  - questionText: Ikalawang araw na matapos ang lindol; sarado ang mga palengke at
-      walang kuryente o gas para magluto. Anong pagkain ang ligtas at handang kainin
-      agad upang magbigay ng lakas?
+    correctFeedback: 'Tama! Ang tuyong ekstrang damit ay nagpoprotekta laban sa pulmonya, lagnat, at impeksyon sa balat sa evacuation shelter.'
+    incorrectFeedback: 'Magbaon ng tuyong damit! Ang pagpapalit ng tuyong damit ay nagliligtas sa iyo laban sa sakit.'
+    questionVoice: {fileID: 8300000, guid: 7dc0002053f245548c3eac0653c0a44d, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: 154246ea99bb448f9c941e547fe6203e, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 28d4d1b3a79d4e5c91fa7fe7632fe1b0, type: 3}
+  - questionText: 'Ikalawang araw na matapos ang sakuna; sarado ang mga palengke at walang kuryente o gas para magluto. Anong pagkain ang ligtas at handang kainin agad upang magbigay ng lakas?'
     correctAnswerItemNames:
     - Canned Corned Beef
     - Canned Fish
-    correctFeedback: Magaling! Ang easy-open canned goods ay nagbibigay ng agarang
-      protina at sustansya nang hindi nangangailangan ng kalan.
-    incorrectFeedback: Mahalaga ang de-lata! Nagtatagal ito nang walang refrigerator
-      at hindi nangangailangan ng pagluluto sa panahon ng kalamidad.
-  - questionText: Dumating ang mga opisyal ng barangay upang irehistro ang mga biktima
-      ng lindol para sa relief assistance at ayuda. Anong gamit ang magpapatunay
-      ng iyong pagkakakilanlan at pamilya?
+    correctFeedback: 'Magaling! Ang easy-open canned goods ay nagbibigay ng agarang protina at sustansya nang hindi na kailangan lutuin pa.'
+    incorrectFeedback: 'Mahalaga ang de-lata! Nagtatagal ito nang walang refrigerator at hindi nangangailangan pang iluto sa panahon ng kalamidad.'
+    questionVoice: {fileID: 8300000, guid: 715ddf3951f045e8bab94086e4e6821b, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: ebf54f5a16634374969b0d4bac709ba4, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: be4a517bb9c844b9868083a506c57620, type: 3}
+  - questionText: 'Dumating ang mga opisyal ng barangay upang irehistro ang mga biktima ng sakuna para sa relief assistance at ayuda. Anong gamit ang magpapatunay ng iyong pagkakakilanlan at ng iyong pamilya?'
     correctAnswerItemNames:
     - Important Documents
-    correctFeedback: Tama! Ang kopya ng birth certificate at iba pang dokumento ang
-      patunay ng pagkakakilanlan upang mapadali ang tulong at emergency aid.
-    incorrectFeedback: Isama ang mga dokumento! Kapag nawalan ng bahay dahil sa lindol,
-      ang kopya ng birth certificate ang magpapatunay sa inyong pamilya para sa tulong.
-  - questionText: Siksikan ang libu-libong lumikas sa evacuation area at marumi ang
-      paligid. Anong kit ang naglalaman ng sabon at toothbrush upang maiwasan ang
-      nakakahawang sakit at diarrhea?
+    correctFeedback: 'Tama! Ang kopya ng birth certificate at iba pang dokumento ang patunay ng pagkakakilanlan upang mapadali ang tulong at emergency aid.'
+    incorrectFeedback: 'Isama ang mga dokumento! Kapag nawalan ng bahay dahil sa sakuna, ang kopya ng birth certificate ang magpapatunay sa inyong pamilya para kaagaran na tulong.'
+    questionVoice: {fileID: 8300000, guid: c43298ca6620494493ad07f4f36f719a, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: fc585bbf8e214865ada8e01167aaf07a, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 61b5ea80ab14429a9f5dd3f4b4a29718, type: 3}
+  - questionText: 'Siksikan ang libu-libong lumikas sa evacuation area at marumi ang paligid. Anong kit ang naglalaman ng sabon at toothbrush upang maiwasan ang nakakahawang sakit at diarrhea?'
     correctAnswerItemNames:
     - Toiletries
-    correctFeedback: Tumpak! Ang toiletries kit ay panlaban sa diarrhea at mga mikrobyo
-      sa siksikang evacuation shelter.
-    incorrectFeedback: Dapat may hygiene kit! Sa gitna ng kalamidad, ang kalinisan
-      sa katawan ang humahadlang sa malawakang pagkalat ng sakit.
-  - questionText: Anong alternatibong gamit ang maaari mong gamitin upang makagawa
-      ng mapa papunta sa evacuation center kung sakaling hindi mo magamit ang iyong
-      telepono at walang signal?
+    correctFeedback: 'Tumpak! Ang toiletries kit ay mahalaga upang mapanatiling malinis ang sarili at malayo sa sakit or impeksyon.'
+    incorrectFeedback: 'Dapat may hygiene kit! Sa gitna ng kalamidad, ang kalinisan sa katawan ang humahadlang sa malawakang pagkalat ng sakit.'
+    questionVoice: {fileID: 8300000, guid: f7c079b0247c4d2bb5e731e3bbf6770e, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: 880107f6e6bf4a3684422e7f988695b0, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 1f78cece0aa246e29b016706f77e95a5, type: 3}
+  - questionText: 'Anong alternatibong gamit ang maaari mong gamitin upang makagawa ng mapa papunta sa evacuation center kung sakaling hindi mo magamit ang iyong telepono at walang signal?'
     correctAnswerItemNames:
     - Pen & Paper
-    correctFeedback: Tama! Ang panulat at papel ay ang bagay na pwede mong gamitin
-      upang makagawa ng mapa na maaari niyong gawing gabay sakaling kayo ay maligaw.
-    incorrectFeedback: Isama ito sa go-bag! Kapag walang kuryente at cellphone, maaari
-      mo itong gamitin na gabay at pangkomunikasyon.
-  - questionText: Naubusan ng baterya ang iyong cellphone at hindi mo na ito mabuksan.
-      Paano mo malalaman ang opisyal na numero ng Valenzuela CDRRMO at mga kamag-anak
-      upang humingi ng tulong?
+    correctFeedback: 'Tama! Ang panulat at papel ay ang bagay na pwede mong gamitin upang makagawa ng mapa na maaari niyong gawing gabay sakaling kayo ay maligaw.'
+    incorrectFeedback: 'Isama ito sa go-bag! Kapag walang kuryente at cellphone, maaari mo itong gamitin na gabay at pangkomunikasyon.'
+    questionVoice: {fileID: 8300000, guid: 2d14bddab0b648e197a8ef0ad833efa6, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: ee693af0f0b14bee8f0c3348241db54c, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 668b838b3ba04e87b59b8e89610165ba, type: 3}
+  - questionText: 'Naubusan ng baterya ang iyong cellphone at hindi mo na ito mabuksan. Paano mo malalaman ang opisyal na numero ng Valenzuela CDRRMO at mga kamag-anak upang humingi ng tulong?'
     correctAnswerItemNames:
     - Contact Card
-    correctFeedback: Tama! Ang nakasulat sa Contact Card ay napakahalaga at makatutulong
-      ito sa mga oras na kailangan ng tulong at sakuna pagkatapos ng lindol.
-    incorrectFeedback: Laging magbaon nito! Ang nakasulat na emergency numbers sa
-      papel ang sasagip sa iyo kapag walang baterya ang smartphone.
-  - questionText: Namatay na ang iyong radyo at flashlight dahil naubusan ng karga,
-      at nananatiling walang kuryente sa inyong barangay. Anong gamit ang kailangan
-      mo para mapagana ulit ang mga ito?
+    correctFeedback: 'Tama! Ang nakasulat sa Contact Card ay napakahalaga at makatutulong ito sa mga oras na kailangan ng tulong pagkatapos ng sakuna.'
+    incorrectFeedback: 'Laging magbaon nito! Ang nakasulat na emergency numbers sa papel ang sasagip sa iyo kapag walang baterya ang smartphone.'
+    questionVoice: {fileID: 8300000, guid: 8c8828fa87fb4fb89f3f0f0db6c6afd1, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: 408609a73e724dc890765bc36aa3601d, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 27de7b2c62264d889e45b3d297a4bc6d, type: 3}
+  - questionText: 'Namatay na ang iyong radyo at flashlight dahil naubusan ng karga, at nananatiling walang kuryente sa inyong lugar. Anong gamit ang kailangan mo para mapagana ulit ang mga ito?'
     correctAnswerItemNames:
     - Batteries
-    correctFeedback: Tama! Ang mga extra na baterya ay ang magsisilbing kuryente
-      upang patuloy na magamit ang radyo at flashlight sa oras ng emergency.
-    incorrectFeedback: Huwag kalimutan ang mga extra na baterya! Walang silbi ang
-      iyong radyo at flashlight kung wala itong power.
-  - questionText: Bagsak ang internet at cell signal sa buong siyudad, at kumakalat
-      ang fake news tungkol sa lindol. Anong gamit ang makakasagap ng opisyal na
-      balita at aftershock advisories mula sa PHIVOLCS?
+    correctFeedback: 'Tama! Ang mga extra na baterya ay ang magsisilbing kuryente upang patuloy na magamit ang radyo at flashlight sa oras ng sakuna.'
+    incorrectFeedback: 'Huwag kalimutan ang mga extra na baterya! Walang silbi ang iyong radyo at flashlight kung wala itong power.'
+    questionVoice: {fileID: 8300000, guid: 44c19b8a07a04a78b4b7319ed0c576f5, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: 3d7024dcda8f4c36adcba93295420848, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 904b1dc1ed844f40b5109350e138ff2f, type: 3}
+  - questionText: 'Bagsak ang internet at walang signal sa inyong lugar at kumakalat ang fake news tungkol sa sakuna. Anong gamit ang makakasagap ng opisyal na balita at emergency advisories ukol sa sakuna?'
     correctAnswerItemNames:
     - Radio
-    correctFeedback: Tumpak! Ang radyo ang pinakamatatag na linya ng komunikasyon
-      upang makasagap ng totoong balita mula sa gobyerno kapag walang internet.
-    incorrectFeedback: Isama ang radyo! Ito ang maaasahang paraan upang malaman ang
-      opisyal na babala ng PHIVOLCS kapag walang internet at kuryente.
-  - questionText: Tumigil na ang pagyanig, ngunit may basag na salamin na humaharang
-      sa iyong daraanan. Kailangan mong maingat na alisin ang mga basag na salamin.
-      Ano ang unang-unang dapat mong isuot sa iyong mga kamay?
+    correctFeedback: 'Tumpak! Ang radyo ang pinakamatatag na linya ng komunikasyon upang makasagap ng totoong balita mula sa gobyerno kapag walang internet.'
+    incorrectFeedback: 'Isama ang radyo! Ito ang maaasahang paraan upang malaman ang opisyal na babala ukol sa sakuna kapag walang kuryente at internet.'
+    questionVoice: {fileID: 8300000, guid: 26d84b90d25540a0a74f79ed41b2d398, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: 33d4b367d5d044e8a36138236eb308d2, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: b2efca3fea6c4cc396366dc93d81cd5f, type: 3}
+  - questionText: 'Kahit humupa na ang sakuna, may basag na salamin na humaharang sa iyong daraanan. Kailangan mong maingat na alisin ang mga basag na salamin. Ano ang unang-unang dapat mong isuot sa iyong mga kamay?'
     correctAnswerItemNames:
     - Gloves
-    correctFeedback: Tama! Napakatibay ng mga heavy-duty gloves! Nagsisilbi itong
-      pangbalot sa iyong mga kamay para hindi ka masugatan ng mga matutulis na salamin,
-      kalawanging pako, o magagaspang na semento habang nililinis mo ang iyong daraanan.
-    incorrectFeedback: Huwag na huwag mong hahawakan ang mga kalat mula sa lindol
-      gamit ang iyong mga kamay nang walang proteksyon! Kahit mag-ingat ka pa, ang
-      mga nakatagong bubog o kalawanging bakal ay maaaring magdulot ng malubhang
-      sugat. Laging protektahan muna ang iyong mga kamay!
+    correctFeedback: 'Tama! Napakatibay ng mga heavy-duty gloves! Nagsisilbi itong pangbalot sa iyong mga kamay para hindi ka masugatan ng mga matutulis na salamin, kalawanging pako, o magagaspang na semento habang nililinis mo ang iyong daraanan.'
+    incorrectFeedback: 'Huwag na huwag mong hahawakan ang mga kalat mula sa sakuna gamit ang iyong mga kamay nang walang proteksyon! Kahit mag-ingat ka pa, ang mga nakatagong bubog o kalawanging bakal ay maaaring magdulot ng malubhang sugat. Laging protektahan muna ang iyong mga kamay!'
+    questionVoice: {fileID: 8300000, guid: 27087084a2a74e478f3d4d9d468a3b5b, type: 3}
+    correctFeedbackVoice: {fileID: 8300000, guid: 2dd2f68a9f234122a33bb06d40b48eea, type: 3}
+    incorrectFeedbackVoice: {fileID: 8300000, guid: 61cd25e529b149278b2ad4caefddd7b1, type: 3}

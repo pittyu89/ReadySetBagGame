@@ -356,6 +356,11 @@ public class QuizManager : MonoBehaviour
     // Plays minigameTickingSFX. Made on first use and handed to the SFX bus.
     private AudioSource minigameTickingSource;
 
+    // Reads the question and its feedback aloud. Made on first use and handed to the SFX bus.
+    private AudioSource voiceSource;
+    // Set while the pause menu is holding the voice, so a held line still counts as unfinished
+    private bool voicePaused;
+
     // The onboarding's practice quiz: one question, nothing timed, nothing scored or uploaded
     private bool practiceQuiz = false;
 
@@ -452,11 +457,20 @@ public class QuizManager : MonoBehaviour
     {
         bool asking = dialogueBox != null && dialogueBox.activeSelf && !minigameRunning;
         FrameRateManager.SetStillScreen(this, asking);
+
+        UpdateVoicePause();
     }
 
     void OnDisable()
     {
         FrameRateManager.SetStillScreen(this, false);
+        StopVoice();
+    }
+
+    void OnDestroy()
+    {
+        if (voiceSource != null && SoundManager.Instance != null)
+            SoundManager.Instance.UnregisterSFXSource(voiceSource);
     }
 
     /// <summary>
@@ -830,6 +844,8 @@ public class QuizManager : MonoBehaviour
             questionTimerBar.Begin();
 
         UpdateQuestionTimerDisplay(questionTimeLeft);
+
+        PlayVoice(index < randomizedQuestions.Count ? randomizedQuestions[index].questionVoice : null);
 
         typewriterRoutine = StartCoroutine(TypeQuestion(text, true));
     }
@@ -1214,6 +1230,9 @@ public class QuizManager : MonoBehaviour
     {
         bool isCorrect = item != null && IsCorrectAnswer(answerBoxIndex, item.itemName);
 
+        // Answered: the question needn't be read out any further
+        StopVoice();
+
         // Nothing is being timed from here until the next question, so the bar comes down
         // rather than sitting frozen behind the verdict and the minigame that follows it.
         if (questionTimerBar != null)
@@ -1285,6 +1304,7 @@ public class QuizManager : MonoBehaviour
         bool hasFeedback = !string.IsNullOrEmpty(feedback) && questionText != null;
         if (hasFeedback)
         {
+            PlayVoice(GetFeedbackVoice(answerBoxIndex, isCorrect));
             typewriterRoutine = StartCoroutine(TypeQuestion(feedback));
             yield return typewriterRoutine;
         }
@@ -1300,11 +1320,18 @@ public class QuizManager : MonoBehaviour
         else if (hasFeedback)
         {
             yield return new WaitForSecondsRealtime(feedbackReadSeconds);
+
+            // A voiced line is heard out to the end before the round moves on
+            while (IsVoiceSpeaking)
+                yield return null;
         }
 
         currentQuestionIndex++;
 
         yield return new WaitForSecondsRealtime(postFeedbackDelay);
+
+        // Whatever is left of the line would talk over the minigame or the next question
+        StopVoice();
 
         if (answerBox != null)
             answerBox.ClearBox();
@@ -1413,6 +1440,77 @@ public class QuizManager : MonoBehaviour
         string text = isCorrect ? q.correctFeedback : q.incorrectFeedback;
 
         return string.IsNullOrEmpty(text) ? string.Empty : text;
+    }
+
+    /// <summary>The voice-over for <see cref="GetFeedback"/>'s line, or null if it has none.</summary>
+    private AudioClip GetFeedbackVoice(int answerBoxIndex, bool isCorrect)
+    {
+        if (answerBoxIndex < 0 || answerBoxIndex >= randomizedQuestions.Count)
+            return null;
+
+        QuestionData q = randomizedQuestions[answerBoxIndex];
+        return isCorrect ? q.correctFeedbackVoice : q.incorrectFeedbackVoice;
+    }
+
+    /// <summary>
+    /// Reads a line aloud, cutting off whatever was being read before. A null clip just
+    /// silences the voice, so an unvoiced line doesn't carry on with the last one's.
+    /// </summary>
+    private void PlayVoice(AudioClip clip)
+    {
+        StopVoice();
+
+        if (clip == null)
+            return;
+
+        if (voiceSource == null)
+        {
+            voiceSource = gameObject.AddComponent<AudioSource>();
+            voiceSource.loop = false;
+            voiceSource.playOnAwake = false;
+            voiceSource.spatialBlend = 0f;
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.RegisterSFXSource(voiceSource);
+        }
+
+        voiceSource.clip = clip;
+        voiceSource.Play();
+    }
+
+    private void StopVoice()
+    {
+        voicePaused = false;
+
+        if (voiceSource != null)
+            voiceSource.Stop();
+    }
+
+    /// <summary>True while a line is being read, or is held part-way by the pause menu.</summary>
+    private bool IsVoiceSpeaking => voiceSource != null && (voiceSource.isPlaying || voicePaused);
+
+    /// <summary>
+    /// Holds the voice while the game is paused and picks it up again after, the way the
+    /// minigame tick is held, rather than reading on behind the pause menu.
+    /// </summary>
+    private void UpdateVoicePause()
+    {
+        if (voiceSource == null)
+            return;
+
+        if (Time.timeScale == 0f)
+        {
+            if (voiceSource.isPlaying)
+            {
+                voiceSource.Pause();
+                voicePaused = true;
+            }
+        }
+        else if (voicePaused)
+        {
+            voicePaused = false;
+            voiceSource.UnPause();
+        }
     }
 
     /// <summary>
