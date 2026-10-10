@@ -35,9 +35,9 @@ public class BagRevealOverlay : MonoBehaviour
     public const int CharacterQueue = FirstBurstQueue + 10;
 
     // Burst sizes as multiples of the figure's height (character plus bag)
-    private const float RaysSize = 2.4f;
-    private const float ShadeSize = 3.6f;
-    private const float HaloSize = 2.1f;
+    private const float RaysSize = 1.7f;
+    private const float ShadeSize = 2.8f;
+    private const float HaloSize = 1.6f;
     private const float CoreSize = 1.25f;
     private const int SparkleCount = 16;
     // How far behind the character the burst sits, as a share of the figure's height
