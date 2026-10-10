@@ -27,15 +27,22 @@ public class BagPickupPose : MonoBehaviour
     /// Starts the pose on <paramref name="spriteObject"/>. <paramref name="bagSprite"/> is drawn
     /// with its bottom-centre at <paramref name="bagBottom"/> (units from the pose sprite's
     /// centre), fitted into a <paramref name="bagWorldSize"/> world-unit square with its real
-    /// proportions; pass null to show the pose on its own.
+    /// proportions; pass null to show the pose on its own. With a <paramref name="revealBagName"/>,
+    /// the full-screen "You got a ..." reveal (<see cref="BagRevealOverlay"/>) plays over it.
     /// </summary>
     public static BagPickupPose Play(GameObject spriteObject, Sprite poseSprite, Sprite bagSprite, Vector2 bagBottom,
-                                     float bagWorldSize, float duration, Action onFinished)
+                                     float bagWorldSize, float duration, Action onFinished, string revealBagName = null)
     {
         BagPickupPose pose = spriteObject.AddComponent<BagPickupPose>();
         pose.Begin(poseSprite, bagSprite, bagBottom, bagWorldSize, duration, onFinished);
+        if (!string.IsNullOrEmpty(revealBagName) && pose.spriteRenderer != null && pose.spriteRenderer.sprite != null)
+            pose.reveal = BagRevealOverlay.Show(pose.spriteRenderer.sprite, bagSprite, pose.revealBagRect, revealBagName, duration);
         return pose;
     }
+
+    private BagRevealOverlay reveal;
+    // Where the held bag's visible pixels sit, in pose-sprite pixels from the pose's pivot
+    private Rect revealBagRect;
 
     private void Begin(Sprite poseSprite, Sprite bagSprite, Vector2 bagBottom, float bagWorldSize,
                        float duration, Action onFinished)
@@ -200,6 +207,12 @@ public class BagPickupPose : MonoBehaviour
         float scaleX = worldScale / Mathf.Max(1e-5f, Mathf.Abs(parentScale.x));
         float scaleY = worldScale / Mathf.Max(1e-5f, Mathf.Abs(parentScale.y));
 
+        // The reveal draws the pose without the billboard's height stretch, so the bag keeps
+        // its proportions there and takes its size from the unstretched x axis
+        float ppu = spriteRenderer.sprite != null ? spriteRenderer.sprite.pixelsPerUnit : 100f;
+        Vector2 bagPixels = size * scaleX * ppu;
+        revealBagRect = new Rect(bottom.x * ppu - bagPixels.x * 0.5f, bottom.y * ppu, bagPixels.x, bagPixels.y);
+
         // Bottom-centre of the visible bag lands on the given point
         overlay.transform.localScale = new Vector3(scaleX, scaleY, scaleX);
         overlay.transform.localPosition = new Vector3(bottom.x - center.x * scaleX,
@@ -218,6 +231,9 @@ public class BagPickupPose : MonoBehaviour
 
     private void Finish()
     {
+        if (reveal != null)
+            Destroy(reveal.gameObject);
+
         if (bagOverlay != null)
             Destroy(bagOverlay);
 
@@ -244,6 +260,9 @@ public class BagPickupPose : MonoBehaviour
     {
         if (!countReleased)
             activeCount = Mathf.Max(0, activeCount - 1);
+
+        if (reveal != null)
+            Destroy(reveal.gameObject);
 
         if (trimmedPose != null)
         {
