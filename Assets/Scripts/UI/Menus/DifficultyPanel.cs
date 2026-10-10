@@ -66,6 +66,23 @@ public class DifficultyPanel : MonoBehaviour
     /// </summary>
     private static readonly string[] BagNames = { "Standard Backpack", "Roll-Top Waterproof Pack", "Tactical Modular Duffel" };
 
+    /// <summary>
+    /// Each bag's colour, in carousel order, for text naming it. Taken from the bag art, with
+    /// the Small bag's navy lifted so it still reads on a dark background.
+    /// </summary>
+    private static readonly Color32[] BagColors =
+    {
+        new Color32(0xF5, 0x8A, 0x3C, 0xFF),   // Standard: orange
+        new Color32(0x5C, 0x6E, 0xFF, 0xFF),   // Small: navy blue
+        new Color32(0xF2, 0xC2, 0x14, 0xFF),   // Medium: yellow
+    };
+
+    /// <summary>The colour of bag <paramref name="index"/>, or white if there's no such bag.</summary>
+    public static Color GetBagColor(int index)
+    {
+        return index >= 0 && index < BagColors.Length ? (Color)BagColors[index] : Color.white;
+    }
+
     /// <summary>The display name of bag <paramref name="index"/>, or empty if there's no such bag.</summary>
     public static string GetBagName(int index)
     {

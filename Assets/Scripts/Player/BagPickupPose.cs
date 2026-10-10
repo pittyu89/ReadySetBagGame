@@ -28,15 +28,19 @@ public class BagPickupPose : MonoBehaviour
     /// with its bottom-centre at <paramref name="bagBottom"/> (units from the pose sprite's
     /// centre), fitted into a <paramref name="bagWorldSize"/> world-unit square with its real
     /// proportions; pass null to show the pose on its own. With a <paramref name="revealBagName"/>,
-    /// the full-screen "You got a ..." reveal (<see cref="BagRevealOverlay"/>) plays over it.
+    /// the full-screen "You got a ..." reveal (<see cref="BagRevealOverlay"/>) plays over it,
+    /// with the name in <paramref name="revealBagColor"/>, and the pose is held until the
+    /// player taps it away rather than for <paramref name="duration"/>.
     /// </summary>
     public static BagPickupPose Play(GameObject spriteObject, Sprite poseSprite, Sprite bagSprite, Vector2 bagBottom,
-                                     float bagWorldSize, float duration, Action onFinished, string revealBagName = null)
+                                     float bagWorldSize, float duration, Action onFinished,
+                                     string revealBagName = null, Color revealBagColor = default)
     {
         BagPickupPose pose = spriteObject.AddComponent<BagPickupPose>();
         pose.Begin(poseSprite, bagSprite, bagBottom, bagWorldSize, duration, onFinished);
         if (!string.IsNullOrEmpty(revealBagName) && pose.spriteRenderer != null && pose.spriteRenderer.sprite != null)
-            pose.reveal = BagRevealOverlay.Show(pose.spriteRenderer.sprite, bagSprite, pose.revealBagRect, revealBagName, duration);
+            pose.reveal = BagRevealOverlay.Show(pose.spriteRenderer.sprite, bagSprite, pose.revealBagRect,
+                                                revealBagName, revealBagColor);
         return pose;
     }
 
@@ -225,7 +229,8 @@ public class BagPickupPose : MonoBehaviour
     {
         elapsed += Time.unscaledDeltaTime;
 
-        if (elapsed >= duration)
+        bool done = reveal != null ? reveal.IsDone : elapsed >= duration;
+        if (done)
             Finish();
     }
 

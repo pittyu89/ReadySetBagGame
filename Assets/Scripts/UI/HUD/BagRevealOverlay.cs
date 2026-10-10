@@ -5,10 +5,10 @@ using UnityEngine.UI;
 /// <summary>
 /// The full-screen "You got a Standard Bag" reveal shown while the character holds the go-bag
 /// overhead: a dark screen, warm light rays and sparkles behind the pickup pose drawn large,
-/// with the bag's name in orange above it.
+/// with the bag's name above it in the bag's own colour. It stays up until the player taps.
 ///
-/// Built entirely in code and owned by <see cref="BagPickupPose"/>, which destroys it when
-/// the pose ends. Runs on unscaled time because the game is paused meanwhile.
+/// Built entirely in code and owned by <see cref="BagPickupPose"/>, which ends the pose once
+/// <see cref="IsDone"/> and destroys it. Runs on unscaled time because the game is paused meanwhile.
 /// </summary>
 public class BagRevealOverlay : MonoBehaviour
 {
@@ -16,13 +16,15 @@ public class BagRevealOverlay : MonoBehaviour
     private static readonly Color RayColor = new Color(1f, 0.93f, 0.8f, 1f);
     private static readonly Color HaloColor = new Color(0.66f, 0.48f, 0.3f, 0.8f);
     private static readonly Color CoreColor = new Color(1f, 0.95f, 0.85f, 1f);
-    private const string BagNameColor = "#F58A3C";
+    private const string HintText = "Tap to continue";
 
     // Sizes in canvas units at the 1280x720 reference resolution
     private const float FigureHeight = 330f;
     private const float FigureOffsetY = -40f;
     private const float TitleGap = 14f;
     private const float TitleSize = 46f;
+    private const float HintSize = 30f;
+    private const float HintGap = 18f;
     private const float RaysSize = 780f;
     private const float HaloSize = 700f;
     private const float CoreSize = 360f;
@@ -31,6 +33,9 @@ public class BagRevealOverlay : MonoBehaviour
     private const float FadeIn = 0.18f;
     private const float FadeOut = 0.25f;
     private const float PopDuration = 0.4f;
+    // A tap this early is ignored, so the tap that walked the character onto the bag
+    // can't dismiss the reveal before it's been seen
+    private const float MinShowTime = 0.7f;
 
     private static Sprite raysSprite;
     private static Sprite glowSprite;
@@ -38,10 +43,15 @@ public class BagRevealOverlay : MonoBehaviour
     private CanvasGroup group;
     private RectTransform raysA, raysB, figure, title, core;
     private Image coreImage;
+    private TextMeshProUGUI hint;
     private Sparkle[] sparkles;
-    private float duration;
     private float elapsed;
     private float titleRestY;
+    private bool dismissing;
+    private float dismissedAt;
+
+    /// <summary>True once the player has tapped and the reveal has faded out.</summary>
+    public bool IsDone { get; private set; }
 
     private struct Sparkle
     {
@@ -61,21 +71,20 @@ public class BagRevealOverlay : MonoBehaviour
     }
 
     /// <summary>
-    /// Shows the reveal for <paramref name="duration"/> seconds. <paramref name="bagRect"/> is
-    /// where the bag's visible pixels sit, in pose-sprite pixels measured from the pose's pivot.
+    /// Shows the reveal until the player taps. <paramref name="bagRect"/> is where the bag's
+    /// visible pixels sit, in pose-sprite pixels measured from the pose's pivot.
     /// </summary>
-    public static BagRevealOverlay Show(Sprite poseSprite, Sprite bagSprite, Rect bagRect, string bagName, float duration)
+    public static BagRevealOverlay Show(Sprite poseSprite, Sprite bagSprite, Rect bagRect, string bagName, Color bagColor)
     {
         Prewarm();
 
         GameObject go = new GameObject("BagRevealOverlay", typeof(RectTransform));
         BagRevealOverlay overlay = go.AddComponent<BagRevealOverlay>();
-        overlay.duration = duration;
-        overlay.Build(poseSprite, bagSprite, bagRect, bagName);
+        overlay.Build(poseSprite, bagSprite, bagRect, bagName, bagColor);
         return overlay;
     }
 
-    private void Build(Sprite poseSprite, Sprite bagSprite, Rect bagRect, string bagName)
+    private void Build(Sprite poseSprite, Sprite bagSprite, Rect bagRect, string bagName, Color bagColor)
     {
         Canvas canvas = gameObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -112,7 +121,8 @@ public class BagRevealOverlay : MonoBehaviour
 
         BuildSparkles(root, centre);
         float figureTop = BuildFigure(root, poseSprite, bagSprite, bagRect);
-        BuildTitle(root, bagName, figureTop);
+        BuildTitle(root, bagName, bagColor, figureTop);
+        BuildHint(root, FigureOffsetY - figure.sizeDelta.y * 0.5f);
     }
 
     /// <summary>The pose with the bag overhead, scaled up as one piece. Returns the top of it in canvas units.</summary>
@@ -166,7 +176,7 @@ public class BagRevealOverlay : MonoBehaviour
         rect.sizeDelta = pixels.size * scale;
     }
 
-    private void BuildTitle(RectTransform root, string bagName, float figureTop)
+    private void BuildTitle(RectTransform root, string bagName, Color bagColor, float figureTop)
     {
         GameObject go = new GameObject("Title", typeof(RectTransform));
         title = (RectTransform)go.transform;
@@ -177,16 +187,37 @@ public class BagRevealOverlay : MonoBehaviour
         titleRestY = figureTop + TitleGap;
         title.anchoredPosition = new Vector2(0f, titleRestY);
 
+        TextMeshProUGUI text = MakeText(go, TitleSize, TextAlignmentOptions.Bottom);
+        text.text = "You got a <color=#" + ColorUtility.ToHtmlStringRGB(bagColor) + ">" + bagName + "</color>";
+    }
+
+    private void BuildHint(RectTransform root, float figureBottom)
+    {
+        GameObject go = new GameObject("Hint", typeof(RectTransform));
+        RectTransform rect = (RectTransform)go.transform;
+        rect.SetParent(root, false);
+        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 1f);
+        rect.sizeDelta = new Vector2(800f, HintSize * 1.4f);
+        rect.anchoredPosition = new Vector2(0f, figureBottom - HintGap);
+
+        hint = MakeText(go, HintSize, TextAlignmentOptions.Top);
+        hint.text = HintText;
+        hint.alpha = 0f;
+    }
+
+    private static TextMeshProUGUI MakeText(GameObject go, float size, TextAlignmentOptions alignment)
+    {
         TextMeshProUGUI text = go.AddComponent<TextMeshProUGUI>();
         TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts/Jersey25-Regular SDF");
         if (font != null)
             text.font = font;
-        text.fontSize = TitleSize;
-        text.alignment = TextAlignmentOptions.Bottom;
+        text.fontSize = size;
+        text.alignment = alignment;
         text.color = Color.white;
         text.raycastTarget = false;
         text.textWrappingMode = TextWrappingModes.NoWrap;
-        text.text = "You got a <color=" + BagNameColor + ">" + bagName + "</color>";
+        return text;
     }
 
     private void BuildSparkles(RectTransform root, Vector2 centre)
@@ -214,10 +245,25 @@ public class BagRevealOverlay : MonoBehaviour
         elapsed += Time.unscaledDeltaTime;
         float t = elapsed;
 
+        // Touches arrive as mouse clicks too, so this covers taps, clicks and keys
+        if (!dismissing && t >= MinShowTime && Input.anyKeyDown)
+        {
+            dismissing = true;
+            dismissedAt = t;
+        }
+
         float fade = Mathf.Clamp01(t / FadeIn);
-        if (duration > 0f)
-            fade = Mathf.Min(fade, Mathf.Clamp01((duration - t) / FadeOut));
+        if (dismissing)
+        {
+            fade = Mathf.Min(fade, 1f - Mathf.Clamp01((t - dismissedAt) / FadeOut));
+            if (fade <= 0f)
+                IsDone = true;
+        }
         group.alpha = fade;
+
+        // The hint fades in once a tap will count, then pulses gently
+        float hintIn = Mathf.Clamp01((t - MinShowTime) / 0.3f);
+        hint.alpha = hintIn * (0.55f + 0.35f * Mathf.Sin((t - MinShowTime) * 3f));
 
         float pop = EaseOutBack(Mathf.Clamp01(t / PopDuration));
 

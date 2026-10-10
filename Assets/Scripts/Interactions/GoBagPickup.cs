@@ -33,10 +33,8 @@ public class GoBagPickup : MonoBehaviour
     [SerializeField] private Vector2 maleHeldBagBottom = new Vector2(0f, 9f);
 
     [Header("Reveal")]
-    [Tooltip("Show the full-screen \"You got a ...\" reveal over the pickup pose.")]
+    [Tooltip("Show the full-screen \"You got a ...\" reveal over the pickup pose. It stays up until the player taps.")]
     [SerializeField] private bool showReveal = true;
-    [Tooltip("How long the reveal stays up. The pose is held at least this long.")]
-    [SerializeField] private float revealDuration = 2.6f;
 
     private const string SELECTED_CHARACTER_SUFFIX = "_SelectedCharacter";
 
@@ -211,10 +209,10 @@ public class GoBagPickup : MonoBehaviour
             Sprite heldBag = GetHeldBagSprite();
             Vector2 bottom = (isMale ? maleHeldBagBottom : femaleHeldBagBottom) * pixel;
 
-            float duration = showReveal ? Mathf.Max(pickupPoseDuration, revealDuration) : pickupPoseDuration;
-            BagPickupPose.Play(playerAnimator.gameObject, pose, heldBag, bottom, bagWorldSize, duration,
+            int bag = DifficultyPanel.GetActiveGoBag();
+            BagPickupPose.Play(playerAnimator.gameObject, pose, heldBag, bottom, bagWorldSize, pickupPoseDuration,
                                () => FinishPickup(playerAnimator, isMale, movement),
-                               showReveal ? DifficultyPanel.GetBagName(DifficultyPanel.GetActiveGoBag()) : null);
+                               showReveal ? DifficultyPanel.GetBagName(bag) : null, DifficultyPanel.GetBagColor(bag));
         }
     }
 
