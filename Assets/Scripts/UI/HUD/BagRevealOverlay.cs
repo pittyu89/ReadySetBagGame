@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// The full-screen "You got a Standard Bag" reveal shown while the character holds the go-bag
-/// overhead: a dark screen, warm light rays and sparkles behind the pickup pose drawn large,
+/// overhead, over the game itself: warm light rays and sparkles behind the pickup pose drawn large,
 /// with the bag's name above it in the bag's own colour. It stays up until the player taps.
 ///
 /// Built entirely in code and owned by <see cref="BagPickupPose"/>, which ends the pose once
@@ -12,7 +12,6 @@ using UnityEngine.UI;
 /// </summary>
 public class BagRevealOverlay : MonoBehaviour
 {
-    private static readonly Color BackdropColor = new Color(0.02f, 0.02f, 0.02f, 1f);
     private static readonly Color RayColor = new Color(1f, 0.93f, 0.8f, 1f);
     private static readonly Color HaloColor = new Color(0.66f, 0.48f, 0.3f, 0.8f);
     private static readonly Color CoreColor = new Color(1f, 0.95f, 0.85f, 1f);
@@ -102,7 +101,9 @@ public class BagRevealOverlay : MonoBehaviour
 
         RectTransform root = (RectTransform)transform;
 
-        Image backdrop = MakeImage("Backdrop", root, null, BackdropColor);
+        // Invisible, so the game shows through, but it still catches the dismissing tap
+        // before it can reach the HUD underneath
+        Image backdrop = MakeImage("InputBlocker", root, null, Color.clear);
         backdrop.raycastTarget = true;
         RectTransform backdropRect = backdrop.rectTransform;
         backdropRect.anchorMin = Vector2.zero;
@@ -217,6 +218,9 @@ public class BagRevealOverlay : MonoBehaviour
         text.color = Color.white;
         text.raycastTarget = false;
         text.textWrappingMode = TextWrappingModes.NoWrap;
+        // With the game showing through, a dark edge keeps the words readable over busy rooms
+        text.outlineWidth = 0.22f;
+        text.outlineColor = new Color32(0, 0, 0, 220);
         return text;
     }
 
