@@ -39,7 +39,6 @@ public class DifficultyPanel : MonoBehaviour
     [SerializeField] private Image bagImage;
     [SerializeField] private TextMeshProUGUI bagNameText;
     [SerializeField] private Sprite[] bagSprites = new Sprite[] { };
-    [SerializeField] private string[] bagNames = new string[] { };
     [Tooltip("How long one bag takes to slide out while the next slides in.")]
     [SerializeField] private float bagSwapDuration = 0.45f;
     [SerializeField] private float bagSlideDistance = 110f;
@@ -60,6 +59,18 @@ public class DifficultyPanel : MonoBehaviour
     /// <summary>The bag the teacher picked for the current session. Kept apart from the
     /// player's own offline choice so a session doesn't overwrite it.</summary>
     public const string SESSION_GO_BAG_KEY = "SessionGoBag";
+
+    /// <summary>
+    /// The bags' display names, in carousel order. Kept in code rather than on the panel so
+    /// the game scene's pickup reveal can show the same names.
+    /// </summary>
+    private static readonly string[] BagNames = { "Standard Backpack", "Roll-Top Waterproof Pack", "Tactical Modular Duffel" };
+
+    /// <summary>The display name of bag <paramref name="index"/>, or empty if there's no such bag.</summary>
+    public static string GetBagName(int index)
+    {
+        return index >= 0 && index < BagNames.Length ? BagNames[index] : string.Empty;
+    }
 
     /// <summary>
     /// The bag this run uses (0 = Standard Backpack, 1 = Small = Roll-Top Waterproof Pack,
@@ -562,7 +573,7 @@ public class DifficultyPanel : MonoBehaviour
             bagImage.sprite = bagSprites[currentBagIndex];
 
         if (bagNameText != null)
-            bagNameText.text = currentBagIndex < bagNames.Length ? bagNames[currentBagIndex] : string.Empty;
+            bagNameText.text = GetBagName(currentBagIndex);
 
         // Read in the game scene by InventoryPanel and GoBagPickup
         PlayerPrefs.SetInt(SELECTED_GO_BAG_KEY, currentBagIndex);

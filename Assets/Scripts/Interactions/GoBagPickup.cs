@@ -37,9 +37,6 @@ public class GoBagPickup : MonoBehaviour
     [SerializeField] private bool showReveal = true;
     [Tooltip("How long the reveal stays up. The pose is held at least this long.")]
     [SerializeField] private float revealDuration = 2.6f;
-    [SerializeField] private string standardBagName = "Standard Bag";
-    [SerializeField] private string smallBagName = "Small Bag";
-    [SerializeField] private string mediumBagName = "Medium Bag";
 
     private const string SELECTED_CHARACTER_SUFFIX = "_SelectedCharacter";
 
@@ -217,7 +214,7 @@ public class GoBagPickup : MonoBehaviour
             float duration = showReveal ? Mathf.Max(pickupPoseDuration, revealDuration) : pickupPoseDuration;
             BagPickupPose.Play(playerAnimator.gameObject, pose, heldBag, bottom, bagWorldSize, duration,
                                () => FinishPickup(playerAnimator, isMale, movement),
-                               showReveal ? GetBagName() : null);
+                               showReveal ? DifficultyPanel.GetBagName(DifficultyPanel.GetActiveGoBag()) : null);
         }
     }
 
@@ -229,16 +226,6 @@ public class GoBagPickup : MonoBehaviour
             case SMALL_BAG: return smallBagSprite;
             case MEDIUM_BAG: return mediumBagSprite;
             default: return standardBagSprite;
-        }
-    }
-
-    private string GetBagName()
-    {
-        switch (DifficultyPanel.GetActiveGoBag())
-        {
-            case SMALL_BAG: return smallBagName;
-            case MEDIUM_BAG: return mediumBagName;
-            default: return standardBagName;
         }
     }
 
